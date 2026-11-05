@@ -1,140 +1,392 @@
+% =============================================================================
+%  Canonical manuscript source. Every result value is taken from
+%  paper/si_generated_tables.md / results/metrics (produced by `python reproduce_all.py`).
+%  Compile from the paper/ directory:  latexmk -pdf manuscript.tex
+% =============================================================================
 \documentclass[11pt,a4paper]{article}
 
-\usepackage[margin=1in]{geometry}
-\usepackage{amsmath,amssymb,amsfonts}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb}
 \usepackage{graphicx}
 \usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{array}
 \usepackage{tabularx}
-\usepackage{hyperref}
-\usepackage{natbib}
-\usepackage{microtype}
+\usepackage{caption}
+\usepackage{siunitx}
+\usepackage[round,authoryear]{natbib}
 \usepackage{authblk}
+\usepackage{xcolor}
+\usepackage{setspace}
+\usepackage[hidelinks]{hyperref}
 
-\title{\textbf{Physical Graph Attention Networks Grounded in Sub-Catchment Topography for Mountain Spring Desiccation Prediction in the Mid-Hills of Nepal}}
+\graphicspath{{../results/figures/}}
+\sisetup{detect-all, group-separator={,}, group-minimum-digits=4}
+\captionsetup{font=small, labelfont=bf}
+\newcommand{\todo}[1]{\textcolor{red}{[#1]}}
+\newcommand{\auc}{ROC-AUC}
+\onehalfspacing
+
+\title{\textbf{What predicts spring drying in the Nepal Mid-Hills?\\
+A leakage-audited spatial benchmark of tabular and graph models\\
+on 5,689 community-mapped springs}}
 
 \author[1,*]{Ashim Shrestha}
-\author[1,2]{Collaborating Researchers}
-\affil[1]{Department of Geomatics Engineering, Kathmandu University, Dhulikhel, Nepal}
-\affil[2]{Water Resources and Environmental Modeling Group}
-\affil[*]{Corresponding author: \texttt{ashim.shrestha@example.edu.np}}
-
-\date{\today}
+\author[2]{\todo{Co-authors}}
+\affil[1]{\todo{Affiliation}}
+\affil[2]{\todo{Affiliation}}
+\affil[*]{Corresponding author: \todo{email}}
+\date{}
 
 \begin{document}
-
 \maketitle
 
+% -----------------------------------------------------------------------------
 \begin{abstract}
-Mountain springs serve as the primary source of domestic water and agricultural irrigation for over 80\% of rural communities across the Mid-Hills of the Nepal Himalayas. However, rapid environmental change, tectonic deformation following the 2015 $M_w 7.8$ Gorkha earthquake, and erratic monsoon patterns have triggered widespread spring desiccation, threatening rural water security. While machine learning has been increasingly applied to hydrogeological hazard mapping, standard tabular models treat springs as isolated, independent observations, failing to capture subterranean fracture connectivity. Conversely, standard multi-hop Graph Neural Networks (GNNs) suffer from severe oversmoothing across rugged alpine ridgelines, while conventional \texttt{LayerNorm} erases critical absolute elevation differentials and logit magnitude scales. Here, we present \textbf{HydroBoost-GAT}, a dual-stage, physically grounded spatial graph framework that bridges tabular non-linear priors with subterranean fracture attention across 5,689 surveyed mountain springs in Kavrepalanchok District, Nepal. Spatial autocorrelation diagnostics reveal that desiccation clustering peaks at a localized sub-catchment scale ($k=3$, $\bar{d} \approx 315\text{ m}$, Global Moran's $I = 0.364$) and decays sharply by $k=20$ ($I = 0.207$). Guided by this physical boundary, we formulate \textbf{ResGATv2}, a shallow, 1-layer Residual Graph Attention Network conditioned on a standardized 5-dimensional physical terrain tensor ($\log(1+d_{ij})$, $\hat{\Delta x}$, $\hat{\Delta y}$, $\Delta z$, $\nabla_{\text{slope}}$) with ego-node skip projections and zero normalization layers. HydroBoost-GAT unifies out-of-fold CatBoost tabular priors with ResGATv2 message passing and localized residual spatial diffusion. Evaluated across 5 independent random seeds under Spatial Block 5-Fold Cross-Validation, HydroBoost-GAT achieves state-of-the-art performance (\textbf{Macro F1 = 0.9405 $\pm$ 0.0025}, \textbf{Balanced Accuracy = 0.9576 $\pm$ 0.0032}, \textbf{ROC-AUC = 0.9859 $\pm$ 0.0015}), outperforming pure tabular models and standard GNNs. In Inductive Leave-One-Municipality-Out (LOMO) regional transfer, it maintains superior generalization (\textbf{Macro F1 = 0.9340}, \textbf{Balanced Accuracy = 0.9529}). To protect against surrogate confounders (the ``Frog Trap'' attribution fallacy), negative placebo controls with scrambled edge topography and rewired graphs confirm that model discrimination strictly depends on true physical terrain conduits ($p < 0.001$). Regime-specific attention analysis demonstrates that attention concentrates on upstream recharge conduits ($\Delta z > 80\text{ m}$, mean $\alpha = 0.2084$) compared to distant background pairs ($\alpha = 0.0996$, Mann-Whitney $U = 437,383.0$, $p = 6.94 \times 10^{-55}$). Finally, we translate our predictions into actionable policy via the Composite Hydro-Social Vulnerability Index (HSVI), pinpointing the top 500 critically endangered springsheds for targeted artificial recharge interventions.
+\noindent
+Springs supply most rural households in the Mid-Hills of the Hindu Kush Himalaya, and community-mapped inventories now record their condition at an unprecedented scale. Whether such inventories can support data-driven prioritisation has not been tested with validation designs that match how predictions would be used. Using 5,689 water sources mapped by community resource persons in seven municipalities of Kavrepalanchok, Nepal (26.7\% dried), we benchmark eleven tabular, spatial-interpolation and graph-neural-network models---including a residual graph-attention network with terrain-based edge attributes and a hybrid tree--graph model---under spatial block cross-validation with and without a \SI{500}{\metre} buffer and under leave-one-municipality-out transfer. A missingness audit shows that the questionnaire's skip logic makes 46 recorded fields outcome-dependent; whether a question on the 2015 earthquake was answered (it is asked only of active sources) predicts drying with \auc{} 0.958 on its own and lifts every model to \auc{} $\approx$ 0.99. With these fields removed, drying is only modestly predictable from terrain, climate, vegetation and land-use covariates (\auc{} 0.60--0.64 under spatial cross-validation; 0.51--0.59 for an unseen municipality), and no graph model outperforms the best graph-free model. Ablations and placebo controls show that edge attributes, skip connections, normalisation and graph topology do not affect accuracy. Drying is spatially clustered (Moran's $I$ = 0.28 at $\sim$\SI{160}{\metre}) and associated with lower NDVI and NDWI and with pond sources. Descriptively, 35\% of dried sources are reported to have dried in the year of the 2015 Gorkha earthquake, and these earthquake-attributed dryings are less predictable from environmental covariates than other dryings. A seasonal-flow flag adds $\sim$0.09 \auc{} but may be confounded by dry-season fieldwork. We release a fully reproducible, leakage-audited pipeline and a transparent priority index for 3,206 active springs, and recommend skip-logic audits, spatially separated validation and graph-free controls as minimum standards for survey-based environmental prediction.
 \end{abstract}
 
-\textbf{Keywords:} Mountain Springs, Sub-Catchment Hydrology, Graph Attention Networks, Residual Diffusion, Spatial Autocorrelation, Himalayan Water Security, Kavrepalanchok.
+\noindent\textbf{Keywords:} mountain springs; spring drying; springshed management; spatial cross-validation; target leakage; graph neural networks; citizen science; Gorkha earthquake; Hindu Kush Himalaya
 
-\section{Introduction}
-Across the Hindu Kush Himalaya (HKH), mountain springs constitute the lifeline for over 100 million people, supplying drinking water, sanitation, and subsistence terrace irrigation \citep{tambe2012reviving, kulkarni2014spring, icimod2021springs}. Despite their vital importance, an estimated 30\% to 50\% of Himalayan springs have exhibited declining seasonal discharge or complete desiccation over the past three decades \citep{tambe2012reviving}. This hydrological crisis was acutely amplified in central Nepal by the 2015 $M_w 7.8$ Gorkha earthquake, which permanently altered subterranean hydraulic conductivity pathways and caused springsheds to dry up unpredictably \citep{sharma2016impact}.
+% =============================================================================
+\section{Introduction}\label{sec:intro}
 
-Predicting and mitigating spring desiccation requires modeling complex, coupled interactions between steep mountain topography, land cover transformations, monsoonal precipitation gradients, and subsurface fracture corridors. In recent years, data-driven approaches---predominantly tree-based ensembles such as Random Forest, XGBoost \citep{chen2016xgboost}, and CatBoost \citep{prokhorenkova2018catboost}---have emerged as powerful tools for regional water resource mapping. While tabular models excel at discovering sharp, non-linear thresholds, they operate under the strict assumption that individual spring observations are Independent and Identically Distributed (i.i.d.). In reality, mountain springs are hydrogeologically interconnected: springs situated along the same structural fault corridor or within the same sub-catchment recharge zone exhibit pronounced spatial autocorrelation.
+Springs are the principal source of domestic water for rural households across the Mid-Hills of the Hindu Kush Himalaya (HKH), where they also sustain livestock, small-scale irrigation and cultural practices \citep{tambe2012reviving, nitiaayog2017springs, icimod2021springs}. Over the past two decades a consistent picture of decline has emerged from field inventories and community surveys. In Nepal, studies report that 60--73\% of inventoried springs have declining discharge and that between 2\% and 16\% have dried completely, with substantial variation between watersheds \citep{poudel2017vanishing, adhikari2021status, chauhan2023degradation, pandit2024depleting}. A nationwide survey of local-government leaders found that springs had dried in about three-quarters of local government units \citep{thapa2023drying}. The proposed causes are many and interacting: changing rainfall and rising temperatures, land-use change and land fragmentation, road and infrastructure construction, growing abstraction, and the 2015 Gorkha earthquake \citep{chapagain2019status, thapa2023drying, chauhan2023degradation, pandit2024depleting}.
 
-Graph Neural Networks (GNNs) offer a natural paradigm to model interconnected systems by propagating latent representations along network edges \citep{kipf2017semi, hamilton2017inductive, brody2022attentive}. However, naively applying standard GNN architectures to geospatial hydrogeology encounters two fundamental pitfalls:
+Responding to this decline requires deciding where to act. Springshed management protocols recommend inventorying springs, characterising their hydrogeology, and prioritising critical springs for recharge interventions \citep{icimod2021springs}. Field hydrogeological mapping is effective but labour-intensive \citep{thapa2023recharge}, and the number of springs far exceeds the capacity to study each one. Large community-mapped inventories now offer a complement: in 2023--2024, 150 community resource persons mapped 5,689 water sources in Kavrepalanchok district, Nepal, recording for each whether it is active or dried, together with dozens of biophysical, social and governance attributes \citep{thapa2025citizen, icimod2025kavredata}. Such inventories invite a natural question: can machine learning identify which springs are at risk, and what drives drying?
+
+Two methodological pitfalls make this question harder than it looks. First, \emph{target leakage} \citep{kaufman2012leakage, kapoor2023leakage}: questionnaires branch on the outcome, so fields asked only of active sources are missing for dried ones, and any encoding of those fields---even an indicator of whether a question was answered---reveals the label. Second, \emph{spatial over-optimism}: random cross-validation lets models exploit spatial autocorrelation and can substantially overstate skill in unsampled areas \citep{roberts2017cross, ploton2020spatial, meyer2022machine}. Both pitfalls inflate apparent accuracy, and both can make sophisticated models appear superior. Graph neural networks \citep[GNNs;][]{kipf2017semi, hamilton2017inductive, brody2022attentive}, which have shown gains for spatially connected hydrological time series \citep{sun2021explore, bai2023graph, taccari2024spatial}, are an attractive but untested candidate for cross-sectional spring inventories, where neighbouring springs may share recharge areas and geological controls.
+
+In this study we use the Kavre inventory to address three questions:
 \begin{enumerate}
-    \item \textbf{The Oversmoothing Dilemma}: Standard multi-layer GNNs (3--4 layers) aggregate information across broad topological neighborhoods. In rugged Himalayan terrain, expanding message passing beyond 2 hops forces the model to traverse major alpine ridgelines, aggregating signals from hydrologically disconnected watersheds and diluting localized fracture signals into an uninformative mean \citep{oono2020graph}.
-    \item \textbf{The LayerNorm Normalization Artifact}: Deep GNNs frequently incorporate \texttt{LayerNorm} to stabilize training. However, \texttt{LayerNorm} normalizes node representations across feature channels to zero mean and unit variance, erasing the physical magnitude of absolute elevation differentials and compressing logit dynamic ranges.
+  \item How well can spring drying be predicted from covariates that are observable \emph{without} knowing the outcome, under validation designed for interpolation among surveyed springs and for extrapolation to unsurveyed terrain?
+  \item Does representing springs as a spatial graph---including a residual graph-attention network with physically motivated edge attributes and a hybrid tree--graph model---add predictive value over graph-free models?
+  \item Which covariates are robustly associated with drying, and what does the inventory reveal about the timing and reported causes of drying?
 \end{enumerate}
+Our contributions are (i) a leakage audit of a branched spring questionnaire that explains how near-perfect skill can arise from survey design alone; (ii) a benchmark of eleven models under three spatially explicit validation designs with corrected statistical tests; (iii) ablations and placebo controls for every architectural claim; (iv) a descriptive analysis of drying timing that places the 2015 Gorkha earthquake in context without using leaky fields as predictors; and (v) an open, fully reproducible pipeline and a transparent priority index for field verification.
 
-In this paper, we address these challenges by developing a physically grounded, dual-stage spatial graph framework. Guided by empirical multi-scale spatial autocorrelation tests, we demonstrate that spring desiccation is an intensely localized phenomenon governed by sub-catchment scale interactions ($k=3$, $\bar{d} \approx 315\text{ m}$). We introduce \textbf{ResGATv2}, a lean 1-layer Graph Attention Network with ego-node skip projections and zero normalization layers, conditioned on a standardized 5-dimensional physical edge tensor ($\log(1+d_{ij})$, $\hat{\Delta x}$, $\hat{\Delta y}$, $\Delta z$, $\nabla_{\text{slope}}$). We then build \textbf{HydroBoost-GAT}, a hybrid learning system that integrates out-of-fold CatBoost tabular priors with anisotropic graph attention and localized residual spatial diffusion.
+% =============================================================================
+\section{Background}\label{sec:background}
 
-\section{Study Area and Data}
-The study was conducted across Kavrepalanchok District (Bagmati Province, central Nepal), spanning an area of $1,396\text{ km}^2$ with elevations ranging from $280\text{ m}$ to $3,018\text{ m}$ a.s.l. We utilize the comprehensive ICIMOD field inventory comprising \textbf{5,689 georeferenced springs} surveyed across 7 major local municipalities: Bethanchowk, Chaurideurali, Dhulikhel, Mandandeupur, Namobuddha, Panauti, and Roshi. Among these, \textbf{1,521 springs (26.7\%)} are categorized as completely dried, while \textbf{4,168 springs (73.3\%)} remain actively discharging.
+\subsection{Spring decline in the Himalayan Mid-Hills}
+Mid-Hill springs typically emerge from shallow, fractured or weathered-rock aquifers recharged by monsoon rainfall, and their discharge follows a strong seasonal rhythm with minimum flows before the monsoon \citep{tambe2012reviving}. Their recharge areas are controlled by local lithology, rock orientation and fractures, and may lie beyond the topographic catchment \citep{thapa2023recharge}. Inventories across Nepal consistently report declining discharge. In the Thulokhola watershed (Nuwakot), 73.2\% of springs had decreasing flow and 12.2\% had dried over ten or more years \citep{poudel2017vanishing}; in five watersheds of western Nepal, about 70\% of more than 4,200 springs were decreasing \citep{adhikari2021status}; and in the Rangun Khola watershed, 73\% of 1,122 springs showed declining flow, which the authors linked to land fragmentation, conversion to agriculture, rising temperature, more intense local rainfall and rural road expansion \citep{pandit2024depleting}. A national synthesis estimated that 16\% of springs have dried and about 60\% are declining, attributing the decline mainly to declining rainfall, unplanned infrastructure development and over-exploitation \citep{chauhan2023degradation}. In India, springshed development that combines hydrogeological mapping with recharge structures has increased lean-season discharge \citep{tambe2012reviving}, and similar approaches have been adopted in Nepal \citep{icimod2021springs, thapa2023recharge}.
 
-For each spring point, we synthesized 25 environmental covariates integrating survey metrics with Google Earth Engine (GEE) cloud-processed geospatial data: digital elevation ($z$), slope, and aspect from SRTM 30m \citep{farr2007shuttle}; multi-temporal precipitation indices from CHIRPS Daily 0.05° \citep{funk2015climate}; vegetation and moisture indices (NDVI, NDWI) from Sentinel-2 MSI \citep{drusch2012sentinel}; and 2015 Gorkha earthquake damage scores.
+\subsection{Earthquakes and spring hydrology}
+Earthquakes can change spring discharge by altering permeability through dynamic stresses, opening or clogging fractures and redistributing groundwater \citep{manga2012changes}. In the Melamchi region of central Nepal, the 2015 Gorkha earthquake was followed by the immediate drying of about 18\% of surveyed springs \citep{chapagain2019status}, and local-government leaders across Nepal rank earthquakes as the second most important cause of spring drying after roads and infrastructure \citep{thapa2023drying}. Earthquake-related drying is therefore a plausible and important process in Kavrepalanchok, which lies close to the 2015 rupture. It is also, as we show, a process that is easily misrepresented when survey fields about earthquake impact are used na\"{\i}vely as predictors.
 
-\section{Methodology}
-\subsection{Empirical Sub-Catchment Scale Discovery}
-To determine the natural receptive field of spring desiccation, we evaluate multi-scale spatial autocorrelation using Global Moran's $I$ across varying $k$-nearest neighbor radii ($k \in [3, 20]$):
-\begin{equation}
-    I(k) = \frac{N}{\sum_{i} \sum_{j} w_{ij}} \frac{\sum_{i} \sum_{j} w_{ij} (y_i - \bar{y})(y_j - \bar{y})}{\sum_{i} (y_i - \bar{y})^2}
-\end{equation}
-Global Moran's $I$ peaks sharply at $k=3$ ($\bar{d} \approx 315\text{ m}$, $I = 0.364$, $p < 0.001$) and monotonically decays to $I = 0.207$ by $k=20$ ($\bar{d} \approx 1,280\text{ m}$). This confirms that mountain spring desiccation is an intensely localized sub-catchment phenomenon, setting the theoretical upper bound on GNN neighborhood aggregation.
+\subsection{Data-driven assessment of springs}
+Machine-learning studies of springs fall into three groups. The largest is \emph{spring} or \emph{groundwater potential mapping}, which trains classifiers to discriminate known spring locations from non-spring points using terrain, lithology, land-use and hydrological covariates \citep{naghibi2016gis, naghibi2020xgb, moghaddam2020sample}. These studies typically evaluate on random hold-out sets and report high discrimination: random-forest \auc{} values of 0.91--0.96 in mountain bedrock aquifers \citep{moghaddam2020sample} and up to 0.99 for an ensemble trained on 42 springs and pseudo-absences in the Indian Himalaya, which the authors interpret cautiously as screening-level output \citep{kadaverugu2026springshed}. The second group predicts the \emph{state} of known springs: in the Hangai Mountains of Mongolia, logistic regression, random forest and support vector machines separated depleted from discharging springs with \auc{} 0.84--0.86, with water and vegetation indices as the most important predictors \citep{ishikawa2025spring}. The third forecasts \emph{discharge} time series of individual springs from antecedent rainfall and water-quality data \citep{granata2018machine, mukherjee2023multifactor}. To our knowledge no study has predicted the drying of springs from a large community inventory with spatially separated validation, and none has examined how questionnaire structure interacts with prediction.
 
-\subsection{Standardized 5D Physical Edge Tensor}
-We define the physical edge tensor strictly from projected planar metric coordinates and digital elevation models:
-\begin{equation}
-    \mathbf{e}_{ij}^{\text{raw}} = \left[\log(1 + d_{ij}),\, \hat{\Delta x}_{ij},\, \hat{\Delta y}_{ij},\, \Delta z_{ij},\, \nabla_{\text{slope}, ij}\right]^T \in \mathbb{R}^5
-\end{equation}
-where $d_{ij}$ is planar Euclidean distance, $(\hat{\Delta x}, \hat{\Delta y})$ are directional unit vectors, $\Delta z = z_i - z_j$ is the hydraulic head elevation difference, and $\nabla_{\text{slope}} = \text{slope}_i - \text{slope}_j$. The tensor is standardized via z-score transformation fit exclusively on training folds:
-\begin{equation}
-    \mathbf{e}_{ij} = \frac{\mathbf{e}_{ij}^{\text{raw}} - \boldsymbol{\mu}_{\mathcal{E}_{\text{train}}}}{\boldsymbol{\sigma}_{\mathcal{E}_{\text{train}}}}
-\end{equation}
+\subsection{Validation pitfalls: spatial dependence and target leakage}
+When observations are spatially autocorrelated, random cross-validation places near-duplicates of test points in the training set and overstates performance in unsampled areas \citep{roberts2017cross}. Spatial block or buffered cross-validation is the common remedy \citep{roberts2017cross, valavi2019blockcv}, and its use has revealed poor predictive performance in large-scale ecological mapping \citep{ploton2020spatial} and motivated assessments of the area within which a model is applicable \citep{meyer2021predicting, meyer2022machine}. The remedy is not uncontested: \citet{wadoux2021spatial} argue that spatial cross-validation lacks a theoretical basis for estimating map accuracy and recommend design-based inference from probability samples. We therefore treat spatial blocks not as a map-accuracy estimator but as a deployment scenario---predicting for groups of springs located kilometres from any labelled spring---and report interpolation and extrapolation settings side by side. Target leakage is a distinct and arguably more damaging error. \citet{kaufman2012leakage} formalised it in data mining, and \citet{kapoor2023leakage} found leakage in hundreds of machine-learning-based scientific papers across 17 fields; in a reproduced case study, the apparent superiority of complex models over logistic regression disappeared once leakage was removed.
 
-\subsection{Lean ResGATv2 Architecture}
-In ResGATv2, message passing dynamically weights neighbor features through physical edges while preserving the source spring's ego features via a direct linear projection:
-\begin{equation}
-    \mathbf{h}_i = \mathbf{W}_{\text{ego}} \mathbf{x}_i + \sum_{j \in \mathcal{N}(i)} \alpha_{ij} \mathbf{W}_{\text{val}} \mathbf{x}_j
-\end{equation}
-\begin{equation}
-    \alpha_{ij} = \frac{\exp\left(\mathbf{a}^T \text{LeakyReLU}\left(\mathbf{W}_s \mathbf{x}_i + \mathbf{W}_t \mathbf{x}_j + \mathbf{W}_e \mathbf{e}_{ij}\right)\right)}{\sum_{k \in \mathcal{N}(i)} \exp\left(\mathbf{a}^T \text{LeakyReLU}\left(\mathbf{W}_s \mathbf{x}_i + \mathbf{W}_t \mathbf{x}_k + \mathbf{W}_e \mathbf{e}_{ik}\right)\right)}
-\end{equation}
-Crucially, ResGATv2 omits \texttt{LayerNorm}, preserving absolute logit magnitude and raw elevation gradients.
+\subsection{Graph neural networks for hydrological data}
+GNNs aggregate information from neighbouring nodes and have been applied to streamflow across many basins \citep{sun2021explore} and to groundwater-level forecasting \citep{bai2023graph, taccari2024spatial}, generally performing similarly to or better than recurrent baselines. These applications forecast time series in which neighbours' dynamic states are informative. Whether GNNs help for a static, cross-sectional classification of springs from coarse covariates is unclear. The broader literature urges caution: GNN rankings change with data splits and training protocols, and simple models often match complex ones when tuned equally \citep{shchur2018pitfalls}; deeper message passing can oversmooth node representations \citep{oono2020graph}; tree ensembles remain strong on small tabular data \citep{grinsztajn2022tree}; and attention weights do not in general provide explanations \citep{jain2019attention}. Hybrid physics-aware deep learning is advocated for Earth system science \citep{reichstein2019deep}, but its value must be shown with controls.
 
-\subsection{HydroBoost-GAT Framework}
-HydroBoost-GAT couples non-linear tabular trees with spatial graph attention via a three-stage pipeline:
-\begin{enumerate}
-    \item \textbf{Stage 1 (Tabular Prior)}: Out-of-fold CatBoost symmetric trees fit the feature matrix $\mathbf{X}$ to output base probability priors $\mathbf{p}_{\text{CB}}$.
-    \item \textbf{Stage 2 (Anisotropic Attention)}: ResGATv2 generates graph-conditioned probabilities $\mathbf{p}_{\text{GAT}}$. The base prediction is formed as $\mathbf{p}_{\text{base}} = \lambda \mathbf{p}_{\text{CB}} + (1 - \lambda) \mathbf{p}_{\text{GAT}}$ (with $\lambda = 0.60$).
-    \item \textbf{Stage 3 (Topological Residual Diffusion)}: Training residuals $\mathbf{e}_{\text{train}} = \mathbf{y}_{\text{train}} - \mathbf{p}_{\text{base, train}}$ are diffused along the subterranean graph Laplacian $\mathbf{S} = \mathbf{D}^{-1/2} \mathbf{A} \mathbf{D}^{-1/2}$ over $K=3$ iterations:
-    \begin{equation}
-        \mathbf{E}^{(t+1)} = (1 - \alpha) \mathbf{e} + \alpha \mathbf{S} \mathbf{E}^{(t)}
-    \end{equation}
-    \begin{equation}
-        \mathbf{p}_{\text{final}} = \text{clip}\left(\mathbf{p}_{\text{base}} + \gamma \mathbf{E}^{(K)},\, 0,\, 1\right)
-    \end{equation}
-\end{enumerate}
+\subsection{Citizen-science water data}
+Citizen science can expand hydrological observation in data-scarce mountain regions but produces data whose nature and quality differ from conventional monitoring and must be designed for accordingly \citep{buytaert2014citizen}. The Kavre inventory was collected with a mobile form by trained community resource persons \citep{thapa2025citizen}. Its branching structure, recall-based fields and seasonal timing are features of this design that a modelling study must take into account.
 
-\section{Benchmark Results and Discussion}
-\subsection{Multi-Seed Rigorous Benchmark}
-Models were evaluated across 5 random seeds ($[42, 123, 456, 789, 2024]$) under Spatial Block 5-Fold Cross-Validation:
-\begin{table}[ht]
-\centering
-\small
-\begin{tabular}{lccccc}
-\toprule
-\textbf{Model Architecture} & \textbf{Paradigm} & \textbf{Macro F1 ($\mu \pm \sigma$)} & \textbf{Bal. Acc. ($\mu \pm \sigma$)} & \textbf{ROC-AUC} & \textbf{PR-AUC} \\
-\midrule
-\textbf{HydroBoost-GAT (Ours)} & \textbf{Hybrid GNN-Tree} & \textbf{0.9405 $\pm$ 0.0025} & \textbf{0.9576 $\pm$ 0.0032} & \textbf{0.9859} & \textbf{0.9529} \\
-CatBoost & Tabular Baseline & 0.9402 $\pm$ 0.0015 & 0.9551 $\pm$ 0.0024 & 0.9865 & 0.9543 \\
-Random Forest & Tabular Baseline & 0.9375 $\pm$ 0.0025 & 0.9506 $\pm$ 0.0046 & 0.9849 & 0.9454 \\
-XGBoost & Tabular Baseline & 0.9364 $\pm$ 0.0025 & 0.9487 $\pm$ 0.0038 & 0.9845 & 0.9465 \\
-ResGATv2 (Ours) & Lean Pure Graph & 0.9314 $\pm$ 0.0032 & 0.9499 $\pm$ 0.0043 & 0.9818 & 0.9342 \\
-SpringGraphSAGE & Isotropic GNN & 0.9322 $\pm$ 0.0028 & 0.9509 $\pm$ 0.0035 & 0.9818 & 0.9343 \\
-Vanilla GATv2 & Attention Baseline & 0.9257 $\pm$ 0.0034 & 0.9505 $\pm$ 0.0039 & 0.9779 & 0.9125 \\
-SpringGCN & Isotropic GNN & 0.6717 $\pm$ 0.0125 & 0.6995 $\pm$ 0.0142 & 0.7804 & 0.5434 \\
-\bottomrule
-\end{tabular}
-\caption{Multi-seed benchmark performance across 5 random seeds under Spatial Block 5-Fold Cross-Validation.}
-\label{tab:benchmark}
+% =============================================================================
+\section{Study area and data}\label{sec:data}
+
+\subsection{Study area}
+Kavrepalanchok district lies east of the Kathmandu Valley in Bagmati Province, central Nepal (Fig.~\ref{fig:map}). It is underlain by Lesser Himalayan metasedimentary rocks of the Nawakot and Kathmandu complexes \citep{stocklin1980geology}. The inventoried sources span elevations of 576--\SI{2758}{\metre} (median \SI{1452}{\metre}). Mean annual precipitation at the sources ranges from about 1,000 to \SI{1780}{\milli\metre} (CHIRPS 2018--2023; median \SI{1353}{\milli\metre}), of which about four-fifths falls in the June--September monsoon. Surrounding land use recorded in the survey is predominantly sparse forest (39\%), agriculture (24\%), dense forest (14\%), grassland (11\%) and settlement (9\%).
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.78\linewidth]{study_area_map.png}
+  \caption{Kavrepalanchok district (dashed), the seven surveyed municipalities (grey) and the 5,689 mapped water sources (blue: active; red: dried). Dotted lines show the $5 \times 5$ grid ($\sim$\SI{8}{\kilo\metre} cells) used for spatial block cross-validation. Administrative boundaries \copyright\ OpenStreetMap contributors (ODbL); Bethanchowk's boundary is not available as a polygon.}
+  \label{fig:map}
+\end{figure}
+
+\subsection{Spring inventory}
+The inventory \citep[CC BY 4.0;][]{icimod2025kavredata} covers 5,689 water sources (5,168 springs and 521 ponds) over $\sim$\SI{743}{\kilo\metre\squared} in seven municipalities: Bethanchowk, Dhulikhel, Namobuddha, Panauti, Panchkhal, Roshi and Temal. Sources were mapped between October 2023 and June 2024 by trained community resource persons using a mobile survey application \citep{thapa2025citizen}. The outcome is the recorded source condition: 1,521 sources (26.7\%) are dried and 4,168 active. Drying rates range from 9.4\% (Panauti) to 39.9\% (Panchkhal) and are higher for ponds (49.3\%) than for springs (24.5\%).
+
+\subsection{Questionnaire skip logic and leakage audit}\label{sec:audit}
+The survey form has seven sections for active sources and four for dried ones \citep{thapa2025citizen}. For each processed column we compared the missingness rate between dried and active sources (Supplementary Text~S1, Table~S4). Forty-six of the 93 processed columns differ in missingness by more than 5 percentage points. They include questions asked only of dried sources (year of drying, reason of drying, post-drying actions) and, conversely, every question asked only of active sources: discharge, perceived discharge trend, household dependency, water-user groups, tapping, revival measures and \emph{``Any impact due to 2015 earthquake?''}. The earthquake question is answered for 7 of the 1,521 dried sources. None of these fields can be used as a predictor of drying; dried-only fields are used purely descriptively (Section~\ref{sec:timing}). The rule is enforced in code and unit-tested.
+
+\subsection{Covariates}
+The primary feature set (\texttt{env}; 23 covariates; Table~\ref{tab:covariates}) contains only variables that are observable without knowing the outcome. Perennial/seasonal flow is recorded for all sources, but because fieldwork took place mainly in the dry season, a seasonal spring visited while not flowing may have been recorded as dried. We therefore analyse it only in a sensitivity set (\texttt{env\_season}). A diagnostic set (\texttt{leaky\_reference}) adds the two earthquake encodings used in an earlier version of this analysis, solely to quantify the leakage.
+
+\begin{table}[t]
+  \centering
+  \caption{Covariates of the primary feature set (\texttt{env}). Details in Table~S1.}
+  \label{tab:covariates}
+  \small
+  \begin{tabularx}{\linewidth}{lXl}
+    \toprule
+    Group & Covariates & Source (resolution) \\
+    \midrule
+    Location & latitude, longitude, number of mapped sources within \SI{500}{\metre} & survey GPS \\
+    Terrain & elevation, slope, eastness, northness & SRTM \citep[\SI{30}{\metre};][]{farr2007shuttle} \\
+    Climate & annual, monsoon (Jun--Sep) and dry-season precipitation, 2018--2023 & CHIRPS \citep[0.05\textdegree;][]{funk2015climate} \\
+    Vegetation & NDVI, NDWI, 2022--2023 & Sentinel-2 \citep[10--\SI{20}{\metre};][]{drusch2012sentinel} \\
+    Survey (structural) & source type (spring/pond); surrounding land use (7 classes); ownership (3 classes) & field survey \\
+    \bottomrule
+  \end{tabularx}
 \end{table}
 
-\subsection{The ``Frog Trap'' Falsification Suite}
-To verify that ResGATv2 is genuinely learning physical fracture flow rather than acting as a non-specific spatial regularizer, we conducted three negative control tests:
-\begin{itemize}
-    \item \textbf{Placebo 1 (Scrambled Physical Edges)}: Permuting terrain edge attributes ($\Delta z, \text{slope}, \hat{\Delta x}, \hat{\Delta y}$) drops Balanced Accuracy to $0.9496 \pm 0.0052$ across all 5 seeds ($p < 0.001$).
-    \item \textbf{Placebo 2 (Random Topology)}: Rewiring graph edges across the study area reduces Macro F1 to $0.9334 \pm 0.0039$, demonstrating the necessity of localized sub-catchment proximity.
-    \item \textbf{Control 3 (LayerNorm Confounder)}: Adding \texttt{LayerNorm} artificially suppresses raw elevation variance, explaining why previous deep architectures collapsed due to feature normalization rather than multi-hop propagation alone.
-\end{itemize}
+% =============================================================================
+\section{Methods}\label{sec:methods}
 
-\subsection{Regime-Specific Attention Explainability}
-Analyzing attention weights across 39,727 directed graph conduits confirms strong physical alignment:
-\begin{itemize}
-    \item \textbf{Regime 1: Upslope Hazard Conduits} ($N=355$, Dried $\rightarrow$ Active, $\Delta z > 80\text{ m}$): Mean $\alpha = \mathbf{0.2084}$.
-    \item \textbf{Regime 2: Short-Range Sub-Catchment Conduits} ($N=29,106$, $d < 350\text{ m}$): Mean $\alpha = \mathbf{0.1249}$.
-    \item \textbf{Regime 3: Distant Background Conduits} ($N=1,614$, $d > 700\text{ m}$): Mean $\alpha = \mathbf{0.0996}$.
-\end{itemize}
-Non-parametric hypothesis tests confirm statistical significance: Mann-Whitney $U = 437,383.0$ ($p = 6.94 \times 10^{-55}$) for Upslope Hazard vs. Background, and Kolmogorov-Smirnov $D = 0.1833$ ($p = 1.97 \times 10^{-45}$) for Short-Range vs. Background.
+\subsection{Spatial structure and associations}
+We computed global Moran's $I$ \citep{moran1950notes} of the binary drying indicator for row-standardised $k$-nearest-neighbour weights ($k = 3, 5, 7, 10, 15, 20$; 999 permutations) and local Moran's $I$ \citep[LISA, $k = 7$;][]{anselin1995local} with 999 conditional permutations and Benjamini--Hochberg false-discovery-rate (FDR) control \citep{benjamini1995controlling}. Association rules with one- and two-item antecedents (e.g.\ ``pond source and slope $>$ \SI{25}{\degree}'') were screened with Fisher's exact test and BH-FDR over all candidate rules.
 
-\section{Conclusion and Policy Translation}
-We have developed HydroBoost-GAT, a hybrid learning framework that unifies tabular non-linear priors with subterranean physical graph attention and localized residual diffusion. Grounded in empirical Moran's $I$ sub-catchment boundaries, our architecture outperforms standard models while avoiding the pitfalls of oversmoothing and LayerNorm scale destruction. Using the Composite Hydro-Social Vulnerability Index (HSVI), we prioritized the top 500 critically endangered springsheds in Kavrepalanchok, providing local municipalities with actionable spatial intelligence for springshed protection and artificial recharge infrastructure.
+\subsection{Spring graph}
+Coordinates were projected to a local metric plane. Each source $i$ was linked to its $k = 7$ nearest neighbours $j$ by a directed edge $(i \to j)$, along which $j$ receives a message from $i$. With planar distance $d_{ij}$ and SRTM elevations $z_i, z_j$, each edge carries
+\begin{equation}
+  \mathbf{e}_{ij} = \Bigl[\log(1 + d_{ij}),\; \tfrac{x_j - x_i}{d_{ij}},\; \tfrac{y_j - y_i}{d_{ij}},\; \Delta z_{ij},\; \tfrac{\Delta z_{ij}}{d_{ij}}\Bigr],
+  \qquad \Delta z_{ij} = z_j - z_i ,
+  \label{eq:edges}
+\end{equation}
+so that $\Delta z_{ij} > 0$ when the receiver is upslope of the sender. Each component is $z$-scored over all edges; edges contain no label information. The mean edge length is \SI{262}{\metre}.
 
-\bibliographystyle{plainnat}
+\subsection{Models}
+\paragraph{Graph-free and interpolation baselines.} Logistic regression, random forest, XGBoost \citep{chen2016xgboost}, CatBoost \citep{prokhorenkova2018catboost} and a two-layer multilayer perceptron (MLP) trained with exactly the same loop as the GNNs; and a spatial-interpolation baseline predicting the inverse-distance-weighted mean label of the seven nearest \emph{training} springs.
+
+\paragraph{Graph neural networks.} Two-layer GCN \citep{kipf2017semi}, GraphSAGE \citep{hamilton2017inductive} and GATv2 \citep{brody2022attentive} with edge attributes, and \emph{ResGATv2}, a one-layer GATv2 with an ego-node linear skip connection and no normalisation layer:
+\begin{equation}
+  \mathbf{h}_i = \operatorname{GELU}\Bigl(\mathbf{W}_{\text{ego}}\mathbf{x}_i + \sum_{j \in \mathcal{N}(i) \cup \{i\}} \alpha_{ji}\, \mathbf{W}\mathbf{x}_j\Bigr),
+  \qquad
+  \alpha_{ji} = \operatorname*{softmax}_{j}\, \mathbf{a}^{\top}\operatorname{LeakyReLU}\bigl(\mathbf{W}_s\mathbf{x}_j + \mathbf{W}_t\mathbf{x}_i + \mathbf{W}_e\mathbf{e}_{ji}\bigr),
+\end{equation}
+followed by a two-layer classifier (2 attention heads, 64 hidden units). The one-hop design reflects the short range of label autocorrelation (Section~\ref{sec:res-spatial}).
+
+\paragraph{HydroBoost-GAT.} A hybrid that blends CatBoost and ResGATv2 probabilities and diffuses residuals of training springs over the symmetric-normalised graph $\mathbf{S} = \mathbf{D}^{-1/2}\tilde{\mathbf{A}}\mathbf{D}^{-1/2}$, where $\tilde{\mathbf{A}}$ is the symmetrised adjacency with self-loops:
+\begin{gather}
+  \mathbf{p} = w\,\mathbf{p}_{\text{CB}} + (1 - w)\,\mathbf{p}_{\text{GAT}}, \qquad
+  r_i = \begin{cases} y_i - p_i & i \in \text{training set} \\ 0 & \text{otherwise} \end{cases} \\
+  \mathbf{E}^{(t+1)} = (1 - a)\,\mathbf{r} + a\,\mathbf{S}\mathbf{E}^{(t)}, \quad t = 0,1,2, \qquad
+  \hat{\mathbf{p}} = \operatorname{clip}\bigl(\mathbf{p} + b\,\mathbf{E}^{(3)},\, 0,\, 1\bigr).
+\end{gather}
+CatBoost probabilities for training springs are out-of-fold (inner five-fold spatial grouping) so that residuals are not artificially small. The parameters $(w, a, b)$ are selected on the validation fold from $w \in \{0, 0.2, \dots, 1\}$, $a \in \{0.2, 0.4, 0.6\}$ and $b \in \{0, 0.5, 1\}$; the grid includes ``no GAT'' ($w = 1$) and ``no diffusion'' ($b = 0$). All other hyperparameters were fixed a priori (Table~S12).
+
+\subsection{Validation designs and statistics}
+\paragraph{Spatial block cross-validation.} The $\sim$\SI{40}{} $\times$ \SI{39}{\kilo\metre} extent was divided into a $5 \times 5$ grid whose non-empty cells were dealt into five folds (Fig.~\ref{fig:map}); fold $f$ is the test set and fold $f+1$ the validation set, used for early stopping, decision thresholds and HydroBoost parameters. We evaluated with \emph{no buffer}, representing interpolation among surveyed springs, and with a \SI{500}{\metre} buffer that removes training and validation springs within \SI{500}{\metre} of any test spring, approximating extrapolation \citep{roberts2017cross, valavi2019blockcv}. Five seeds re-shuffle the block assignment and re-initialise all models.
+
+\paragraph{Leave-one-municipality-out (LOMO).} Each municipality was held out in turn, $\sim$20\% of the remaining spatial blocks formed the validation set, and a \SI{500}{\metre} buffer was applied (three seeds). LOMO represents transferring a model to a new administrative unit, the scale at which springshed programmes are planned.
+
+\paragraph{Metrics.} Every model sees only training labels. We report \auc{} and PR-AUC as primary, threshold-free metrics, and macro-F1, balanced accuracy (at the validation-optimal threshold) and Brier score as secondary metrics. Unless stated otherwise, values are means over seed--fold pairs.
+
+\paragraph{Statistical comparison.} Because repeated cross-validation folds share training data, paired differences $d_1, \dots, d_J$ over seeds $\times$ folds were tested with the corrected resampled $t$-test \citep{nadeau2003inference, bouckaert2004evaluating},
+\begin{equation}
+  t = \frac{\bar d}{\sqrt{\bigl(\tfrac{1}{J} + \tfrac{n_{\text{test}}}{n_{\text{train}}}\bigr)\, \hat\sigma_d^{2}}}, \qquad \text{df} = J - 1,
+\end{equation}
+with Holm adjustment across the models compared in each setting. The reference is the best graph-free tabular model in that setting.
+
+\subsection{Ablations, negative controls and attribution}
+In the same folds and seeds we (i) removed ResGATv2's edge attributes, (ii) removed its skip connection, (iii) added LayerNorm, (iv) added a second layer, (v) shuffled the rows of the edge-attribute matrix (placebo), (vi) replaced the neighbourhood graph by links to seven random sources anywhere in the district (placebo), and (vii) isolated HydroBoost-GAT's GAT and diffusion stages (Supplementary Text~S4). Attribution used TreeSHAP for CatBoost \citep{lundberg2017unified} and standardised logistic-regression coefficients with 95\% spatial-block bootstrap intervals (500 resamples of $8 \times 8$ grid cells). To test whether ResGATv2 uses geometry in a hydrologically interpretable way, we compared within-receiver attention statistics on test springs with those of the shuffled-edge placebo model, defining edge groups by geometry only \citep{jain2019attention}.
+
+\subsection{Timing and reported causes of drying}\label{sec:timing-methods}
+For dried sources the survey records the year of drying (Bikram Sambat, BS) and a reported reason. We tabulated both and compared them with 2072 BS (mid-April 2015 to mid-April 2016), which contains the 25 April 2015 Gorkha earthquake. These fields are never used as predictors. To ask whether earthquake-related drying is less predictable from environmental covariates, we computed pooled out-of-fold \auc{} (spatial CV, no buffer, predictions averaged over seeds) separately for dried sources attributed to the earthquake and to other causes, each against all active sources, with 2,000-sample bootstrap intervals.
+
+\subsection{Spring Priority Index}
+For active springs with household data, we defined a transparent priority index
+\begin{equation}
+  \mathrm{SPI}_i = \operatorname{pct}(s_i) \times \operatorname{pct}(h_i),
+\end{equation}
+where $s_i$ is the out-of-fold predicted drying probability of the best model under spatial cross-validation (averaged over seeds), $h_i$ the number of dependent households and $\operatorname{pct}$ the percentile rank among ranked springs (Supplementary Text~S5).
+
+\subsection{Reproducibility}
+All analyses are run by a single command that regenerates every number, table and figure from the archived inventory; per-fold results, out-of-fold predictions and unit tests for leakage, split disjointness and buffer distances are included in the code repository.
+
+% =============================================================================
+\section{Results}\label{sec:results}
+
+\subsection{Skip-logic leakage dominates na\"{\i}ve results}
+An indicator of whether the earthquake question was answered predicts drying with \auc{} 0.958 and balanced accuracy 0.958 on its own (Table~S4). Adding the two earthquake encodings raises every model to \auc{} 0.982--0.987 and balanced accuracy $\approx$ 0.95 (Table~\ref{tab:featuresets}, Fig.~\ref{fig:leakage}), and TreeSHAP then ranks the earthquake fields as the dominant ``drivers'' of drying. These values describe the questionnaire rather than hydrology. Among legitimate single covariates, the strongest is the seasonal-flow flag (\auc{} 0.652), followed by longitude (0.611) and the precipitation variables (0.605--0.608).
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.8\linewidth]{leakage_feature_sets.png}
+  \caption{\auc{} (spatial block CV, no buffer; mean and corrected 95\% CI over 5 seeds $\times$ 5 folds) for the primary feature set, with the seasonal-flow flag, and with the two skip-logic earthquake fields. Dashed line: the one-feature rule ``earthquake question unanswered $\Rightarrow$ dried''.}
+  \label{fig:leakage}
+\end{figure}
+
+\begin{table}[t]
+  \centering
+  \caption{Feature-set sensitivity: \auc{} (mean $\pm$ SD over 25 seed--fold pairs; spatial block CV, no buffer).}
+  \label{tab:featuresets}
+  \small
+  \begin{tabular}{lccc}
+    \toprule
+    Model & \texttt{env} (primary, 23) & \texttt{env\_season} (24) & \texttt{leaky\_reference} (26) \\
+    \midrule
+    Logistic regression & 0.634 $\pm$ 0.055 & 0.717 $\pm$ 0.037 & 0.986 $\pm$ 0.006 \\
+    CatBoost            & 0.629 $\pm$ 0.057 & 0.726 $\pm$ 0.042 & 0.987 $\pm$ 0.006 \\
+    MLP                 & 0.628 $\pm$ 0.056 & 0.712 $\pm$ 0.047 & 0.985 $\pm$ 0.006 \\
+    ResGATv2            & 0.629 $\pm$ 0.062 & 0.709 $\pm$ 0.047 & 0.982 $\pm$ 0.007 \\
+    HydroBoost-GAT      & 0.641 $\pm$ 0.057 & 0.730 $\pm$ 0.040 & 0.987 $\pm$ 0.006 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Predictability from leak-free covariates is modest}
+On the primary feature set, \auc{} ranges from 0.598 (kNN label interpolation) to 0.641 (HydroBoost-GAT) under spatial CV without a buffer and from 0.595 to 0.641 with a \SI{500}{\metre} buffer; PR-AUC is 0.35--0.40 against a base rate of 0.27 (Table~\ref{tab:benchmark}, Fig.~\ref{fig:benchmark}). Fold-to-fold standard deviations ($\sim$0.06) exceed every between-model difference. No model differs significantly from the best graph-free tabular model (all Holm-adjusted $p = 1$); for HydroBoost-GAT the paired difference is $+0.003$ $[-0.027, +0.034]$ without and $+0.007$ $[-0.029, +0.044]$ with a buffer. Logistic regression is as accurate as any tree ensemble. The \SI{500}{\metre} buffer barely changes performance, so having labelled springs immediately adjacent to the test area contributes little. Transfer to an unseen municipality is weaker: \auc{} 0.51--0.59, with logistic regression (0.588) and the tree models best and per-municipality values between 0.42 and 0.66 (Table~S3). Adding the seasonal-flow flag raises \auc{} to 0.71--0.73 for all models (Table~\ref{tab:featuresets}).
+
+\begin{table}[t]
+  \centering
+  \caption{Benchmark on the primary feature set: mean $\pm$ SD of \auc{} and mean PR-AUC over seed--fold pairs (spatial CV: 5 $\times$ 5; LOMO: 3 seeds $\times$ 7 municipalities). Mean test prevalence is 0.27. --: not run in LOMO. No model differs significantly from the best graph-free tabular model in any setting (corrected resampled $t$-test, Holm-adjusted $p = 1$; Tables~S2--S3).}
+  \label{tab:benchmark}
+  \small
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{llcccccc}
+    \toprule
+    & & \multicolumn{2}{c}{Spatial CV, no buffer} & \multicolumn{2}{c}{Spatial CV, \SI{500}{\metre}} & \multicolumn{2}{c}{LOMO, \SI{500}{\metre}} \\
+    \cmidrule(lr){3-4}\cmidrule(lr){5-6}\cmidrule(lr){7-8}
+    Family & Model & \auc{} & PR-AUC & \auc{} & PR-AUC & \auc{} & PR-AUC \\
+    \midrule
+    \multirow{4}{*}{Tabular}
+      & Logistic regression & 0.634 $\pm$ 0.055 & 0.388 & 0.634 $\pm$ 0.054 & 0.388 & 0.588 $\pm$ 0.030 & 0.330 \\
+      & Random forest       & 0.638 $\pm$ 0.061 & 0.390 & 0.631 $\pm$ 0.060 & 0.385 & 0.584 $\pm$ 0.058 & 0.335 \\
+      & XGBoost             & 0.625 $\pm$ 0.056 & 0.385 & 0.616 $\pm$ 0.050 & 0.380 & --                & --    \\
+      & CatBoost            & 0.629 $\pm$ 0.057 & 0.382 & 0.625 $\pm$ 0.051 & 0.383 & 0.581 $\pm$ 0.038 & 0.329 \\
+    \midrule
+    Interpolation & kNN label           & 0.598 $\pm$ 0.043 & 0.348 & 0.595 $\pm$ 0.051 & 0.346 & 0.513 $\pm$ 0.071 & 0.282 \\
+    \midrule
+    Neural & MLP                        & 0.628 $\pm$ 0.056 & 0.386 & 0.628 $\pm$ 0.057 & 0.384 & 0.567 $\pm$ 0.042 & 0.322 \\
+    \midrule
+    \multirow{5}{*}{Graph}
+      & GCN                 & 0.606 $\pm$ 0.065 & 0.356 & 0.603 $\pm$ 0.066 & 0.357 & --                & --    \\
+      & GraphSAGE           & 0.618 $\pm$ 0.055 & 0.374 & 0.616 $\pm$ 0.056 & 0.373 & 0.545 $\pm$ 0.063 & 0.301 \\
+      & GATv2               & 0.611 $\pm$ 0.066 & 0.368 & 0.608 $\pm$ 0.063 & 0.365 & --                & --    \\
+      & ResGATv2            & 0.629 $\pm$ 0.062 & 0.385 & 0.628 $\pm$ 0.062 & 0.383 & 0.554 $\pm$ 0.052 & 0.311 \\
+      & HydroBoost-GAT      & 0.641 $\pm$ 0.057 & 0.397 & 0.641 $\pm$ 0.059 & 0.402 & 0.581 $\pm$ 0.034 & 0.329 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{model_benchmark_comparison.png}
+  \caption{\auc{} (mean and corrected 95\% CI) on the primary feature set under spatial block CV without buffer (interpolation), with a \SI{500}{\metre} buffer (extrapolation), and leave-one-municipality-out. Blue: tabular; orange: kNN label interpolation; purple: MLP; green: graph models. Dotted line: chance.}
+  \label{fig:benchmark}
+\end{figure}
+
+\subsection{Graph structure does not add predictive value}
+No GNN outperforms the graph-free MLP trained with the identical loop ($\Delta$\auc{} between $-0.026$ and $+0.002$, all intervals spanning zero; Table~\ref{tab:controls}, Fig.~\ref{fig:controls}). For ResGATv2, removing the edge attributes, shuffling them across edges, or replacing the neighbourhood graph by random district-wide links leaves accuracy unchanged, while removing the skip connection, adding LayerNorm or adding a second layer produces small, non-significant decreases. Within HydroBoost-GAT, the validation-selected weight on CatBoost averages 0.35, and dropping either the GAT stage or residual diffusion changes \auc{} by at most 0.016 (not significant).
+
+ResGATv2 does make use of geometry. Compared with the shuffled-edge placebo, its attention on test springs increases with edge length (within-receiver Spearman $\rho = 0.26$ $[0.25, 0.27]$ versus 0.03 for the placebo) and is slightly lower for upslope than for downslope neighbours ($-0.017$ $[-0.019, -0.014]$ versus $+0.002$). This pattern---favouring distant and downslope neighbours---does not match a recharge-pathway interpretation and does not improve accuracy, so we do not interpret it hydrologically (Table~S7, Fig.~S3).
+
+\begin{table}[t]
+  \centering
+  \caption{Ablations and negative controls: paired $\Delta$\auc{} versus the stated reference with corrected 95\% confidence intervals (5 seeds $\times$ 5 folds, primary feature set). All Holm-adjusted $p > 0.8$.}
+  \label{tab:controls}
+  \small
+  \begin{tabular}{llcc}
+    \toprule
+    Variant & Reference & No buffer & \SI{500}{\metre} buffer \\
+    \midrule
+    ResGATv2 $-$ edge attributes        & ResGATv2 & $+0.000$ $[-0.038, +0.038]$ & $+0.002$ $[-0.037, +0.042]$ \\
+    ResGATv2 $-$ ego skip               & ResGATv2 & $-0.018$ $[-0.060, +0.024]$ & $-0.012$ $[-0.055, +0.031]$ \\
+    ResGATv2 $+$ LayerNorm              & ResGATv2 & $-0.006$ $[-0.021, +0.009]$ & $-0.005$ $[-0.022, +0.012]$ \\
+    ResGATv2, 2 layers                  & ResGATv2 & $-0.011$ $[-0.056, +0.035]$ & $-0.021$ $[-0.086, +0.044]$ \\
+    Placebo: shuffled edge attributes   & ResGATv2 & $-0.000$ $[-0.010, +0.010]$ & $-0.000$ $[-0.005, +0.005]$ \\
+    Placebo: random topology            & ResGATv2 & $-0.007$ $[-0.040, +0.027]$ & $-0.007$ $[-0.046, +0.032]$ \\
+    \midrule
+    CatBoost $+$ diffusion only         & HydroBoost-GAT & $-0.010$ $[-0.040, +0.020]$ & $-0.016$ $[-0.056, +0.023]$ \\
+    CatBoost $+$ GAT, no diffusion      & HydroBoost-GAT & $-0.002$ $[-0.008, +0.004]$ & $-0.001$ $[-0.009, +0.006]$ \\
+    \midrule
+    ResGATv2                            & MLP & $+0.002$ $[-0.033, +0.036]$ & $-0.000$ $[-0.036, +0.035]$ \\
+    GraphSAGE                           & MLP & $-0.009$ $[-0.039, +0.021]$ & $-0.012$ $[-0.048, +0.023]$ \\
+    GCN                                 & MLP & $-0.021$ $[-0.066, +0.023]$ & $-0.026$ $[-0.076, +0.025]$ \\
+    GATv2                               & MLP & $-0.017$ $[-0.070, +0.036]$ & $-0.020$ $[-0.068, +0.029]$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{ablation_controls.png}
+  \caption{Paired $\Delta$\auc{} (corrected 95\% CI) for ResGATv2 ablations and placebos, HydroBoost-GAT stage ablations, and GNNs versus the MLP.}
+  \label{fig:controls}
+\end{figure}
+
+\subsection{Spatial structure and covariate associations}\label{sec:res-spatial}
+Drying is spatially clustered: global Moran's $I$ decreases from 0.279 at $k = 3$ (mean neighbour distance \SI{162}{\metre}) to 0.179 at $k = 20$ (\SI{477}{\metre}), all permutation $p = 0.001$ (Table~S9). After FDR control, LISA identifies 95 sources in clusters of dried sources and 30 active sources surrounded by dried ones, compared with 354 and 215 without correction (Table~S10, Fig.~\ref{fig:lisa}).
+
+In logistic regression with spatial-block bootstrap intervals (Table~S8, Fig.~\ref{fig:coef}), drying is associated with lower NDVI (log-odds $-0.51$ per SD $[-0.80, -0.23]$) and NDWI ($-0.41$ $[-0.72, -0.08]$), with agricultural ($-0.40$) and dense-forest ($-0.33$) surroundings relative to other land uses, with pond sources ($+0.22$ $[0.07, 0.38]$), with longitude ($+0.36$) and with west-facing aspect (eastness $-0.13$). The precipitation variables are strongly collinear and individually unidentified. Ponds dry 1.8 times more often than the base rate (Fisher $q < 10^{-29}$). TreeSHAP for CatBoost ranks longitude, latitude, NDVI and elevation highest (Fig.~S1), consistent with broad regional gradients rather than a single dominant driver.
+
+\begin{figure}[t]
+  \centering
+  \begin{minipage}[t]{0.49\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{logistic_coefficients.png}
+    \caption{Standardised logistic-regression coefficients with 95\% spatial-block bootstrap intervals (red: interval excludes zero).}
+    \label{fig:coef}
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.49\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{lisa_cluster_map.png}
+    \caption{LISA clusters of drying ($k = 7$; BH-FDR $q < 0.05$).}
+    \label{fig:lisa}
+  \end{minipage}
+\end{figure}
+
+\subsection{Timing and reported causes of drying}\label{sec:timing}
+Respondents most often attribute drying to the earthquake (34.3\% of dried sources), drought (31.4\%) and infrastructure development (15.8\%), followed by natural disasters (7.4\%) and neglect of the source (6.3\%) (Table~S14). The reported year of drying is sharply concentrated: 538 of 1,521 dried sources (35.4\%) dried in 2072 BS, the year of the Gorkha earthquake, and 84.0\% of these are attributed to the earthquake; conversely, 86.8\% of all earthquake-attributed sources are reported to have dried in that year (Fig.~\ref{fig:timing}a; Table~S13). Of the remaining dried sources, 40.6\% dried before 2072 BS and 23.5\% after it. Reported years also cluster on round numbers (2060, 2065 and 2070 BS), indicating recall rounding.
+
+Earthquake-attributed drying is less predictable from environmental covariates than other drying. Pooled out-of-fold \auc{} against active springs is 0.631 $[0.605, 0.656]$ for earthquake-attributed versus 0.674 $[0.657, 0.692]$ for other dried sources with logistic regression, and 0.639 $[0.613, 0.666]$ versus 0.691 $[0.673, 0.709]$ with HydroBoost-GAT (Fig.~\ref{fig:timing}b; Table~S15). Pooled \auc{} values are somewhat higher than fold means because they combine folds with different prevalence.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{drying_timing_and_cause.png}
+  \caption{(a) Reported year of drying (Bikram Sambat) of dried sources, by whether the respondent attributed drying to the earthquake; 2072 BS spans mid-April 2015 to mid-April 2016. (b) Pooled out-of-fold \auc{} (logistic regression, spatial CV without buffer) for all dried sources and for earthquake-attributed and other dried sources, each against all active sources (95\% bootstrap CI).}
+  \label{fig:timing}
+\end{figure}
+
+\subsection{Spring Priority Index}
+Of 4,168 active springs, 3,206 have household data and receive an SPI; 962 lack household counts. The index correlates with its susceptibility ($\rho = 0.71$) and exposure ($\rho = 0.66$) components, and 52.8\% of the top-500 springs would also be in the top 500 on susceptibility alone (Table~S11). Top-500 springs are concentrated in Panchkhal (151), Temal (125) and Namobuddha (100).
+
+% =============================================================================
+\section{Discussion}\label{sec:discussion}
+
+\subsection{Near-perfect skill was a property of the questionnaire}
+A single indicator of an unanswered question reproduces the skill that every model achieved when the earthquake fields were included. This is a textbook case of target leakage \citep{kaufman2012leakage} arising not from preprocessing errors but from survey design: the four-section form for dried sources guarantees that every active-only question carries the label. The episode mirrors the broader pattern documented by \citet{kapoor2023leakage}, in which complex models lost their apparent advantage over logistic regression once leakage was corrected. Two features make skip-logic leakage especially dangerous in environmental surveys. It affects the variables that appear most process-relevant---here, earthquake impact---and attribution methods then elevate them to ``drivers'', producing a mechanistic narrative that the data cannot support. We recommend that any modelling of branched questionnaires begin with a missingness-by-outcome audit, which takes a few lines of code and can be enforced by tests.
+
+\subsection{What the inventory can and cannot say about drivers}
+With leak-free covariates, the discrimination we obtain (\auc{} $\approx$ 0.63) is lower than typically reported in spring potential mapping \citep{naghibi2016gis, moghaddam2020sample, kadaverugu2026springshed} and in the prediction of spring states in Mongolia \citep[0.84--0.86;][]{ishikawa2025spring}. The comparison is not like-for-like: potential mapping discriminates spring locations from arbitrary background points, a much easier task than discriminating dried from active springs that all emerge in comparable settings; and most of these studies use random hold-out validation, which our interpolation/extrapolation comparison suggests would add little here but which inflates performance where training and test points are close \citep{roberts2017cross, ploton2020spatial}. The difference nonetheless indicates that, at the scale of a mid-hill district, the controls on whether an individual spring has dried are poorly captured by \SI{30}{\metre} terrain, $\sim$\SI{5}{\kilo\metre} precipitation and point land-use labels.
+
+The associations that do emerge are physically plausible. Lower NDVI and NDWI around dried sources agree with the Mongolian finding that springs in wetter, more vegetated settings remain discharging \citep{ishikawa2025spring}; however, our indices are contemporaneous with the survey and may partly reflect, rather than cause, local drying. The higher drying rate of ponds is consistent with their dependence on shallow storage and surface inflow. The lower drying odds of springs with agricultural or dense-forest surroundings, relative to sparse forest, grassland and settlement, should be read cautiously: land use is recorded as a single class around the source, and \citet{pandit2024depleting} attribute declining flows partly to conversion to agriculture and landscape fragmentation at watershed scale, which a point label cannot capture. Respondents cite infrastructure development for 16\% of dried sources, in line with national evidence that roads are a leading cause of drying \citep{thapa2023drying}. Road density and construction history are therefore a priority covariate for future work, together with lithology and structural geology, which control recharge areas \citep{thapa2023recharge} but were not available at an adequate resolution.
+
+\subsection{The 2015 earthquake}
+Although the earthquake field cannot serve as a predictor, the dried-only fields provide legitimate descriptive evidence. Over a third of all dried sources are reported to have dried in the earthquake year, and most of them are attributed to the earthquake by respondents. This is consistent with the immediate drying of about 18\% of springs observed in the Melamchi region after the same event \citep{chapagain2019status}, with local-government leaders' ranking of earthquakes as a major cause of drying \citep{thapa2023drying}, and with the established mechanisms by which seismic shaking alters permeability \citep{manga2012changes}. That earthquake-attributed drying is less predictable from terrain, climate and vegetation than other drying is what one would expect if seismic changes to fracture permeability are poorly expressed in surface covariates. Two caveats apply: reported years are recalled roughly eight years later and show rounding, and attribution by respondents may be influenced by the salience of the earthquake. Repeat surveys and discharge monitoring at a subset of sources would allow these patterns to be tested.
+
+\subsection{Why graph models did not help}
+GNNs have improved forecasts of streamflow and groundwater levels \citep{sun2021explore, bai2023graph, taccari2024spatial}, but those tasks propagate informative dynamic states between connected nodes. In a static inventory, the only information a GNN can pass between springs is their covariates---which are already spatially smooth---and the label autocorrelation is short-ranged and weak relative to the spacing between validation blocks. Our controls show that the graph adds nothing measurable: accuracy is unchanged without message passing, without or with shuffled edge attributes, and with random neighbourhoods. These results echo evidence that simpler models match complex ones under equal evaluation \citep{shchur2018pitfalls}, that tree ensembles and linear models are strong on small tabular data \citep{grinsztajn2022tree}, and that attention patterns are not explanations \citep{jain2019attention}. Hybrid, physics-motivated architectures \citep{reichstein2019deep} may still prove useful for springs, but only where the graph carries information that the node features do not, such as mapped recharge connectivity or shared fracture systems.
+
+\subsection{Validation design}
+The interpolation and extrapolation settings yield almost identical results, whereas transfer to an unseen municipality reduces \auc{} by about 0.05. The relevant uncertainty for springshed planning therefore lies less in distance to the nearest labelled spring than in regional differences between municipalities, which have drying rates between 9\% and 40\%. We agree with \citet{wadoux2021spatial} that spatial cross-validation does not estimate map accuracy, which requires a probability sample; we use it instead to emulate deployment scenarios, and we recommend that studies report several such scenarios and an estimate of the area of applicability \citep{meyer2021predicting}.
+
+\subsection{Implications for springshed management}
+Given modest discrimination, model outputs should support triage rather than replace field assessment. The Spring Priority Index combines susceptibility with household dependence and is intended to rank active springs for hydrogeological verification and monitoring within the six-step springshed approach \citep{icimod2021springs}, not to forecast drying. Three changes to inventory design would most improve the evidence base: (i) recording all non-outcome attributes for dried as well as active sources, so that they can be analysed without leakage; (ii) repeat visits in a fixed season, to separate seasonal from permanent drying; and (iii) measuring discharge at a monitored subset, so that changes can be quantified rather than recalled \citep{buytaert2014citizen, thapa2025citizen}.
+
+\subsection{Limitations}
+The inventory is a single cross-section; most drying dates are recalled, and associations are not causal. The outcome may be affected by survey season for seasonal springs. Covariates are coarse relative to spring-scale hydrogeology, and no geological, fracture or road data were available. Remote-sensing indices are contemporaneous with the outcome. Validation blocks are $\sim$\SI{8}{\kilo\metre}; results may differ at other deployment scales. Hyperparameters were fixed a priori rather than tuned, which may disadvantage some models slightly but avoids test-set optimisation. The priority index uses equal weights and a susceptibility model of modest discrimination.
+
+% =============================================================================
+\section{Conclusions}\label{sec:conclusions}
+On a 5,689-source community inventory from the Nepal Mid-Hills, apparently near-perfect prediction of spring drying was an artefact of questionnaire skip logic. With leak-free covariates and spatially separated validation, drying is modestly predictable (\auc{} $\approx$ 0.63), and graph neural networks---including physically motivated attention and a hybrid tree--graph design---perform no better than logistic regression. Drying is spatially clustered, associated with sparser vegetation and pond sources, and, according to respondents, was strongly concentrated in the year of the 2015 Gorkha earthquake; such earthquake-related drying is the least predictable from environmental covariates. We recommend skip-logic audits, spatial cross-validation with buffers, graph-free and placebo controls, and repeat-season inventories with discharge measurements as minimum standards for data-driven springshed prioritisation.
+
+% =============================================================================
+\section*{Data and code availability}
+The survey data are available from ICIMOD's Regional Database System under CC BY 4.0 \citep[doi:10.26066/RDS.1974131;][]{icimod2025kavredata}; processed derivatives are redistributed with attribution under the same licence. Municipal boundaries are from OpenStreetMap (ODbL). All code, per-fold results, out-of-fold predictions and the script that regenerates every number, table and figure (\texttt{python reproduce\_all.py}) are available at \url{https://github.com/ashimst/kavre_springs} \todo{archive DOI on acceptance}.
+
+\section*{Author contributions}
+\todo{CRediT statement.}
+
+\section*{Competing interests}
+\todo{Declaration.}
+
+\section*{Acknowledgements}
+We thank the community resource persons and ICIMOD for collecting and openly publishing the Kavre spring inventory. \todo{Funding.}
+
+\bibliographystyle{apalike}
 \bibliography{references}
 
 \end{document}

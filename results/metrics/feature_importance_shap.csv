@@ -1,26 +1,24 @@
-feature,mean_abs_shap,rank
-earthquake_impact_ordinal,3.3962018073710096,1
-earthquake_impact_known,2.8238290246204953,2
-Perennial / Seasonal_encoded,0.7663736553355923,3
-latitude,0.35497456127894395,4
-elevation_m,0.3271757395561207,5
-spring_density_500m,0.32324162601001216,6
-Source Type_encoded,0.302007185269087,7
-ndwi_mean,0.21899140686144147,8
-longitude,0.19760863386058264,9
-slope_deg,0.17615459227659466,10
-aspect_deg,0.17090173560220434,11
-ndvi_mean,0.16999131022140784,12
-precip_monsoon_mm,0.09333072088225104,13
-landuse_agriculture,0.08102086027066639,14
-ownership_community,0.07485538189522603,15
-precip_annual_mm,0.07425871014859126,16
-landuse_settlement,0.07324498091354709,17
-landuse_sparse_forest,0.05753989099754372,18
-precip_dry_season_mm,0.05738068814117372,19
-ownership_private,0.04825836236229484,20
-ownership_public,0.038146748402880355,21
-landuse_grassland,0.03135982031841691,22
-landuse_fallow,0.01615709390889466,23
-landuse_dense_forest,0.01075206538451887,24
-landuse_others,0.005516786994955933,25
+feature,label,mean_abs_shap,rank
+longitude,Longitude,0.4123786214169508,1
+latitude,Latitude,0.22438807789177004,2
+ndvi_mean,NDVI,0.1792960859891102,3
+elevation_m,Elevation,0.17404880249754007,4
+Source Type_encoded,Source type (pond=1),0.159550730868556,5
+precip_monsoon_mm,Monsoon precip.,0.14447113433499,6
+slope_deg,Slope,0.13880522570708145,7
+spring_density_500m,Spring density (500 m),0.13656475729655454,8
+aspect_sin,Aspect (eastness),0.11084350824730996,9
+ndwi_mean,NDWI,0.10229770572367432,10
+precip_dry_season_mm,Dry-season precip.,0.09419879185912404,11
+precip_annual_mm,Annual precip.,0.08847690490349099,12
+aspect_cos,Aspect (northness),0.08621513744198003,13
+landuse_agriculture,LU: agriculture,0.08044762811264788,14
+landuse_settlement,LU: settlement,0.0790457666788146,15
+landuse_dense_forest,LU: dense forest,0.07773216200712789,16
+ownership_private,Own.: private,0.0377078435723996,17
+ownership_community,Own.: community,0.024948623875566057,18
+ownership_public,Own.: public,0.018195193674786177,19
+landuse_fallow,LU: fallow,0.016789775626569258,20
+landuse_sparse_forest,LU: sparse forest,0.013084837106099988,21
+landuse_grassland,LU: grassland,0.011263010666115026,22
+landuse_others,LU: other,0.0007100419138982943,23

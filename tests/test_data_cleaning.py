@@ -44,9 +44,16 @@ def test_municipalities_count():
 def test_spatial_features():
     df = pd.read_csv(CLEAN_CSV)
     assert "spring_density_500m" in df.columns
-    assert "dist_to_nearest_dried_m" in df.columns
     assert (df["spring_density_500m"] >= 0).all()
-    assert (df["dist_to_nearest_dried_m"] >= 0).all()
+
+
+def test_label_derived_columns_never_used_as_features():
+    """dist_to_nearest_dried_m / muni_drying_rate are computed from the label (descriptive only)."""
+    from src.features import FEATURE_SETS
+    for fs, cols in FEATURE_SETS.items():
+        assert "dist_to_nearest_dried_m" not in cols
+        assert "dist_to_nearest_active_m" not in cols
+        assert "muni_drying_rate" not in cols
 
 
 if __name__ == "__main__":

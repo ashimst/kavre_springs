@@ -1,185 +1,162 @@
 """
-Standardized 5D Physical Hydro-Topographic Graph Construction.
+k-NN spring graph with physical edge attributes.
 
-Constructs:
-1. k-NN Spatial Proximity Graph (k=7 nearest neighbors in metric space).
-2. 5-Dimensional Purely Physical Edge Tensor (Zero Administrative Boundary Leakage):
-   e_ij = [log1p(d_ij), unit_dx, unit_dy, delta_z, slope_gradient]
-3. Standardized Node Features (25 non-leaking hydro-environmental covariates).
-4. Provides edge standardization (StandardScaler) to prevent distance from swamping unit directional vectors.
+Graph
+-----
+Directed k-nearest-neighbour graph (k = 7) in a local metric projection.
+For every spring i and each of its k nearest neighbours j we add the edge
+(i -> j) stored as ``edge_index[:, e] = [i, j]``. In PyTorch Geometric's
+message-passing convention (source_to_target) node j therefore *receives* a
+message from i. Attention coefficients are normalised over each receiver's
+incoming edges.
+
+Edge attributes (exactly as implemented; Text S1 of the SI matches this)
+------------------------------------------------------------------------
+For edge (i -> j) with planar distance d_ij (metres; d := 1 m when two
+springs share coordinates):
+
+    e_ij = [ log(1 + d_ij),
+             (x_j - x_i) / d_ij,
+             (y_j - y_i) / d_ij,
+             dz_ij = z_j - z_i,           # metres; > 0  => receiver j is upslope of sender i
+             dz_ij / d_ij ]               # along-edge gradient
+
+Each column is z-scored over all edges. Edge attributes contain no label
+information, so this is not leakage; it is stated explicitly in the SI.
+
+Node features
+-------------
+Chosen by name from ``src.features.FEATURE_SETS``. Missing remote-sensing
+values (22 springs fall outside valid Sentinel-2 / CHIRPS pixels) are
+median-imputed and all features are z-scored over all nodes (unsupervised,
+label-free; standard for transductive node classification).
 """
+
+from __future__ import annotations
 
 import sys
 from pathlib import Path
+
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-import os
-os.environ["MPLCONFIGDIR"] = os.path.join(str(PROJECT_ROOT), ".matplotlib")
+import logging
 
 import numpy as np
 import pandas as pd
 import torch
-from scipy.spatial import KDTree
+from scipy.spatial import cKDTree
 from sklearn.preprocessing import StandardScaler
-import logging
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+from src.features import FEATURE_SETS, PRIMARY_FEATURE_SET, add_derived_columns
+
 logger = logging.getLogger(__name__)
 
-MASTER_DATA = Path("data/processed/master_dataset.parquet")
-OUTPUT_GRAPH_PATH = Path("data/graph/graph_knn_k7_physical.pt")
-
-NODE_FEATURE_COLS = [
-    # Geospatial Coordinates & Density
-    "latitude",
-    "longitude",
-    "spring_density_500m",
-    # Topographic (SRTM 30m)
-    "elevation_m",
-    "slope_deg",
-    "aspect_deg",
-    # Hydro-Climatic (CHIRPS Daily)
-    "precip_annual_mm",
-    "precip_monsoon_mm",
-    "precip_dry_season_mm",
-    # Vegetation & Moisture (Sentinel-2)
-    "ndvi_mean",
-    "ndwi_mean",
-    # Survey Environmental & Physical
-    "Source Type_encoded",
-    "Perennial / Seasonal_encoded",
-    "earthquake_impact_ordinal",
-    "earthquake_impact_known",
-    # Land Use
-    "landuse_agriculture",
-    "landuse_dense_forest",
-    "landuse_fallow",
-    "landuse_grassland",
-    "landuse_others",
-    "landuse_settlement",
-    "landuse_sparse_forest",
-    # Ownership
-    "ownership_community",
-    "ownership_private",
-    "ownership_public",
-]
+MASTER_DATA = PROJECT_ROOT / "data/processed/master_dataset.parquet"
+GRAPH_DIR = PROJECT_ROOT / "data/graph"
+K_NEIGHBOURS = 7
+REF_LATITUDE = 27.57
 
 
 def coords_to_metric(lat: np.ndarray, lon: np.ndarray) -> np.ndarray:
-    """Project WGS84 coordinates to local metric coordinates centered at Kavre (27.57 N)."""
+    """Equirectangular projection to metres, centred on the study-area mean (error < 0.1 % over 40 km)."""
     lat_to_m = 111_320.0
-    lon_to_m = 111_320.0 * np.cos(np.radians(27.57))
+    lon_to_m = 111_320.0 * np.cos(np.radians(REF_LATITUDE))
     x = (lon - lon.mean()) * lon_to_m
     y = (lat - lat.mean()) * lat_to_m
     return np.column_stack([x, y])
 
 
-def build_physical_knn_graph(df: pd.DataFrame, k: int = 7) -> tuple:
-    """
-    Construct k-NN spatial graph with strictly physical 5D edge attributes:
-    e_ij = [log1p(distance_m), unit_dx, unit_dy, delta_z_m, slope_gradient]
-    Zero administrative boundaries (no same_municipality leakage).
-    """
-    logger.info(f"Building physical hydro-topographic graph (k={k} neighbors)...")
-    coords_m = coords_to_metric(df["latitude"].values, df["longitude"].values)
-    elev = df["elevation_m"].fillna(df["elevation_m"].median()).values
-
-    tree = KDTree(coords_m)
-    distances, indices = tree.query(coords_m, k=k + 1)
-
-    sources = []
-    targets = []
-    edge_attrs_raw = []
-
-    n_nodes = len(df)
-    for i in range(n_nodes):
-        for rank in range(1, k + 1):
-            j = indices[i, rank]
-            d = distances[i, rank]
-            if d == 0:
-                d = 1.0  # avoid div by zero
-
-            dx = coords_m[j, 0] - coords_m[i, 0]
-            dy = coords_m[j, 1] - coords_m[i, 1]
-            unit_dx = dx / d
-            unit_dy = dy / d
-            dz = elev[j] - elev[i]  # upward elevation head difference
-            slope_gradient = dz / d
-
-            sources.append(i)
-            targets.append(j)
-            # 5D Physical Edge Vector
-            edge_attrs_raw.append([
-                np.log1p(d),       # log-transformed distance to reduce scale disparity
-                unit_dx,           # unit directional x vector
-                unit_dy,           # unit directional y vector
-                dz,                # elevation head difference in meters
-                slope_gradient,    # topographic slope gradient along conduit
-            ])
-
-    edge_index = torch.tensor([sources, targets], dtype=torch.long)
-    edge_attr_raw = np.array(edge_attrs_raw, dtype=np.float32)
-
-    # Standardize edge attributes with StandardScaler to prevent log-distance from swamping unit directional vectors
-    edge_scaler = StandardScaler()
-    edge_attr_norm = edge_scaler.fit_transform(edge_attr_raw)
-    edge_attr = torch.tensor(edge_attr_norm, dtype=torch.float32)
-
-    logger.info(f"Constructed graph with {n_nodes:,} nodes and {edge_index.shape[1]:,} directed edges (edge_dim=5).")
-    logger.info(f"Edge features standardized: means={edge_attr.mean(dim=0).numpy().round(3)}, stds={edge_attr.std(dim=0).numpy().round(3)}")
-
-    return edge_index, edge_attr, edge_attr_raw, edge_scaler
+def physical_edge_attributes(coords_m: np.ndarray, elev: np.ndarray, src: np.ndarray, dst: np.ndarray) -> np.ndarray:
+    """Raw (unscaled) 5-D edge attributes for edges src -> dst."""
+    delta = coords_m[dst] - coords_m[src]
+    d = np.linalg.norm(delta, axis=1)
+    d = np.where(d == 0, 1.0, d)
+    dz = elev[dst] - elev[src]
+    return np.column_stack([np.log1p(d), delta[:, 0] / d, delta[:, 1] / d, dz, dz / d]).astype(np.float32)
 
 
-def prepare_node_features(df: pd.DataFrame):
-    """Extract and standardize 25 hydro-environmental node features."""
-    available_cols = [c for c in NODE_FEATURE_COLS if c in df.columns]
-    X_raw = df[available_cols].values.astype(np.float32)
-
-    # Median impute any missing GEE values
-    for col_idx in range(X_raw.shape[1]):
-        col_vals = X_raw[:, col_idx]
-        if np.isnan(col_vals).any():
-            med = np.nanmedian(col_vals)
-            X_raw[np.isnan(col_vals), col_idx] = med
-
-    scaler = StandardScaler()
-    X_norm = scaler.fit_transform(X_raw)
-
-    x = torch.tensor(X_norm, dtype=torch.float32)
-    y_dried = torch.tensor(df["target_dried"].values, dtype=torch.long)
-
-    return x, y_dried, available_cols, scaler
+def knn_edges(coords_m: np.ndarray, k: int = K_NEIGHBOURS) -> tuple[np.ndarray, np.ndarray]:
+    _, idx = cKDTree(coords_m).query(coords_m, k=k + 1)
+    n = len(coords_m)
+    src = np.repeat(np.arange(n), k)
+    dst = idx[:, 1:].reshape(-1)
+    return src, dst
 
 
-def build_and_save_physical_graph():
-    df = pd.read_parquet(MASTER_DATA)
-    edge_index, edge_attr, edge_attr_raw, edge_scaler = build_physical_knn_graph(df, k=7)
-    x, y_dried, feature_cols, node_scaler = prepare_node_features(df)
+def load_master(path: Path = MASTER_DATA) -> pd.DataFrame:
+    df = pd.read_parquet(path)
+    return add_derived_columns(df)
 
-    graph_dict = {
-        "x": x,
-        "edge_index": edge_index,
-        "edge_attr": edge_attr,
-        "edge_attr_raw": torch.tensor(edge_attr_raw, dtype=torch.float32),
-        "y_dried": y_dried,
-        "num_nodes": len(df),
-        "num_edges": edge_index.shape[1],
-        "feature_cols": feature_cols,
-        "latitude": torch.tensor(df["latitude"].values, dtype=torch.float32),
-        "longitude": torch.tensor(df["longitude"].values, dtype=torch.float32),
-        "municipality": df["municipality"].tolist(),
-        "id": df["id"].tolist(),
+
+def build_graph(df: pd.DataFrame, feature_set: str = PRIMARY_FEATURE_SET, k: int = K_NEIGHBOURS) -> dict:
+    """Assemble node features, labels and the physical k-NN graph for one feature set."""
+    cols = FEATURE_SETS[feature_set]
+    missing = [c for c in cols if c not in df.columns]
+    if missing:
+        raise KeyError(f"Feature columns missing from master dataset: {missing}")
+
+    X = df[cols].astype(np.float32).to_numpy()
+    n_imputed = int(np.isnan(X).sum())
+    col_median = np.nanmedian(X, axis=0)
+    nan_r, nan_c = np.where(np.isnan(X))
+    X[nan_r, nan_c] = col_median[nan_c]
+    X_raw = X.copy()
+    X = StandardScaler().fit_transform(X).astype(np.float32)
+
+    coords_m = coords_to_metric(df["latitude"].to_numpy(), df["longitude"].to_numpy())
+    elev = df["elevation_m"].fillna(df["elevation_m"].median()).to_numpy(dtype=np.float64)
+    src, dst = knn_edges(coords_m, k)
+    edge_raw = physical_edge_attributes(coords_m, elev, src, dst)
+    edge_mu, edge_sd = edge_raw.mean(0), edge_raw.std(0)
+    edge_attr = (edge_raw - edge_mu) / edge_sd
+
+    logger.info(f"[{feature_set}] {len(df)} nodes, {len(src)} edges, {len(cols)} features, {n_imputed} imputed values")
+    return {
+        "feature_set": feature_set,
+        "feature_cols": list(cols),
+        "x": torch.tensor(X),
+        "x_raw": X_raw,
+        "y": torch.tensor(df["target_dried"].to_numpy(), dtype=torch.long),
+        "edge_index": torch.tensor(np.vstack([src, dst]), dtype=torch.long),
+        "edge_attr": torch.tensor(edge_attr, dtype=torch.float32),
+        "edge_attr_raw": edge_raw,
+        "edge_scaler": (edge_mu, edge_sd),
+        "coords_m": coords_m,
+        "elevation": elev,
+        "latitude": df["latitude"].to_numpy(),
+        "longitude": df["longitude"].to_numpy(),
+        "municipality": df["municipality"].to_numpy(),
+        "id": df["id"].to_numpy(),
     }
 
-    OUTPUT_GRAPH_PATH.parent.mkdir(parents=True, exist_ok=True)
-    torch.save(graph_dict, OUTPUT_GRAPH_PATH)
-    logger.info(f"Successfully persisted standardized 5D physical graph to {OUTPUT_GRAPH_PATH}")
-    return graph_dict
+
+def rewired_graph(g: dict, rng: np.random.Generator) -> tuple[torch.Tensor, torch.Tensor]:
+    """Null-model topology: same out-degree, neighbours drawn uniformly at random from the
+    whole district; edge attributes recomputed from the true geometry of the random pairs
+    and scaled with the original edge scaler."""
+    n = len(g["y"])
+    k = g["edge_index"].shape[1] // n
+    src = np.repeat(np.arange(n), k)
+    dst = rng.integers(0, n - 1, size=n * k)
+    dst = dst + (dst >= src)  # no self-edges
+    raw = physical_edge_attributes(g["coords_m"], g["elevation"], src, dst)
+    mu, sd = g["edge_scaler"]
+    return torch.tensor(np.vstack([src, dst]), dtype=torch.long), torch.tensor((raw - mu) / sd, dtype=torch.float32)
+
+
+def save_graph(g: dict, path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    keep = {k: v for k, v in g.items() if k not in ("edge_scaler",)}
+    keep["edge_attr_raw"] = torch.tensor(g["edge_attr_raw"])
+    keep["municipality"] = list(g["municipality"])
+    keep["id"] = list(g["id"])
+    keep["y_dried"] = g["y"]
+    torch.save(keep, path)
 
 
 if __name__ == "__main__":
-    build_and_save_physical_graph()
-
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+    g = build_graph(load_master(), PRIMARY_FEATURE_SET)
+    save_graph(g, GRAPH_DIR / f"graph_knn_k{K_NEIGHBOURS}_{PRIMARY_FEATURE_SET}.pt")

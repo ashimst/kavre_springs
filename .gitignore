@@ -32,3 +32,7 @@ cache/
 tmp/
 scratch/
 
+
+# Smoke-test outputs (reproduce_all.py --quick)
+results/metrics/*_quick.csv
+results/predictions/*_quick.parquet

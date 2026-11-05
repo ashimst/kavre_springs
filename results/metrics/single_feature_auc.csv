@@ -1,0 +1,27 @@
+feature,single_feature_auc
+earthquake_impact_ordinal,0.9583733205374281
+earthquake_impact_known,0.9583733205374281
+Perennial / Seasonal_encoded,0.6518183214901804
+longitude,0.6112733471640159
+precip_monsoon_mm,0.6076423197436781
+precip_annual_mm,0.6051700536696107
+ndvi_mean,0.5876622045048149
+elevation_m,0.5869821854245301
+ndwi_mean,0.5776493928254596
+Source Type_encoded,0.5528140265332057
+precip_dry_season_mm,0.5466680642470544
+landuse_settlement,0.5437467111116158
+aspect_sin,0.5394122401541566
+landuse_dense_forest,0.5340808495522065
+spring_density_500m,0.5296918003990203
+ownership_private,0.52822907320545
+landuse_agriculture,0.5278606703842936
+ownership_community,0.5243578070796437
+latitude,0.5214243079295493
+aspect_cos,0.5198223747887856
+landuse_grassland,0.5132123400985058
+landuse_fallow,0.5081373565981568
+landuse_sparse_forest,0.5043093902258969
+ownership_public,0.5038712661258062
+slope_deg,0.5028364887732967
+landuse_others,0.5008257712561567

@@ -1,124 +1,92 @@
 """
-Spatial cross-validation splitting strategies for Kavre Springs dataset.
+Spatial cross-validation splits.
 
-To prevent spatial data leakage, we implement:
-1. Spatial Block Cross-Validation (Transductive): Divide the study area into
-   spatial grid blocks; group springs by block to ensure no training springs
-   are spatially adjacent to test springs.
-2. Leave-One-Municipality-Out (LOMO) (Inductive): Train on 6 municipalities,
-   evaluate on 1 held-out municipality. Evaluates regional transferability.
+1. Spatial block k-fold: the study area (~40 x 39 km) is cut into an
+   ``n_blocks_side x n_blocks_side`` grid (default 5 x 5, ~8 km cells). Non-empty
+   blocks are shuffled (seeded) and dealt into k folds. For fold i the test set
+   is block-group i and the validation set (early stopping, threshold choice,
+   HydroBoost blend selection) is block-group i+1.
+
+   ``buffer_m`` removes from train *and* validation every spring lying within
+   ``buffer_m`` metres of any test spring (Roberts et al., 2017, Ecography).
+   Buffered springs stay in the graph (their features are visible, as in any
+   transductive setting) but contribute no labels. ``buffer_m = 0`` corresponds
+   to the *interpolation* use case (surveyed neighbours are known);
+   ``buffer_m = 500`` approximates *extrapolation* to unsurveyed terrain --
+   500 m is the distance by which Moran's I of the label has decayed to ~0.26
+   (results/metrics/spatial_autocorrelation_distance_decay.csv).
+
+2. Leave-one-municipality-out (LOMO): one municipality is the test set; the
+   remaining springs are split into train / validation by spatial blocks
+   (~20 % of blocks to validation, seeded), and the same buffer is applied
+   around the held-out municipality.
 """
 
+from __future__ import annotations
+
 import numpy as np
-import pandas as pd
-from typing import Generator, Tuple, List, Dict
-from sklearn.model_selection import KFold
+from scipy.spatial import cKDTree
 
 
-def create_spatial_grid_blocks(
-    latitudes: np.ndarray,
-    longitudes: np.ndarray,
-    n_lat_bins: int = 5,
-    n_lon_bins: int = 5,
-) -> np.ndarray:
-    """
-    Divide bounding box into a 2D regular grid and assign each point a block ID.
-    """
-    lat_bins = np.linspace(latitudes.min() - 1e-5, latitudes.max() + 1e-5, n_lat_bins + 1)
-    lon_bins = np.linspace(longitudes.min() - 1e-5, longitudes.max() + 1e-5, n_lon_bins + 1)
-
-    lat_idx = np.digitize(latitudes, lat_bins) - 1
-    lon_idx = np.digitize(longitudes, lon_bins) - 1
-
-    block_ids = lat_idx * n_lon_bins + lon_idx
-    return block_ids
+def grid_block_ids(coords_m: np.ndarray, n_blocks_side: int = 5) -> np.ndarray:
+    x, y = coords_m[:, 0], coords_m[:, 1]
+    xb = np.linspace(x.min() - 1e-6, x.max() + 1e-6, n_blocks_side + 1)
+    yb = np.linspace(y.min() - 1e-6, y.max() + 1e-6, n_blocks_side + 1)
+    xi = np.clip(np.digitize(x, xb) - 1, 0, n_blocks_side - 1)
+    yi = np.clip(np.digitize(y, yb) - 1, 0, n_blocks_side - 1)
+    return yi * n_blocks_side + xi
 
 
-def spatial_block_kfold(
-    df: pd.DataFrame,
-    n_splits: int = 5,
-    n_blocks_side: int = 5,
-    random_state: int = 42,
-) -> List[Dict[str, np.ndarray]]:
-    """
-    Generate 5-fold spatial cross-validation masks (train, val, test) for transductive modeling.
-    Returns list of dicts with boolean masks for each fold.
-    """
-    lat = df["latitude"].values
-    lon = df["longitude"].values
+def within_buffer_of(coords_m: np.ndarray, target_mask: np.ndarray, buffer_m: float) -> np.ndarray:
+    """Boolean mask of nodes (outside target_mask) within buffer_m of any target node."""
+    if buffer_m <= 0 or not target_mask.any():
+        return np.zeros(len(coords_m), dtype=bool)
+    d, _ = cKDTree(coords_m[target_mask]).query(coords_m, k=1)
+    return (d <= buffer_m) & ~target_mask
 
-    block_ids = create_spatial_grid_blocks(lat, lon, n_blocks_side, n_blocks_side)
-    unique_blocks = np.unique(block_ids)
 
-    # Shuffle blocks
+def _finalise(train, val, test, coords_m, buffer_m):
+    buf = within_buffer_of(coords_m, test, buffer_m)
+    train = train & ~buf
+    val = val & ~buf
+    return {
+        "train_mask": train, "val_mask": val, "test_mask": test, "buffer_mask": buf,
+        "n_train": int(train.sum()), "n_val": int(val.sum()), "n_test": int(test.sum()), "n_buffer": int(buf.sum()),
+    }
+
+
+def spatial_block_kfold(coords_m: np.ndarray, n_splits: int = 5, n_blocks_side: int = 5,
+                        random_state: int = 42, buffer_m: float = 0.0) -> list[dict]:
+    block = grid_block_ids(coords_m, n_blocks_side)
+    blocks = np.unique(block)
     rng = np.random.RandomState(random_state)
-    rng.shuffle(unique_blocks)
-
-    # Group blocks into n_splits folds
-    block_folds = np.array_split(unique_blocks, n_splits)
-
+    rng.shuffle(blocks)
+    groups = np.array_split(blocks, n_splits)
     splits = []
-    n_samples = len(df)
-
     for i in range(n_splits):
-        test_blocks = block_folds[i]
-        val_blocks = block_folds[(i + 1) % n_splits]
-        train_blocks = [b for b in unique_blocks if b not in test_blocks and b not in val_blocks]
-
-        test_mask = np.isin(block_ids, test_blocks)
-        val_mask = np.isin(block_ids, val_blocks)
-        train_mask = np.isin(block_ids, train_blocks)
-
-        splits.append({
-            "fold": i,
-            "train_mask": train_mask,
-            "val_mask": val_mask,
-            "test_mask": test_mask,
-            "n_train": int(train_mask.sum()),
-            "n_val": int(val_mask.sum()),
-            "n_test": int(test_mask.sum()),
-        })
-
+        test = np.isin(block, groups[i])
+        val = np.isin(block, groups[(i + 1) % n_splits])
+        train = ~test & ~val
+        s = _finalise(train, val, test, coords_m, buffer_m)
+        s["fold"] = i
+        splits.append(s)
     return splits
 
 
-def leave_one_municipality_out(df: pd.DataFrame) -> List[Dict[str, any]]:
-    """
-    Generate Leave-One-Municipality-Out (LOMO) splits for inductive transferability.
-    """
-    municipalities = sorted(df["municipality"].unique())
+def leave_one_municipality_out(coords_m: np.ndarray, municipality: np.ndarray, random_state: int = 42,
+                               buffer_m: float = 0.0, val_fraction: float = 0.2,
+                               n_blocks_side: int = 8) -> list[dict]:
+    block = grid_block_ids(coords_m, n_blocks_side)
     splits = []
-
-    for test_muni in municipalities:
-        test_mask = (df["municipality"] == test_muni).values
-        # Use one remaining muni as validation, the others as train
-        remaining_munis = [m for m in municipalities if m != test_muni]
-        val_muni = remaining_munis[0]
-        val_mask = (df["municipality"] == val_muni).values
-        train_mask = (~test_mask) & (~val_mask)
-
-        splits.append({
-            "test_municipality": test_muni,
-            "train_mask": train_mask,
-            "val_mask": val_mask,
-            "test_mask": test_mask,
-            "n_train": int(train_mask.sum()),
-            "n_val": int(val_mask.sum()),
-            "n_test": int(test_mask.sum()),
-        })
-
+    for m in sorted(np.unique(municipality)):
+        test = municipality == m
+        rest_blocks = np.unique(block[~test])
+        rng = np.random.RandomState(random_state)
+        rng.shuffle(rest_blocks)
+        n_val = max(1, int(round(val_fraction * len(rest_blocks))))
+        val = ~test & np.isin(block, rest_blocks[:n_val])
+        train = ~test & ~val
+        s = _finalise(train, val, test, coords_m, buffer_m)
+        s["fold"] = str(m)
+        splits.append(s)
     return splits
-
-
-if __name__ == "__main__":
-    df = pd.read_csv("data/processed/clean_springs.csv")
-    splits = spatial_block_kfold(df, n_splits=5)
-    print("=== Spatial Block 5-Fold Splits ===")
-    for s in splits:
-        print(f"Fold {s['fold']}: Train={s['n_train']}, Val={s['n_val']}, Test={s['n_test']}")
-
-    print("\n=== Leave-One-Municipality-Out Splits ===")
-    lomo_splits = leave_one_municipality_out(df)
-    for s in lomo_splits:
-        print(f"Test on {s['test_municipality']:15s}: Train={s['n_train']}, Val={s['n_val']}, Test={s['n_test']}")
-

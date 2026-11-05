@@ -1,0 +1,2 @@
+susceptibility_model,model_mean_roc_auc,n_seeds_averaged,n_active_springs_ranked,n_active_springs_missing_households,spearman_SPI_vs_susceptibility,spearman_SPI_vs_exposure,top500_overlap_with_susceptibility_only_top500
+HydroBoost-GAT,0.6409507349607831,5,3206,962,0.7074616631256656,0.6562289603073808,0.528

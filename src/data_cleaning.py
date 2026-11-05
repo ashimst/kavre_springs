@@ -366,7 +366,13 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def compute_spatial_features(df: pd.DataFrame) -> pd.DataFrame:
-    """Compute spatial features from coordinates using scipy KDTree."""
+    """Compute spatial features from coordinates using scipy KDTree.
+
+    WARNING: ``dist_to_nearest_dried_m``, ``dist_to_nearest_active_m`` and
+    ``muni_drying_rate`` are computed from the LABEL. They are kept for
+    descriptive mapping only and are listed in ``src.features.FORBIDDEN_FEATURES``;
+    never use them as model inputs.
+    """
     from scipy.spatial import KDTree
 
     coords = df[["Latitude", "Longitude"]].values

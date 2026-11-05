@@ -1,0 +1,151 @@
+profile,scheme,feature_set,buffer_m,seed,fold,n_train,n_val,n_test,n_buffer,variant,w_catboost,alpha,beta,val_auc
+main,spatial,env,0.0,42,0,3448,933,1308,0,HydroBoost-GAT,0.0,0.6,1.0,0.6032959326788219
+main,spatial,env,0.0,42,0,3448,933,1308,0,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.5379669769220962
+main,spatial,env,0.0,42,0,3448,933,1308,0,"HydroBoost | CatBoost + GAT, no diffusion",0.0,0.4,0.0,0.6001593777891114
+main,spatial,env,0.0,42,1,3433,1323,933,0,HydroBoost-GAT,0.4,0.6,1.0,0.73404861261002
+main,spatial,env,0.0,42,1,3433,1323,933,0,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.7215042449097058
+main,spatial,env,0.0,42,1,3433,1323,933,0,"HydroBoost | CatBoost + GAT, no diffusion",0.4,0.4,0.0,0.7318871861284985
+main,spatial,env,0.0,42,2,3415,951,1323,0,HydroBoost-GAT,0.0,0.6,1.0,0.6637632352798455
+main,spatial,env,0.0,42,2,3415,951,1323,0,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.6143329224856607
+main,spatial,env,0.0,42,2,3415,951,1323,0,"HydroBoost | CatBoost + GAT, no diffusion",0.0,0.4,0.0,0.6595706480070653
+main,spatial,env,0.0,42,3,3564,1174,951,0,HydroBoost-GAT,0.8,0.6,1.0,0.6096355543803984
+main,spatial,env,0.0,42,3,3564,1174,951,0,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.6075621364357483
+main,spatial,env,0.0,42,3,3564,1174,951,0,"HydroBoost | CatBoost + GAT, no diffusion",0.8,0.4,0.0,0.6062422880310241
+main,spatial,env,0.0,42,4,3207,1308,1174,0,HydroBoost-GAT,0.2,0.6,1.0,0.7093282151875901
+main,spatial,env,0.0,42,4,3207,1308,1174,0,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.6552833017676767
+main,spatial,env,0.0,42,4,3207,1308,1174,0,"HydroBoost | CatBoost + GAT, no diffusion",0.2,0.4,0.0,0.7011690566378066
+main,spatial,env,0.0,123,0,2961,1823,905,0,HydroBoost-GAT,0.2,0.4,1.0,0.6112539696116057
+main,spatial,env,0.0,123,0,2961,1823,905,0,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.5759585698086034
+main,spatial,env,0.0,123,0,2961,1823,905,0,"HydroBoost | CatBoost + GAT, no diffusion",0.2,0.4,0.0,0.6109711649620214
+main,spatial,env,0.0,123,1,3327,539,1823,0,HydroBoost-GAT,0.0,0.2,1.0,0.7115651717645607
+main,spatial,env,0.0,123,1,3327,539,1823,0,HydroBoost | CatBoost + diffusion only,1.0,0.4,1.0,0.64834562795148
+main,spatial,env,0.0,123,1,3327,539,1823,0,"HydroBoost | CatBoost + GAT, no diffusion",0.0,0.4,0.0,0.7088181734004135
+main,spatial,env,0.0,123,2,3387,1763,539,0,HydroBoost-GAT,0.2,0.6,1.0,0.6480416661777189
+main,spatial,env,0.0,123,2,3387,1763,539,0,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.6264467966094402
+main,spatial,env,0.0,123,2,3387,1763,539,0,"HydroBoost | CatBoost + GAT, no diffusion",0.2,0.4,0.0,0.6469796715052943
+main,spatial,env,0.0,123,3,3267,659,1763,0,HydroBoost-GAT,1.0,0.6,1.0,0.6278375640077768
+main,spatial,env,0.0,123,3,3267,659,1763,0,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.6278375640077768
+main,spatial,env,0.0,123,3,3267,659,1763,0,"HydroBoost | CatBoost + GAT, no diffusion",1.0,0.4,0.0,0.621046578493387
+main,spatial,env,0.0,123,4,4125,905,659,0,HydroBoost-GAT,0.6,0.6,1.0,0.6397684062857635
+main,spatial,env,0.0,123,4,4125,905,659,0,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.634532320982489
+main,spatial,env,0.0,123,4,4125,905,659,0,"HydroBoost | CatBoost + GAT, no diffusion",0.6,0.4,0.0,0.6381194393512422
+main,spatial,env,0.0,456,0,3426,928,1335,0,HydroBoost-GAT,1.0,0.6,1.0,0.5950914520343412
+main,spatial,env,0.0,456,0,3426,928,1335,0,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.5950914520343412
+main,spatial,env,0.0,456,0,3426,928,1335,0,"HydroBoost | CatBoost + GAT, no diffusion",1.0,0.4,0.0,0.5941555233515579
+main,spatial,env,0.0,456,1,3927,834,928,0,HydroBoost-GAT,0.2,0.6,1.0,0.6881569898811277
+main,spatial,env,0.0,456,1,3927,834,928,0,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.6647110472541506
+main,spatial,env,0.0,456,1,3927,834,928,0,"HydroBoost | CatBoost + GAT, no diffusion",0.4,0.4,0.0,0.6843746929953827
+main,spatial,env,0.0,456,2,4442,413,834,0,HydroBoost-GAT,0.2,0.6,1.0,0.7564536741214059
+main,spatial,env,0.0,456,2,4442,413,834,0,HydroBoost | CatBoost + diffusion only,1.0,0.2,1.0,0.723738019169329
+main,spatial,env,0.0,456,2,4442,413,834,0,"HydroBoost | CatBoost + GAT, no diffusion",0.2,0.4,0.0,0.7554313099041534
+main,spatial,env,0.0,456,3,3097,2179,413,0,HydroBoost-GAT,0.0,0.6,1.0,0.6364262101191457
+main,spatial,env,0.0,456,3,3097,2179,413,0,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.582780947349032
+main,spatial,env,0.0,456,3,3097,2179,413,0,"HydroBoost | CatBoost + GAT, no diffusion",0.0,0.4,0.0,0.6353840486277399
+main,spatial,env,0.0,456,4,2175,1335,2179,0,HydroBoost-GAT,0.4,0.6,1.0,0.7768566892940494
+main,spatial,env,0.0,456,4,2175,1335,2179,0,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.7336025518001209
+main,spatial,env,0.0,456,4,2175,1335,2179,0,"HydroBoost | CatBoost + GAT, no diffusion",0.4,0.4,0.0,0.7743037044934902
+main,spatial,env,0.0,789,0,2846,1388,1455,0,HydroBoost-GAT,0.4,0.2,1.0,0.7043944479965899
+main,spatial,env,0.0,789,0,2846,1388,1455,0,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.6851342710997442
+main,spatial,env,0.0,789,0,2846,1388,1455,0,"HydroBoost | CatBoost + GAT, no diffusion",0.4,0.4,0.0,0.7042452578857629
+main,spatial,env,0.0,789,1,3209,1092,1388,0,HydroBoost-GAT,0.2,0.6,1.0,0.585975677743559
+main,spatial,env,0.0,789,1,3209,1092,1388,0,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.5666247582576868
+main,spatial,env,0.0,789,1,3209,1092,1388,0,"HydroBoost | CatBoost + GAT, no diffusion",0.2,0.4,0.0,0.5810274096373961
+main,spatial,env,0.0,789,2,3078,1519,1092,0,HydroBoost-GAT,0.6,0.6,1.0,0.6896805178915458
+main,spatial,env,0.0,789,2,3078,1519,1092,0,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.6780651655846824
+main,spatial,env,0.0,789,2,3078,1519,1092,0,"HydroBoost | CatBoost + GAT, no diffusion",0.6,0.4,0.0,0.6889957177162371
+main,spatial,env,0.0,789,3,3935,235,1519,0,HydroBoost-GAT,0.2,0.2,0.0,0.7144417144417144
+main,spatial,env,0.0,789,3,3935,235,1519,0,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.6393666393666394
+main,spatial,env,0.0,789,3,3935,235,1519,0,"HydroBoost | CatBoost + GAT, no diffusion",0.2,0.4,0.0,0.7144417144417144
+main,spatial,env,0.0,789,4,3999,1455,235,0,HydroBoost-GAT,0.4,0.6,1.0,0.6948288652095523
+main,spatial,env,0.0,789,4,3999,1455,235,0,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.6680569679641174
+main,spatial,env,0.0,789,4,3999,1455,235,0,"HydroBoost | CatBoost + GAT, no diffusion",0.4,0.4,0.0,0.6905130359169357
+main,spatial,env,0.0,2024,0,3366,872,1451,0,HydroBoost-GAT,0.0,0.4,1.0,0.608432173826373
+main,spatial,env,0.0,2024,0,3366,872,1451,0,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.5472341273796472
+main,spatial,env,0.0,2024,0,3366,872,1451,0,"HydroBoost | CatBoost + GAT, no diffusion",0.0,0.4,0.0,0.6039137512874182
+main,spatial,env,0.0,2024,1,3637,1180,872,0,HydroBoost-GAT,0.8,0.6,1.0,0.6384909219964137
+main,spatial,env,0.0,2024,1,3637,1180,872,0,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.6384815824865511
+main,spatial,env,0.0,2024,1,3637,1180,872,0,"HydroBoost | CatBoost + GAT, no diffusion",1.0,0.4,0.0,0.6368191497310222
+main,spatial,env,0.0,2024,2,2921,1588,1180,0,HydroBoost-GAT,0.2,0.6,1.0,0.7602437226415463
+main,spatial,env,0.0,2024,2,2921,1588,1180,0,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.7189535235187566
+main,spatial,env,0.0,2024,2,2921,1588,1180,0,"HydroBoost | CatBoost + GAT, no diffusion",0.2,0.4,0.0,0.7589672666227409
+main,spatial,env,0.0,2024,3,3503,598,1588,0,HydroBoost-GAT,0.4,0.6,1.0,0.6549613738386053
+main,spatial,env,0.0,2024,3,3503,598,1588,0,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.6373316630128407
+main,spatial,env,0.0,2024,3,3503,598,1588,0,"HydroBoost | CatBoost + GAT, no diffusion",0.4,0.4,0.0,0.6521949055224971
+main,spatial,env,0.0,2024,4,3640,1451,598,0,HydroBoost-GAT,0.4,0.6,1.0,0.6658998420475382
+main,spatial,env,0.0,2024,4,3640,1451,598,0,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.6476050934375621
+main,spatial,env,0.0,2024,4,3640,1451,598,0,"HydroBoost | CatBoost + GAT, no diffusion",0.4,0.4,0.0,0.6645151113501335
+main,spatial,env,500.0,42,0,3278,915,1308,188,HydroBoost-GAT,0.0,0.6,1.0,0.6113583246405134
+main,spatial,env,500.0,42,0,3278,915,1308,188,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.5536192940990057
+main,spatial,env,500.0,42,0,3278,915,1308,188,"HydroBoost | CatBoost + GAT, no diffusion",0.0,0.4,0.0,0.6082487158834325
+main,spatial,env,500.0,42,1,3323,1298,933,135,HydroBoost-GAT,0.4,0.6,1.0,0.723604475735479
+main,spatial,env,500.0,42,1,3323,1298,933,135,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.7052505028916269
+main,spatial,env,500.0,42,1,3323,1298,933,135,"HydroBoost | CatBoost + GAT, no diffusion",0.4,0.4,0.0,0.7210051546391752
+main,spatial,env,500.0,42,2,3288,880,1323,198,HydroBoost-GAT,0.2,0.4,1.0,0.6905096399853803
+main,spatial,env,500.0,42,2,3288,880,1323,198,HydroBoost | CatBoost + diffusion only,1.0,0.4,1.0,0.656909608004386
+main,spatial,env,500.0,42,2,3288,880,1323,198,"HydroBoost | CatBoost + GAT, no diffusion",0.2,0.4,0.0,0.6881510416666667
+main,spatial,env,500.0,42,3,3490,1168,951,80,HydroBoost-GAT,0.6,0.6,1.0,0.5850653786104606
+main,spatial,env,500.0,42,3,3490,1168,951,80,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.5782037293307785
+main,spatial,env,500.0,42,3,3490,1168,951,80,"HydroBoost | CatBoost + GAT, no diffusion",0.4,0.4,0.0,0.5833577283372365
+main,spatial,env,500.0,42,4,3099,1267,1174,149,HydroBoost-GAT,0.4,0.6,1.0,0.7115971395223453
+main,spatial,env,500.0,42,4,3099,1267,1174,149,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.6878506721648507
+main,spatial,env,500.0,42,4,3099,1267,1174,149,"HydroBoost | CatBoost + GAT, no diffusion",0.4,0.4,0.0,0.7045822150335046
+main,spatial,env,500.0,123,0,2868,1783,905,133,HydroBoost-GAT,0.0,0.2,1.0,0.6046692116695925
+main,spatial,env,500.0,123,0,2868,1783,905,133,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.562296488067793
+main,spatial,env,500.0,123,0,2868,1783,905,133,"HydroBoost | CatBoost + GAT, no diffusion",0.0,0.4,0.0,0.6046534605262027
+main,spatial,env,500.0,123,1,3168,537,1823,161,HydroBoost-GAT,0.0,0.2,1.0,0.7069805698677758
+main,spatial,env,500.0,123,1,3168,537,1823,161,HydroBoost | CatBoost + diffusion only,1.0,0.4,1.0,0.6353823949345087
+main,spatial,env,500.0,123,1,3168,537,1823,161,"HydroBoost | CatBoost + GAT, no diffusion",0.0,0.4,0.0,0.704373331677944
+main,spatial,env,500.0,123,2,3364,1724,539,62,HydroBoost-GAT,0.4,0.6,1.0,0.6523379870163274
+main,spatial,env,500.0,123,2,3364,1724,539,62,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.6379520365435858
+main,spatial,env,500.0,123,2,3364,1724,539,62,"HydroBoost | CatBoost + GAT, no diffusion",0.4,0.4,0.0,0.6514223397360055
+main,spatial,env,500.0,123,3,3115,656,1763,155,HydroBoost-GAT,0.6,0.6,1.0,0.6112235763960614
+main,spatial,env,500.0,123,3,3115,656,1763,155,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.6008607037113544
+main,spatial,env,500.0,123,3,3115,656,1763,155,"HydroBoost | CatBoost + GAT, no diffusion",0.6,0.4,0.0,0.6022309440198306
+main,spatial,env,500.0,123,4,4079,822,659,129,HydroBoost-GAT,0.8,0.4,1.0,0.6597811156235068
+main,spatial,env,500.0,123,4,4079,822,659,129,HydroBoost | CatBoost + diffusion only,1.0,0.4,1.0,0.6586613115145725
+main,spatial,env,500.0,123,4,4079,822,659,129,"HydroBoost | CatBoost + GAT, no diffusion",0.8,0.4,0.0,0.6587658265647397
+main,spatial,env,500.0,456,0,3258,897,1335,199,HydroBoost-GAT,0.6,0.6,1.0,0.5972259573224203
+main,spatial,env,500.0,456,0,3258,897,1335,199,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.5964016369482608
+main,spatial,env,500.0,456,0,3258,897,1335,199,"HydroBoost | CatBoost + GAT, no diffusion",0.8,0.4,0.0,0.595670856474715
+main,spatial,env,500.0,456,1,3858,808,928,95,HydroBoost-GAT,0.2,0.6,1.0,0.6748188934503311
+main,spatial,env,500.0,456,1,3858,808,928,95,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.6508194382292092
+main,spatial,env,500.0,456,1,3858,808,928,95,"HydroBoost | CatBoost + GAT, no diffusion",0.2,0.4,0.0,0.6702531276144522
+main,spatial,env,500.0,456,2,4390,392,834,73,HydroBoost-GAT,0.4,0.6,0.5,0.76
+main,spatial,env,500.0,456,2,4390,392,834,73,HydroBoost | CatBoost + diffusion only,1.0,0.4,1.0,0.7220652173913044
+main,spatial,env,500.0,456,2,4390,392,834,73,"HydroBoost | CatBoost + GAT, no diffusion",0.4,0.4,0.0,0.7583333333333333
+main,spatial,env,500.0,456,3,3007,2155,413,114,HydroBoost-GAT,0.0,0.6,1.0,0.6377480091363664
+main,spatial,env,500.0,456,3,3007,2155,413,114,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.5929304278041854
+main,spatial,env,500.0,456,3,3007,2155,413,114,"HydroBoost | CatBoost + GAT, no diffusion",0.0,0.4,0.0,0.6365578122106303
+main,spatial,env,500.0,456,4,2150,1288,2179,72,HydroBoost-GAT,0.4,0.6,1.0,0.7717502138796023
+main,spatial,env,500.0,456,4,2150,1288,2179,72,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.7424589682637395
+main,spatial,env,500.0,456,4,2150,1288,2179,72,"HydroBoost | CatBoost + GAT, no diffusion",0.4,0.4,0.0,0.7687322227378484
+main,spatial,env,500.0,789,0,2709,1360,1455,165,HydroBoost-GAT,0.2,0.2,0.5,0.7069747085182105
+main,spatial,env,500.0,789,0,2709,1360,1455,165,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.6776673773636163
+main,spatial,env,500.0,789,0,2709,1360,1455,165,"HydroBoost | CatBoost + GAT, no diffusion",0.2,0.4,0.0,0.7069198284448908
+main,spatial,env,500.0,789,1,3114,1042,1388,145,HydroBoost-GAT,0.4,0.6,1.0,0.5914862403885066
+main,spatial,env,500.0,789,1,3114,1042,1388,145,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.5692238297585324
+main,spatial,env,500.0,789,1,3114,1042,1388,145,"HydroBoost | CatBoost + GAT, no diffusion",0.4,0.4,0.0,0.585559152839606
+main,spatial,env,500.0,789,2,3021,1423,1092,153,HydroBoost-GAT,0.6,0.6,1.0,0.6872880898391104
+main,spatial,env,500.0,789,2,3021,1423,1092,153,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.666385919447144
+main,spatial,env,500.0,789,2,3021,1423,1092,153,"HydroBoost | CatBoost + GAT, no diffusion",0.6,0.4,0.0,0.6865943202677897
+main,spatial,env,500.0,789,3,3780,235,1519,155,HydroBoost-GAT,0.2,0.2,0.5,0.6980616980616982
+main,spatial,env,500.0,789,3,3780,235,1519,155,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.6303576303576304
+main,spatial,env,500.0,789,3,3780,235,1519,155,"HydroBoost | CatBoost + GAT, no diffusion",0.2,0.4,0.0,0.6941031941031941
+main,spatial,env,500.0,789,4,3970,1435,235,49,HydroBoost-GAT,0.4,0.6,1.0,0.7006333755248829
+main,spatial,env,500.0,789,4,3970,1435,235,49,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.673183754244269
+main,spatial,env,500.0,789,4,3970,1435,235,49,"HydroBoost | CatBoost + GAT, no diffusion",0.4,0.4,0.0,0.6969365921282624
+main,spatial,env,500.0,2024,0,3264,815,1451,159,HydroBoost-GAT,0.0,0.6,0.5,0.6059128268234507
+main,spatial,env,500.0,2024,0,3264,815,1451,159,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.545983166978108
+main,spatial,env,500.0,2024,0,3264,815,1451,159,"HydroBoost | CatBoost + GAT, no diffusion",0.0,0.4,0.0,0.6008006319979339
+main,spatial,env,500.0,2024,1,3539,1127,872,151,HydroBoost-GAT,1.0,0.6,1.0,0.6497976028588596
+main,spatial,env,500.0,2024,1,3539,1127,872,151,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.6497976028588596
+main,spatial,env,500.0,2024,1,3539,1127,872,151,"HydroBoost | CatBoost + GAT, no diffusion",1.0,0.4,0.0,0.6474995519854948
+main,spatial,env,500.0,2024,2,2828,1519,1180,162,HydroBoost-GAT,0.2,0.6,1.0,0.7606545857299752
+main,spatial,env,500.0,2024,2,2828,1519,1180,162,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.7065114201150389
+main,spatial,env,500.0,2024,2,2828,1519,1180,162,"HydroBoost | CatBoost + GAT, no diffusion",0.2,0.4,0.0,0.7592142737476965
+main,spatial,env,500.0,2024,3,3334,585,1588,182,HydroBoost-GAT,0.4,0.4,1.0,0.6539358126423073
+main,spatial,env,500.0,2024,3,3334,585,1588,182,HydroBoost | CatBoost + diffusion only,1.0,0.4,1.0,0.6356188333514041
+main,spatial,env,500.0,2024,3,3334,585,1588,182,"HydroBoost | CatBoost + GAT, no diffusion",0.4,0.4,0.0,0.6527295890708014
+main,spatial,env,500.0,2024,4,3600,1413,598,78,HydroBoost-GAT,0.4,0.6,1.0,0.6641845713931605
+main,spatial,env,500.0,2024,4,3600,1413,598,78,HydroBoost | CatBoost + diffusion only,1.0,0.6,1.0,0.6435554050584726
+main,spatial,env,500.0,2024,4,3600,1413,598,78,"HydroBoost | CatBoost + GAT, no diffusion",0.4,0.4,0.0,0.6626995192946113

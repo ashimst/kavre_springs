@@ -1,238 +1,244 @@
 """
-Hydrogeological Explainability Suite:
-1. Exact TreeSHAP feature attribution for non-linear tabular drivers.
-2. ResGATv2 Learned Multi-Head Attention Extraction on Standardized 5D Physical Edges.
-3. Regime-Specific Attention Analysis:
-   - Regime 1: Upslope Hazard Conduits (Dried -> Active, dz > 100m, steep slope)
-   - Regime 2: Short-Range Sub-Catchment Conduits (d < 350m, matching Moran's I peak at k=3)
-   - Regime 3: Cross-Ridge / Distant Background Pairs (d > 700m or flat)
-   - Two-Sample Statistical Significance: Mann-Whitney U and Kolmogorov-Smirnov (KS) tests.
-4. Interactive Spring Subgraph Inspection Tool.
+Explainability on the primary (leak-free) feature set.
+
+1. TreeSHAP for CatBoost fitted on all springs (descriptive attribution).
+2. Logistic-regression standardized coefficients with 95 % spatial-block
+   bootstrap CIs (8 x 8 grid blocks resampled with replacement, 500 reps).
+   Logistic regression is the best-performing model on the primary feature
+   set, so its coefficients are the most defensible driver summary.
+3. ResGATv2 attention analysis -- designed to avoid the circularity of the
+   previous version (which trained on all labels and defined edge "regimes"
+   by the labels themselves):
+     * models are trained on the training folds only (spatial 5-fold, seed 42);
+     * attention is analysed only for edges whose *receiver* is a test spring;
+     * edge groups are defined by geometry only (never by labels);
+     * because GATv2 attention is softmax-normalised per receiver, the unit of
+       analysis is the receiver: for each receiver we compute (a) the Spearman
+       correlation between attention and edge length and (b) the mean attention
+       on upslope senders minus downslope senders; we report the mean over
+       receivers with a bootstrap 95 % CI;
+     * the same statistics are computed for the placebo model trained with
+       shuffled edge attributes; a physical interpretation is only supported if
+       the real model differs from the placebo.
 """
+
+from __future__ import annotations
 
 import sys
 from pathlib import Path
+
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+import logging
 import os
-os.environ["MPLCONFIGDIR"] = os.path.join(str(PROJECT_ROOT), ".matplotlib")
 
+os.environ.setdefault("MPLCONFIGDIR", str(PROJECT_ROOT / ".matplotlib"))
+
+import matplotlib
+
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-from scipy import stats
 import torch
-import torch.nn.functional as F
-import logging
+from scipy import stats
+from sklearn.linear_model import LogisticRegression
 
+from src.features import PRIMARY_FEATURE_SET
+from src.graph_builder import build_graph, load_master
 from src.models.res_gat import ResGATv2
+from src.models.training import DEVICE, train_node_classifier
+from src.spatial_splits import grid_block_ids, spatial_block_kfold
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("explainability")
+METRICS_DIR = PROJECT_ROOT / "results/metrics"
+FIG_DIR = PROJECT_ROOT / "results/figures"
 
-DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-OUTPUT_METRICS_DIR = Path("results/metrics")
-OUTPUT_FIGURES_DIR = Path("results/figures")
-GRAPH_PATH = Path("data/graph/graph_knn_k7_physical.pt")
-
-
-def extract_resgat_attention():
-    """Extract layer-1 multi-head attention weights from trained ResGATv2."""
-    logger.info("Loading standardized 5D physical graph for explainability...")
-    data = torch.load(GRAPH_PATH, weights_only=False)
-    x = data["x"].to(DEVICE)
-    edge_index = data["edge_index"].to(DEVICE)
-    edge_attr = data["edge_attr"].to(DEVICE)
-    y = data["y_dried"].to(DEVICE)
-    y_np = y.cpu().numpy()
-
-    orig_edge_index_np = data["edge_index"].numpy()
-    orig_edge_attr_raw = data["edge_attr_raw"].numpy()  # raw [log1p(d), dx, dy, dz, slope]
-
-    # Initialize and train ResGATv2
-    model = ResGATv2(in_dim=x.shape[1], hidden_dim=64, edge_dim=5, heads=2, num_layers=1).to(DEVICE)
-    optimizer = torch.optim.AdamW(model.parameters(), lr=0.003, weight_decay=1e-4)
-    criterion = torch.nn.CrossEntropyLoss(weight=torch.tensor([1.0, 2.74], device=DEVICE))
-
-    logger.info("Training ResGATv2 to convergence for calibrated attention weights...")
-    model.train()
-    for ep in range(120):
-        optimizer.zero_grad()
-        out = model(x, edge_index, edge_attr=edge_attr)
-        loss = criterion(out, y)
-        loss.backward()
-        optimizer.step()
-
-    model.eval()
-    with torch.no_grad():
-        out, (ret_edge_idx, alpha) = model(x, edge_index, edge_attr=edge_attr, return_attention_weights=True)
-
-    ret_edges = ret_edge_idx.cpu().numpy()
-    alpha_np = alpha.cpu().numpy()  # [num_edges_with_loops, 2 heads]
-
-    # Map original edge attributes to attention edges
-    edge_map = {}
-    for idx in range(orig_edge_index_np.shape[1]):
-        s = int(orig_edge_index_np[0, idx])
-        t = int(orig_edge_index_np[1, idx])
-        edge_map[(s, t)] = idx
-
-    records = []
-    for idx in range(ret_edges.shape[1]):
-        s = int(ret_edges[0, idx])
-        t = int(ret_edges[1, idx])
-        if s == t:
-            continue  # ignore self loops
-        if (s, t) in edge_map:
-            orig_idx = edge_map[(s, t)]
-            raw_attrs = orig_edge_attr_raw[orig_idx]
-            d_meters = np.expm1(raw_attrs[0])
-            dz_meters = raw_attrs[3]
-            slope_grad = raw_attrs[4]
-
-            s_dried = int(y_np[s])
-            d_dried = int(y_np[t])
-            mean_att = float(alpha_np[idx].mean())
-
-            # Assign Physical & Desiccation Regime
-            # Regime 1: Upslope Dried-to-Active Hazard Conduit
-            if s_dried == 1 and d_dried == 0 and dz_meters > 80.0 and slope_grad > 0.10:
-                regime = "1. Upslope Hazard Conduit (Dried->Active, dz>80m)"
-            # Regime 2: Short-Range Sub-Catchment Conduit (d < 350m)
-            elif d_meters < 350.0:
-                regime = "2. Short-Range Sub-Catchment (d < 350m)"
-            # Regime 3: Distant / Cross-Ridge Background (d > 700m)
-            elif d_meters > 700.0:
-                regime = "3. Distant Background Conduit (d > 700m)"
-            else:
-                regime = "4. Intermediate Conduit"
-
-            records.append({
-                "src_id": s,
-                "dst_id": t,
-                "head_1_alpha": float(alpha_np[idx, 0]),
-                "head_2_alpha": float(alpha_np[idx, 1]),
-                "mean_alpha": mean_att,
-                "distance_m": float(d_meters),
-                "delta_elevation_m": float(dz_meters),
-                "slope_gradient": float(slope_grad),
-                "src_dried": s_dried,
-                "dst_dried": d_dried,
-                "regime": regime,
-            })
-
-    df_edges = pd.DataFrame(records)
-    logger.info(f"Extracted attention weights for {len(df_edges):,} directed physical conduits.")
-
-    # Statistical Significance Tests between Regimes
-    r1 = df_edges[df_edges["regime"].str.startswith("1.")]["mean_alpha"].values
-    r2 = df_edges[df_edges["regime"].str.startswith("2.")]["mean_alpha"].values
-    r3 = df_edges[df_edges["regime"].str.startswith("3.")]["mean_alpha"].values
-
-    logger.info(f"Regime 1 (Upslope Hazard) N={len(r1)}, Mean alpha={np.mean(r1):.4f}")
-    logger.info(f"Regime 2 (Short-Range Catchment) N={len(r2)}, Mean alpha={np.mean(r2):.4f}")
-    logger.info(f"Regime 3 (Distant Background) N={len(r3)}, Mean alpha={np.mean(r3):.4f}")
-
-    # Mann-Whitney U & Kolmogorov-Smirnov Tests
-    mw_1_3 = stats.mannwhitneyu(r1, r3, alternative="greater")
-    ks_1_3 = stats.ks_2samp(r1, r3)
-    mw_2_3 = stats.mannwhitneyu(r2, r3, alternative="greater")
-    ks_2_3 = stats.ks_2samp(r2, r3)
-
-    logger.info(f"Mann-Whitney U (Upslope vs Background): U={mw_1_3.statistic:.1f}, p={mw_1_3.pvalue:.4e}")
-    logger.info(f"KS-Test (Short-Range vs Background): D={ks_2_3.statistic:.4f}, p={ks_2_3.pvalue:.4e}")
-
-    test_results = [
-        {"Comparison": "Upslope Hazard vs Distant Background", "Mann_Whitney_U": mw_1_3.statistic, "MW_p_value": mw_1_3.pvalue, "KS_stat_D": ks_1_3.statistic, "KS_p_value": ks_1_3.pvalue, "Significance": "p < 0.001 (Highly Significant)"},
-        {"Comparison": "Short-Range Sub-Catchment vs Distant Background", "Mann_Whitney_U": mw_2_3.statistic, "MW_p_value": mw_2_3.pvalue, "KS_stat_D": ks_2_3.statistic, "KS_p_value": ks_2_3.pvalue, "Significance": "p < 0.001 (Highly Significant)"},
-    ]
-    df_tests = pd.DataFrame(test_results)
-    OUTPUT_METRICS_DIR.mkdir(parents=True, exist_ok=True)
-    df_tests.to_csv(OUTPUT_METRICS_DIR / "regime_attention_significance_tests.csv", index=False)
-
-    # Save Top 500 Hazard Boundary Corridors
-    df_hazard = df_edges[df_edges["src_dried"] != df_edges["dst_dried"]].sort_values("mean_alpha", ascending=False).head(500)
-    df_hazard.to_csv(OUTPUT_METRICS_DIR / "resgat_critical_hazard_corridors.csv", index=False)
-    logger.info(f"Saved {len(df_hazard)} hazard boundary conduits to resgat_critical_hazard_corridors.csv")
-
-    # Plot Publication Figure
-    plot_regime_attention_figure(df_edges, df_tests)
-    return df_edges, df_tests
+PRETTY = {
+    "latitude": "Latitude", "longitude": "Longitude", "spring_density_500m": "Spring density (500 m)",
+    "elevation_m": "Elevation", "slope_deg": "Slope", "aspect_sin": "Aspect (eastness)",
+    "aspect_cos": "Aspect (northness)", "precip_annual_mm": "Annual precip.", "precip_monsoon_mm": "Monsoon precip.",
+    "precip_dry_season_mm": "Dry-season precip.", "ndvi_mean": "NDVI", "ndwi_mean": "NDWI",
+    "Source Type_encoded": "Source type (pond=1)", "landuse_agriculture": "LU: agriculture",
+    "landuse_dense_forest": "LU: dense forest", "landuse_fallow": "LU: fallow", "landuse_grassland": "LU: grassland",
+    "landuse_others": "LU: other", "landuse_settlement": "LU: settlement", "landuse_sparse_forest": "LU: sparse forest",
+    "ownership_community": "Own.: community", "ownership_private": "Own.: private", "ownership_public": "Own.: public",
+    "Perennial / Seasonal_encoded": "Seasonal (=1)",
+}
 
 
-def plot_regime_attention_figure(df_edges, df_tests):
-    plt.style.use("seaborn-v0_8-whitegrid" if "seaborn-v0_8-whitegrid" in plt.style.available else "default")
-    fig, axes = plt.subplots(1, 3, figsize=(18, 5.5), dpi=300)
+def shap_analysis(g):
+    import shap
+    from catboost import CatBoostClassifier
+    X = pd.DataFrame(g["x_raw"], columns=[PRETTY.get(c, c) for c in g["feature_cols"]])
+    y = g["y"].numpy()
+    m = CatBoostClassifier(iterations=400, depth=6, learning_rate=0.05, auto_class_weights="Balanced",
+                           verbose=0, random_seed=42, allow_writing_files=False).fit(X, y)
+    sv = shap.TreeExplainer(m).shap_values(X)
+    imp = pd.DataFrame({"feature": g["feature_cols"], "label": X.columns, "mean_abs_shap": np.abs(sv).mean(0)})
+    imp = imp.sort_values("mean_abs_shap", ascending=False).reset_index(drop=True)
+    imp["rank"] = np.arange(1, len(imp) + 1)
+    imp.to_csv(METRICS_DIR / "feature_importance_shap.csv", index=False)
 
-    # 1. Attention Distributions across Physical Regimes
-    ax1 = axes[0]
-    regimes = [
-        "1. Upslope Hazard Conduit (Dried->Active, dz>80m)",
-        "2. Short-Range Sub-Catchment (d < 350m)",
-        "3. Distant Background Conduit (d > 700m)",
-    ]
-    sub_df = df_edges[df_edges["regime"].isin(regimes)].copy()
-    sub_df["short_regime"] = sub_df["regime"].map({
-        regimes[0]: "Upslope Hazard\n(dz>80m, Dried->Active)",
-        regimes[1]: "Short-Range\n(d < 350m)",
-        regimes[2]: "Distant Background\n(d > 700m)",
-    })
-    palette = ["#e74c3c", "#2980b9", "#95a5a6"]
-    sns.boxplot(data=sub_df, x="short_regime", y="mean_alpha", palette=palette, ax=ax1, width=0.5, showfliers=False)
-    ax1.set_title("(a) ResGATv2 Attention by Hydro-Topographic Regime", fontsize=12, fontweight="bold")
-    ax1.set_ylabel("Learned Attention Weight (alpha)", fontsize=11, fontweight="bold")
-    ax1.set_xlabel("Conduit Physical Regime", fontsize=11, fontweight="bold")
+    plt.figure()
+    shap.summary_plot(sv, X, show=False, max_display=15)
+    plt.title("TreeSHAP (CatBoost, primary feature set)", fontsize=11)
+    plt.savefig(FIG_DIR / "shap_summary_beeswarm.png", dpi=300, bbox_inches="tight")
+    plt.close("all")
 
-    # 2. Distance Decay of Attention (Matching Moran's I Sub-Catchment Peak)
-    ax2 = axes[1]
-    # Bin by distance
-    bins = [0, 250, 500, 750, 1000, 1500, 3000]
-    labels = ["<250m", "250-500m", "500-750m", "750-1000m", "1-1.5km", ">1.5km"]
-    df_edges["dist_bin"] = pd.cut(df_edges["distance_m"], bins=bins, labels=labels)
-    
-    # Compute mean and empirical 95% confidence interval (clipped strictly at 0.0)
-    dist_summary = df_edges.groupby("dist_bin", observed=True)["mean_alpha"].agg(
-        mean="mean",
-        std="std",
-        q25=lambda x: np.percentile(x, 25),
-        q75=lambda x: np.percentile(x, 75),
-    ).reset_index()
+    fig, ax = plt.subplots(figsize=(6.5, 5))
+    top = imp.head(15)[::-1]
+    ax.barh(top["label"], top["mean_abs_shap"], color="#4C72B0")
+    ax.set_xlabel("mean |SHAP| (log-odds)")
+    ax.set_title("Global feature attribution (CatBoost, primary set)")
+    fig.tight_layout()
+    fig.savefig(FIG_DIR / "shap_feature_importance_bar.png", dpi=300)
+    plt.close(fig)
 
-    lower_bound = np.maximum(0.0, dist_summary["mean"] - dist_summary["std"])
-    upper_bound = dist_summary["mean"] + dist_summary["std"]
+    top_feat = imp["label"].iloc[0]
+    plt.figure()
+    shap.dependence_plot(top_feat, sv, X, show=False, interaction_index=None)
+    plt.savefig(FIG_DIR / "shap_dependence_top_feature.png", dpi=300, bbox_inches="tight")
+    plt.close("all")
+    return imp
 
-    ax2.plot(range(len(labels)), dist_summary["mean"], marker="s", linewidth=2.5, markersize=8, color="#27ae60", label="Mean Attention (alpha)")
-    ax2.fill_between(range(len(labels)), lower_bound, upper_bound, alpha=0.20, color="#27ae60", label="±1 Std Dev (Clipped at 0.0)")
-    ax2.set_xticks(range(len(labels)))
-    ax2.set_xticklabels(labels, rotation=15)
-    ax2.set_ylim(bottom=0.0)
-    ax2.set_title("(b) Attention Distance Decay (Sub-Catchment Scale)", fontsize=12, fontweight="bold")
-    ax2.set_xlabel("Physical Conduit Distance", fontsize=11, fontweight="bold")
-    ax2.set_ylabel("Mean Attention Weight (alpha)", fontsize=11, fontweight="bold")
-    ax2.legend(loc="upper right", fontsize=8, frameon=True)
 
-    # 3. Elevation Head vs Attention along Hazard Boundary
-    ax3 = axes[2]
-    haz = df_edges[df_edges["src_dried"] != df_edges["dst_dried"]]
-    sample_n = min(2000, len(haz))
-    sns.regplot(data=haz.sample(sample_n, random_state=42), x="delta_elevation_m", y="mean_alpha", ax=ax3,
-                scatter_kws={"alpha": 0.35, "color": "#e67e22", "s": 15}, line_kws={"color": "#c0392b", "linewidth": 2})
-    ax3.set_title("(c) Hazard Boundary: Elevation Head Delta z vs Attention", fontsize=12, fontweight="bold")
-    ax3.set_xlabel("Elevation Head Delta z (m, Upward Recharge)", fontsize=11, fontweight="bold")
-    ax3.set_ylabel("Learned Attention alpha", fontsize=11, fontweight="bold")
+def logistic_coefficients(g, n_boot=500, seed=0):
+    X, y = g["x"].numpy(), g["y"].numpy()
+    blocks = grid_block_ids(g["coords_m"], 8)
+    ub = np.unique(blocks)
+    members = {b: np.where(blocks == b)[0] for b in ub}
+    fit = lambda Xs, ys: LogisticRegression(class_weight="balanced", max_iter=3000).fit(Xs, ys).coef_[0]
+    coef = fit(X, y)
+    rng = np.random.default_rng(seed)
+    boots = []
+    for _ in range(n_boot):
+        idx = np.concatenate([members[b] for b in rng.choice(ub, size=len(ub), replace=True)])
+        if len(np.unique(y[idx])) < 2:
+            continue
+        boots.append(fit(X[idx], y[idx]))
+    boots = np.array(boots)
+    lo, hi = np.percentile(boots, [2.5, 97.5], axis=0)
+    out = pd.DataFrame({"feature": g["feature_cols"], "label": [PRETTY.get(c, c) for c in g["feature_cols"]],
+                        "coef_per_sd": coef, "ci_low": lo, "ci_high": hi, "odds_ratio_per_sd": np.exp(coef)})
+    out["ci_excludes_zero"] = (out.ci_low > 0) | (out.ci_high < 0)
+    out = out.reindex(out.coef_per_sd.abs().sort_values(ascending=False).index).reset_index(drop=True)
+    out.to_csv(METRICS_DIR / "logistic_coefficients_block_bootstrap.csv", index=False)
 
-    plt.suptitle("ResGATv2 Regime-Specific Attention: Empirical Proof of Sub-Catchment & Recharge Routing", fontsize=14, fontweight="bold", y=1.02)
-    plt.tight_layout()
+    fig, ax = plt.subplots(figsize=(6.5, 6.5))
+    d = out[::-1]
+    col = np.where(d.ci_excludes_zero, "#C44E52", "#8C8C8C")
+    ax.errorbar(d.coef_per_sd, range(len(d)), xerr=[d.coef_per_sd - d.ci_low, d.ci_high - d.coef_per_sd],
+                fmt="none", ecolor=col, elinewidth=1.5)
+    ax.scatter(d.coef_per_sd, range(len(d)), c=col, zorder=3, s=18)
+    ax.axvline(0, color="k", lw=0.8)
+    ax.set_yticks(range(len(d)))
+    ax.set_yticklabels(d.label, fontsize=8)
+    ax.set_xlabel("Standardized log-odds coefficient (95 % spatial-block bootstrap CI)")
+    ax.set_title("Logistic regression: associations with drying")
+    fig.tight_layout()
+    fig.savefig(FIG_DIR / "logistic_coefficients.png", dpi=300)
+    plt.close(fig)
+    return out
 
-    out_fig = OUTPUT_FIGURES_DIR / "attention_explainability.png"
-    plt.savefig(out_fig, dpi=300, bbox_inches="tight")
-    plt.savefig(Path(r"C:\Users\ACER\.gemini\antigravity\brain\be3e2d95-a03e-4ea0-9dbb-28995a69c0d8") / "attention_explainability.png", dpi=300, bbox_inches="tight")
-    logger.info(f"Saved figure to {out_fig}")
+
+def _receiver_stats(att_ei, alpha, g, test_mask):
+    src, dst = att_ei
+    keep = (src != dst) & test_mask[dst]
+    src, dst, a = src[keep], dst[keep], alpha[keep].mean(1)
+    d = np.linalg.norm(g["coords_m"][dst] - g["coords_m"][src], axis=1)
+    upslope_sender = g["elevation"][src] > g["elevation"][dst]
+    df = pd.DataFrame({"dst": dst, "a": a, "d": d, "up": upslope_sender})
+    rho, diff = [], []
+    for _, grp in df.groupby("dst"):
+        if grp.d.nunique() > 2:
+            rho.append(stats.spearmanr(grp.a, grp.d).statistic)
+        if grp.up.any() and (~grp.up).any():
+            diff.append(grp.a[grp.up].mean() - grp.a[~grp.up].mean())
+    return np.array([r for r in rho if np.isfinite(r)]), np.array(diff), df
+
+
+def _boot_ci(v, rng, n=2000):
+    means = [rng.choice(v, len(v), replace=True).mean() for _ in range(n)]
+    return float(np.mean(v)), *np.percentile(means, [2.5, 97.5])
+
+
+def attention_analysis(g, seed=42):
+    x, y, ei, ea = g["x"], g["y"], g["edge_index"], g["edge_attr"]
+    d_in = x.shape[1]
+    rng = np.random.default_rng(seed)
+    perm = torch.as_tensor(rng.permutation(ea.shape[0]))
+    acc = {"real": ([], []), "placebo_shuffled_edges": ([], [])}
+    edge_frames = []
+    for split in spatial_block_kfold(g["coords_m"], 5, random_state=seed):
+        for name, e_attr in [("real", ea), ("placebo_shuffled_edges", ea[perm])]:
+            _, model = train_node_classifier(lambda: ResGATv2(d_in, edge_dim=5), x, ei, e_attr, y,
+                                             split["train_mask"], split["val_mask"], seed=seed)
+            with torch.no_grad():
+                _, (att_ei, alpha) = model(x.to(DEVICE), ei.to(DEVICE), e_attr.to(DEVICE),
+                                           return_attention_weights=True)
+            rho, diff, df = _receiver_stats(att_ei.cpu().numpy(), alpha.cpu().numpy(), g, split["test_mask"])
+            acc[name][0].append(rho)
+            acc[name][1].append(diff)
+            if name == "real":
+                df["fold"] = split["fold"]
+                edge_frames.append(df)
+    rows = []
+    for name, (rhos, diffs) in acc.items():
+        r, dfs = np.concatenate(rhos), np.concatenate(diffs)
+        m, lo, hi = _boot_ci(r, rng)
+        rows.append({"model": name, "statistic": "within-receiver Spearman(attention, edge length)",
+                     "n_receivers": len(r), "mean": m, "ci_low": lo, "ci_high": hi})
+        m, lo, hi = _boot_ci(dfs, rng)
+        rows.append({"model": name, "statistic": "attention(upslope senders) - attention(downslope senders)",
+                     "n_receivers": len(dfs), "mean": m, "ci_low": lo, "ci_high": hi})
+    res = pd.DataFrame(rows)
+    res.to_csv(METRICS_DIR / "attention_analysis.csv", index=False)
+
+    edges = pd.concat(edge_frames)
+    fig, axes = plt.subplots(1, 2, figsize=(11, 4.2))
+    bins = [0, 100, 250, 500, 1000, 1e9]
+    labels = ["<100 m", "100-250", "250-500", "500-1000", ">1 km"]
+    edges["bin"] = pd.cut(edges.d, bins, labels=labels)
+    s = edges.groupby("bin", observed=True).a.agg(["mean", "sem"])
+    axes[0].errorbar(range(len(s)), s["mean"], yerr=1.96 * s["sem"], marker="o", capsize=3)
+    axes[0].axhline(1 / 8, ls="--", c="grey", lw=0.8, label="uniform (1/8)")
+    axes[0].set_xticks(range(len(s)))
+    axes[0].set_xticklabels(s.index, rotation=15)
+    axes[0].set_ylabel("mean attention (test receivers)")
+    axes[0].set_title("(a) Attention vs edge length")
+    axes[0].legend(fontsize=8)
+    ax = axes[1]
+    for i, name in enumerate(["real", "placebo_shuffled_edges"]):
+        sub = res[res.model == name].reset_index(drop=True)
+        ax.errorbar(np.arange(2) + (i - 0.5) * 0.2, sub["mean"],
+                    yerr=[sub["mean"] - sub.ci_low, sub.ci_high - sub["mean"]], fmt="o", capsize=3,
+                    label="ResGATv2" if name == "real" else "placebo (shuffled edge attrs)")
+    ax.axhline(0, c="k", lw=0.8)
+    ax.set_xticks([0, 1])
+    ax.set_xticklabels(["Spearman(att, distance)", "upslope - downslope"], fontsize=9)
+    ax.set_title("(b) Within-receiver attention statistics (95 % CI)")
+    ax.legend(fontsize=8)
+    fig.tight_layout()
+    fig.savefig(FIG_DIR / "attention_analysis.png", dpi=300)
+    plt.close(fig)
+    return res
+
+
+def run_all():
+    METRICS_DIR.mkdir(parents=True, exist_ok=True)
+    FIG_DIR.mkdir(parents=True, exist_ok=True)
+    g = build_graph(load_master(), PRIMARY_FEATURE_SET)
+    logger.info("TreeSHAP ...")
+    shap_analysis(g)
+    logger.info("Logistic coefficients with spatial-block bootstrap ...")
+    logistic_coefficients(g)
+    logger.info("Attention analysis ...")
+    print(attention_analysis(g).to_string())
 
 
 if __name__ == "__main__":
-    extract_resgat_attention()
-
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+    run_all()

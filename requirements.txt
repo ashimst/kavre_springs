@@ -1,18 +1,19 @@
-numpy>=1.26.0
-pandas>=2.2.0
-scipy>=1.13.0
-scikit-learn>=1.4.0
-torch>=2.2.0
-torch-geometric>=2.5.0
-catboost>=1.2.0
-xgboost>=2.0.0
-geopandas>=0.14.0
-shap>=0.45.0
-matplotlib>=3.8.0
-seaborn>=0.13.0
-folium>=0.16.0
-esda>=2.5.0
-libpysal>=4.9.0
-mlxtend>=0.23.0
-pytest>=8.0.0
-
+# Exact versions used to produce the published results (Python 3.12, CUDA 12.6).
+# torch: install the build matching your platform from https://pytorch.org (CPU works, ~5x slower).
+numpy==2.2.6
+pandas==2.2.3
+pyarrow==23.0.0
+scipy==1.13.1
+scikit-learn==1.5.2
+torch==2.13.0
+torch-geometric==2.8.1
+catboost==1.2.10
+xgboost==3.4.1
+shap==0.54.1
+matplotlib==3.9.2
+seaborn==0.13.2
+geopandas==1.2.0
+folium==0.20.0
+pytest==8.3.3
+# Only needed to re-extract remote-sensing covariates (requires a Google Earth Engine account):
+# earthengine-api
