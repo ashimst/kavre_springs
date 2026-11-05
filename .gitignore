@@ -1,0 +1,33 @@
+# Python / Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Environment & Dependencies
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Jupyter / IPython
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+
+# IDEs & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Cache & Temporary Runs
+.matplotlib/
+catboost_info/
+cache/
+.pytest_cache/
+*.log
+
+# Large Raw Artifacts / Intermediates (if any)
+tmp/
+scratch/

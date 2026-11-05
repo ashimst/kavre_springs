@@ -1,0 +1,3 @@
+Comparison,Mann_Whitney_U,MW_p_value,KS_stat_D,KS_p_value,Significance
+Upslope Hazard vs Distant Background,437383.0,6.94335051352162e-55,0.3979073948025202,7.625888325311126e-42,p < 0.001 (Highly Significant)
+Short-Range Sub-Catchment vs Distant Background,28509925.5,8.165201845188816e-48,0.18329592360394273,1.9723635986343202e-45,p < 0.001 (Highly Significant)

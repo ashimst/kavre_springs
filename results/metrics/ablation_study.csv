@@ -1,0 +1,8 @@
+stage,variant,f1_macro,bal_acc,roc_auc,key_finding
+1. Pure Tabular,CatBoost Baseline,0.9387,0.9523,0.9872,"Strong tabular thresholds, zero spatial continuity"
+2. Isotropic GNN,SpringGCN,0.6717,0.6995,0.7804,Severe oversmoothing across mountain ridges
+2. Isotropic GNN,SpringGraphSAGE,0.9322,0.9509,0.9818,"Mean neighbor aggregation, unweighted by topography"
+3. Attention Base,"Vanilla GATv2 (No skip, unscaled)",0.9257,0.9505,0.9779,Attention without skip connections underperforms trees
+4. Ego-Residuals,+ Ego Skip (No LayerNorm),0.9338,0.9576,0.9845,"Preserves ego scale, jumps Balanced Accuracy to 0.9576"
+5. Physical Edges,+ Standardized 5D Edges (ResGATv2),0.9368,0.9545,0.9859,Anchors attention in delta_z and slope (+0.30% F1)
+6. Dual-Stage SOTA,Full HydroBoost-GAT,0.9401,0.9571,0.9873,Out-of-fold prior + ResGATv2 + Residual diffusion = SOTA
