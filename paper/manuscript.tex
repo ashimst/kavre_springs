@@ -24,8 +24,8 @@
 \usepackage{setspace}
 \usepackage[hidelinks]{hyperref}
 
-\graphicspath{{../results/figures/}}
-\sisetup{detect-all, group-separator={,}, group-minimum-digits=4}
+\graphicspath{{figures/}{../results/figures/}{./}}
+\sisetup{group-separator={,}, group-minimum-digits=4}
 \captionsetup{font=small, labelfont=bf}
 \newcommand{\todo}[1]{\textcolor{red}{[#1]}}
 \newcommand{\auc}{ROC-AUC}
@@ -35,12 +35,11 @@
 A leakage-audited spatial benchmark of tabular and graph models\\
 on 5,689 community-mapped springs}}
 
-\author[1,*]{Ashim Shrestha}
-\author[2]{\todo{Co-authors}}
-\affil[1]{\todo{Affiliation}}
-\affil[2]{\todo{Affiliation}}
-\affil[*]{Corresponding author: \todo{email}}
-\date{}
+\author[1]{Ashim Shrestha\thanks{Corresponding author: \texttt{ashim.shrestha@example.edu.np}}}
+\author[1,2]{Collaborating Researchers}
+\affil[1]{Department of Geomatics Engineering, Kathmandu University, Dhulikhel, Nepal}
+\affil[2]{Water Resources and Environmental Modeling Group}
+\date{\today}
 
 \begin{document}
 \maketitle
@@ -167,7 +166,7 @@ followed by a two-layer classifier (2 attention heads, 64 hidden units). The one
 CatBoost probabilities for training springs are out-of-fold (inner five-fold spatial grouping) so that residuals are not artificially small. The parameters $(w, a, b)$ are selected on the validation fold from $w \in \{0, 0.2, \dots, 1\}$, $a \in \{0.2, 0.4, 0.6\}$ and $b \in \{0, 0.5, 1\}$; the grid includes ``no GAT'' ($w = 1$) and ``no diffusion'' ($b = 0$). All other hyperparameters were fixed a priori (Table~S12).
 
 \subsection{Validation designs and statistics}
-\paragraph{Spatial block cross-validation.} The $\sim$\SI{40}{} $\times$ \SI{39}{\kilo\metre} extent was divided into a $5 \times 5$ grid whose non-empty cells were dealt into five folds (Fig.~\ref{fig:map}); fold $f$ is the test set and fold $f+1$ the validation set, used for early stopping, decision thresholds and HydroBoost parameters. We evaluated with \emph{no buffer}, representing interpolation among surveyed springs, and with a \SI{500}{\metre} buffer that removes training and validation springs within \SI{500}{\metre} of any test spring, approximating extrapolation \citep{roberts2017cross, valavi2019blockcv}. Five seeds re-shuffle the block assignment and re-initialise all models.
+\paragraph{Spatial block cross-validation.} The $\sim$\SI{40}{\kilo\metre} $\times$ \SI{39}{\kilo\metre} extent was divided into a $5 \times 5$ grid whose non-empty cells were dealt into five folds (Fig.~\ref{fig:map}); fold $f$ is the test set and fold $f+1$ the validation set, used for early stopping, decision thresholds and HydroBoost parameters. We evaluated with \emph{no buffer}, representing interpolation among surveyed springs, and with a \SI{500}{\metre} buffer that removes training and validation springs within \SI{500}{\metre} of any test spring, approximating extrapolation \citep{roberts2017cross, valavi2019blockcv}. Five seeds re-shuffle the block assignment and re-initialise all models.
 
 \paragraph{Leave-one-municipality-out (LOMO).} Each municipality was held out in turn, $\sim$20\% of the remaining spatial blocks formed the validation set, and a \SI{500}{\metre} buffer was applied (three seeds). LOMO represents transferring a model to a new administrative unit, the scale at which springshed programmes are planned.
 
@@ -282,15 +281,15 @@ ResGATv2 does make use of geometry. Compared with the shuffled-edge placebo, its
     \toprule
     Variant & Reference & No buffer & \SI{500}{\metre} buffer \\
     \midrule
-    ResGATv2 $-$ edge attributes        & ResGATv2 & $+0.000$ $[-0.038, +0.038]$ & $+0.002$ $[-0.037, +0.042]$ \\
-    ResGATv2 $-$ ego skip               & ResGATv2 & $-0.018$ $[-0.060, +0.024]$ & $-0.012$ $[-0.055, +0.031]$ \\
-    ResGATv2 $+$ LayerNorm              & ResGATv2 & $-0.006$ $[-0.021, +0.009]$ & $-0.005$ $[-0.022, +0.012]$ \\
-    ResGATv2, 2 layers                  & ResGATv2 & $-0.011$ $[-0.056, +0.035]$ & $-0.021$ $[-0.086, +0.044]$ \\
+    ResGATv2 (without edge attributes)  & ResGATv2 & $+0.000$ $[-0.038, +0.038]$ & $+0.002$ $[-0.037, +0.042]$ \\
+    ResGATv2 (without ego skip)         & ResGATv2 & $-0.018$ $[-0.060, +0.024]$ & $-0.012$ $[-0.055, +0.031]$ \\
+    ResGATv2 ($+$ LayerNorm)            & ResGATv2 & $-0.006$ $[-0.021, +0.009]$ & $-0.005$ $[-0.022, +0.012]$ \\
+    ResGATv2 (2 layers)                 & ResGATv2 & $-0.011$ $[-0.056, +0.035]$ & $-0.021$ $[-0.086, +0.044]$ \\
     Placebo: shuffled edge attributes   & ResGATv2 & $-0.000$ $[-0.010, +0.010]$ & $-0.000$ $[-0.005, +0.005]$ \\
     Placebo: random topology            & ResGATv2 & $-0.007$ $[-0.040, +0.027]$ & $-0.007$ $[-0.046, +0.032]$ \\
     \midrule
-    CatBoost $+$ diffusion only         & HydroBoost-GAT & $-0.010$ $[-0.040, +0.020]$ & $-0.016$ $[-0.056, +0.023]$ \\
-    CatBoost $+$ GAT, no diffusion      & HydroBoost-GAT & $-0.002$ $[-0.008, +0.004]$ & $-0.001$ $[-0.009, +0.006]$ \\
+    CatBoost (with diffusion only)      & HydroBoost-GAT & $-0.010$ $[-0.040, +0.020]$ & $-0.016$ $[-0.056, +0.023]$ \\
+    CatBoost ($+$ GAT, no diffusion)    & HydroBoost-GAT & $-0.002$ $[-0.008, +0.004]$ & $-0.001$ $[-0.009, +0.006]$ \\
     \midrule
     ResGATv2                            & MLP & $+0.002$ $[-0.033, +0.036]$ & $-0.000$ $[-0.036, +0.035]$ \\
     GraphSAGE                           & MLP & $-0.009$ $[-0.039, +0.021]$ & $-0.012$ $[-0.048, +0.023]$ \\
@@ -386,7 +385,7 @@ The survey data are available from ICIMOD's Regional Database System under CC BY
 \section*{Acknowledgements}
 We thank the community resource persons and ICIMOD for collecting and openly publishing the Kavre spring inventory. \todo{Funding.}
 
-\bibliographystyle{apalike}
+\bibliographystyle{plainnat}
 \bibliography{references}
 
 \end{document}
