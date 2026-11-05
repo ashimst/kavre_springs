@@ -15,5 +15,15 @@ seaborn==0.13.2
 geopandas==1.2.0
 folium==0.20.0
 pytest==8.3.3
-# Only needed to re-extract remote-sensing covariates (requires a Google Earth Engine account):
-# earthengine-api
+# Apriori pattern mining (src/pattern_mining.py)
+mlxtend==0.23.4
+networkx
+# Notebooks
+nbformat
+nbclient
+ipykernel
+# DEM hydrology (src/hydro_gis.py): flow routing and catchments
+pysheds==0.5
+rasterio
+# Only needed to re-extract the Earth Engine covariates (requires an authenticated account):
+# earthengine-api>=1.7

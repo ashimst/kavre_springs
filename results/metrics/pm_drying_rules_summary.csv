@@ -1,0 +1,3 @@
+consequent,n_rules,n_ward_robust,n_reversed_within_wards,median_heldout_replication,median_share_wards_lift_gt1
+active,2337,1903,4,1.0,0.7777777777777778
+dried,3321,2613,11,1.0,0.6842105263157895

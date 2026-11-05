@@ -1,0 +1,10 @@
+model,term,coef_per_sd,ci_low,ci_high,ci_excludes_zero
+seismic + environment,pga_main,-0.22850844545852872,-0.7042518244286553,0.0706503626802254,False
+seismic + environment,pga_may12,0.688249440994346,0.24191247579889907,1.0328802746074974,True
+seismic + environment,aftershocks_20km,-0.2434015634487424,-0.5954634898985333,0.04028025236588611,False
+seismic + environment + ward fixed effects,pga_main,-0.44259187945864104,-1.0372674888341176,0.07277492022969094,False
+seismic + environment + ward fixed effects,pga_may12,0.34721849308484587,-0.09777069988706001,0.7780175706649222,False
+seismic + environment + ward fixed effects,aftershocks_20km,-0.06838417630864578,-0.7203516232611259,0.39277294480712993,False
+seismic + environment + 100 MEMs (broad and meso spatial structure),pga_main,-0.26716465111204524,-0.6995762811396941,0.07623281830712453,False
+seismic + environment + 100 MEMs (broad and meso spatial structure),pga_may12,0.7355972860891268,0.3678763483801204,1.037019189178591,True
+seismic + environment + 100 MEMs (broad and meso spatial structure),aftershocks_20km,-0.23272131622301842,-0.5880984504787027,0.04701170314324676,False

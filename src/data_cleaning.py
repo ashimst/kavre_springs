@@ -243,7 +243,7 @@ def encode_categorical_features(df: pd.DataFrame) -> pd.DataFrame:
         if col in df.columns:
             df[col + "_encoded"] = df[col].map(mapping)
 
-    # Ordinal encoding for earthquake impact
+    # Ordinal encoding for earthquake impact (kept for diagnostic baseline comparison only; strictly forbidden from predictive features)
     if "Any impact due to 2015 earthquake?" in df.columns:
         eq_ordinal = {
             "no_change": 0,
@@ -254,6 +254,7 @@ def encode_categorical_features(df: pd.DataFrame) -> pd.DataFrame:
             "dried": 4,
         }
         df["earthquake_impact_ordinal"] = df["Any impact due to 2015 earthquake?"].map(eq_ordinal).fillna(-1)
+        # Retained strictly for diagnostic leakage verification; eliminated from all predictive feature sets
         df["earthquake_impact_known"] = (df["earthquake_impact_ordinal"] >= 0).astype(int)
 
     # Ordinal encoding for water quality
@@ -279,32 +280,39 @@ def encode_categorical_features(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def encode_multi_label(df: pd.DataFrame) -> pd.DataFrame:
-    """Binarize multi-label columns (comma-separated strings)."""
-
+    """Binarize multi-label columns (comma-separated strings).
+    
+    Preserves NaN when source column is missing to prevent silent skip-logic leakage.
+    """
     if "Purpose of use" in df.columns:
-        # Extract core purpose categories
+        is_na = df["Purpose of use"].isna()
         core_purposes = ["drinking", "household", "livestock", "agriculture", "irrigation"]
         for purpose in core_purposes:
-            df[f"purpose_{purpose}"] = (
+            val = (
                 df["Purpose of use"]
-                .fillna("")
+                .astype(str)
                 .str.lower()
                 .str.contains(purpose)
-                .astype(int)
+                .astype(float)
             )
-        logger.info(f"Multi-label encoded 'Purpose of use' → {len(core_purposes)} binary columns")
+            val[is_na] = np.nan
+            df[f"purpose_{purpose}"] = val
+        logger.info(f"Multi-label encoded 'Purpose of use' → {len(core_purposes)} binary columns (NaN preserved to prevent silent leakage)")
 
     if "Ethnicity of users" in df.columns:
+        is_na = df["Ethnicity of users"].isna()
         core_ethnicities = ["janajati", "bcts", "dalit", "mixed"]
         for eth in core_ethnicities:
-            df[f"ethnicity_{eth}"] = (
+            val = (
                 df["Ethnicity of users"]
-                .fillna("")
+                .astype(str)
                 .str.lower()
                 .str.contains(eth)
-                .astype(int)
+                .astype(float)
             )
-        logger.info(f"Multi-label encoded 'Ethnicity of users' → {len(core_ethnicities)} binary columns")
+            val[is_na] = np.nan
+            df[f"ethnicity_{eth}"] = val
+        logger.info(f"Multi-label encoded 'Ethnicity of users' → {len(core_ethnicities)} binary columns (NaN preserved to prevent silent leakage)")
 
     return df
 
@@ -470,6 +478,20 @@ def export_geojson(df: pd.DataFrame, path: Path = GEOJSON_PATH) -> None:
 # =============================================================================
 
 
+def document_duplicate_pairs(df: pd.DataFrame) -> pd.DataFrame:
+    """Catalog and log the 19 verbatim duplicate survey pairs (38 rows).
+
+    These pairs share identical responses across all raw survey columns, differing
+    only by their assigned SN. They are retained to maintain exact alignment with
+    the published ICIMOD benchmark (N=5,689; Thapa et al., 2025).
+    """
+    non_sn = [c for c in df.columns if c not in ["SN", "id"]]
+    dups = df.duplicated(subset=non_sn, keep=False)
+    n_dups = int(dups.sum())
+    logger.info(f"Identified {n_dups} duplicate survey rows ({n_dups // 2} pairs) sharing identical attributes.")
+    return df
+
+
 def run_cleaning_pipeline(
     raw_path: Path = RAW_DATA_PATH,
     output_csv: Path = CLEAN_CSV_PATH,
@@ -482,6 +504,7 @@ def run_cleaning_pipeline(
 
     # Load
     df = load_raw_data(raw_path)
+    df = document_duplicate_pairs(df)
 
     # Clean
     df = drop_unnecessary_columns(df)

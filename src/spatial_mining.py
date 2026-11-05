@@ -42,6 +42,7 @@ from src.graph_builder import coords_to_metric, load_master
 logger = logging.getLogger("spatial_mining")
 METRICS_DIR = PROJECT_ROOT / "results/metrics"
 FIG_DIR = PROJECT_ROOT / "results/figures"
+PAPER_FIG_DIR = PROJECT_ROOT / "paper/figures"
 
 
 def bh_fdr(p: np.ndarray) -> np.ndarray:
@@ -75,7 +76,7 @@ def morans_i(y: np.ndarray, W: sp.csr_matrix, n_perm: int = 999, rng=None):
 
 
 QUADRANTS = ["High-High (dried cluster)", "Low-Low (active cluster)",
-             "Low-High (active among dried)", "High-Low (isolated dried)"]
+             "Low-High (active among dried)", "High-Low (dried among active)"]
 
 
 def quad_label(y: np.ndarray, W: sp.csr_matrix) -> np.ndarray:
@@ -170,7 +171,7 @@ def run_spatial_mining():
     # Figures
     fig, ax = plt.subplots(figsize=(8, 7))
     colors = {"Not significant": "#d9d9d9", "Low-Low (active cluster)": "#1a9850", "High-High (dried cluster)": "#d73027",
-              "Low-High (active among dried)": "#fdae61", "High-Low (isolated dried)": "#7b3294"}
+              "Low-High (active among dried)": "#fdae61", "High-Low (dried among active)": "#7b3294"}
     for c in colors:
         m = out.lisa_cluster == c
         ax.scatter(out.longitude[m], out.latitude[m], s=6 if c == "Not significant" else 10, c=colors[c],
@@ -182,6 +183,8 @@ def run_spatial_mining():
     ax.legend(fontsize=8, loc="lower left", markerscale=2)
     fig.tight_layout()
     fig.savefig(FIG_DIR / "lisa_cluster_map.png", dpi=300)
+    if PAPER_FIG_DIR.exists():
+        fig.savefig(PAPER_FIG_DIR / "lisa_cluster_map.png", dpi=300)
     plt.close(fig)
 
     fig, axes = plt.subplots(1, 2, figsize=(12, 4.5))
@@ -200,6 +203,8 @@ def run_spatial_mining():
     axes[1].tick_params(axis="y", labelsize=7)
     fig.tight_layout()
     fig.savefig(FIG_DIR / "spatial_mining_diagnostics.png", dpi=300)
+    if PAPER_FIG_DIR.exists():
+        fig.savefig(PAPER_FIG_DIR / "spatial_mining_diagnostics.png", dpi=300)
     plt.close(fig)
     return decay, summary, rules
 

@@ -36,3 +36,9 @@ scratch/
 # Smoke-test outputs (reproduce_all.py --quick)
 results/metrics/*_quick.csv
 results/predictions/*_quick.parquet
+
+# arXiv build directory (paper/arxiv_submission.zip is the deliverable)
+paper/arxiv/
+
+# third-party downloads (Copernicus DEM, USGS ShakeMap); fetched and cached automatically
+data/external/

@@ -48,6 +48,7 @@ import pandas as pd
 import torch
 from scipy.spatial import cKDTree
 from sklearn.preprocessing import StandardScaler
+from torch_geometric.data import Data
 
 from src.features import FEATURE_SETS, PRIMARY_FEATURE_SET, add_derived_columns
 
@@ -77,16 +78,109 @@ def physical_edge_attributes(coords_m: np.ndarray, elev: np.ndarray, src: np.nda
     return np.column_stack([np.log1p(d), delta[:, 0] / d, delta[:, 1] / d, dz, dz / d]).astype(np.float32)
 
 
-def knn_edges(coords_m: np.ndarray, k: int = K_NEIGHBOURS) -> tuple[np.ndarray, np.ndarray]:
-    _, idx = cKDTree(coords_m).query(coords_m, k=k + 1)
+def knn_edges(
+    coords_m: np.ndarray,
+    k: int = K_NEIGHBOURS,
+    elev: np.ndarray | None = None,
+    hnd: np.ndarray | None = None,
+    upa: np.ndarray | None = None,
+    ridge_threshold_m: float = 250.0,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Construct catchment-aware directed k-NN edges respecting flow divides and ridgelines.
+
+    When elev is provided, candidate edges crossing steep ridges (|dz| > ridge_threshold_m)
+    or climbing excessive topographic barriers are penalized so that springs connect along
+    drainage paths and valley contours. Zero self-loops are strictly enforced.
+    """
     n = len(coords_m)
-    src = np.repeat(np.arange(n), k)
-    dst = idx[:, 1:].reshape(-1)
-    return src, dst
+    if n <= 1:
+        return np.array([], dtype=np.int64), np.array([], dtype=np.int64)
+    tree = cKDTree(coords_m)
+    k_actual = min(k, n - 1)
+    k_pool = min(max(k_actual + 25, 40), n)
+    _, idx_mat = tree.query(coords_m, k=k_pool)
+    if k_pool == 1 or idx_mat.ndim == 1:
+        idx_mat = idx_mat.reshape(n, -1)
+
+    src_list, dst_list = [], []
+    has_elev = elev is not None and len(elev) == n
+
+    for i in range(n):
+        row = idx_mat[i]
+        cands = [j for j in row if j != i]
+        if not cands:
+            continue
+        if len(cands) <= k_actual or not has_elev:
+            chosen = cands[:k_actual]
+        else:
+            cands_arr = np.asarray(cands)
+            delta = coords_m[cands_arr] - coords_m[i]
+            d_i = np.maximum(np.linalg.norm(delta, axis=1), 1.0)
+            dz_i = np.abs(elev[cands_arr] - elev[i])
+            s_i = dz_i / d_i
+            # Effective topographic / catchment resistance cost
+            cost = d_i * (1.0 + 0.8 * (dz_i / 100.0) + 1.2 * np.maximum(0.0, s_i - 0.4))
+            if hnd is not None and len(hnd) == n:
+                dhnd_i = np.abs(hnd[cands_arr] - hnd[i])
+                cost = cost + d_i * 0.3 * (dhnd_i / 50.0)
+            if upa is not None and len(upa) == n:
+                d_log_upa = np.abs(np.log10(np.maximum(upa[cands_arr], 1e-4)) - np.log10(np.maximum(upa[i], 1e-4)))
+                cost = cost + d_i * 0.2 * np.minimum(d_log_upa, 3.0)
+            # Severe penalty for crossing mountain ridges
+            mask_ridge = dz_i > ridge_threshold_m
+            cost[mask_ridge] += 10000.0 * (dz_i[mask_ridge] / ridge_threshold_m)
+            best_idx = np.argsort(cost)[:k_actual]
+            chosen = [cands[idx] for idx in best_idx]
+
+        src_list.extend([i] * len(chosen))
+        dst_list.extend(chosen)
+
+    return np.array(src_list, dtype=np.int64), np.array(dst_list, dtype=np.int64)
+
+
+def build_catchment_graph(
+    coords_m: np.ndarray,
+    elevation_m: np.ndarray,
+    hnd_m: np.ndarray | None = None,
+    upa_km2: np.ndarray | None = None,
+    k: int = K_NEIGHBOURS,
+    x: torch.Tensor | None = None,
+    y: torch.Tensor | None = None,
+) -> Data:
+    """Interface contract: construct a catchment-aware spatial PyG Data object."""
+    src, dst = knn_edges(coords_m, k=k, elev=elevation_m, hnd=hnd_m, upa=upa_km2)
+    edge_raw = physical_edge_attributes(coords_m, elevation_m, src, dst)
+    edge_mu, edge_sd = edge_raw.mean(0), edge_raw.std(0)
+    edge_sd = np.where(edge_sd == 0, 1.0, edge_sd)
+    edge_attr = (edge_raw - edge_mu) / edge_sd
+    data = Data(
+        edge_index=torch.tensor(np.vstack([src, dst]), dtype=torch.long),
+        edge_attr=torch.tensor(edge_attr, dtype=torch.float32),
+        coords_m=coords_m,
+        elevation=elevation_m,
+    )
+    if x is not None:
+        data.x = x if isinstance(x, torch.Tensor) else torch.tensor(x, dtype=torch.float32)
+    if y is not None:
+        data.y = y if isinstance(y, torch.Tensor) else torch.tensor(y, dtype=torch.long)
+    return data
 
 
 def load_master(path: Path = MASTER_DATA) -> pd.DataFrame:
     df = pd.read_parquet(path)
+    hydro_path = path.parent / "gee_hydro_catchment_features.csv"
+    if hydro_path.exists():
+        df_h = pd.read_csv(hydro_path)
+        cols_to_use = [c for c in df_h.columns if c not in df.columns or c == "id"]
+        df = df.merge(df_h[cols_to_use], on="id", how="left")
+    enrich_path = path.parent / "gee_enrichment_features.csv"  # produced by src.extract_enrichment_gee
+    if enrich_path.exists():
+        df_e = pd.read_csv(enrich_path)
+        df = df.merge(df_e[[c for c in df_e.columns if c not in df.columns or c == "id"]], on="id", how="left")
+    seismic_path = path.parent / "seismic_features.csv"  # produced by src.seismic (USGS ShakeMap / ComCat)
+    if seismic_path.exists():
+        df_s = pd.read_csv(seismic_path)
+        df = df.merge(df_s[[c for c in df_s.columns if c not in df.columns or c == "id"]], on="id", how="left")
     return add_derived_columns(df)
 
 
@@ -107,9 +201,12 @@ def build_graph(df: pd.DataFrame, feature_set: str = PRIMARY_FEATURE_SET, k: int
 
     coords_m = coords_to_metric(df["latitude"].to_numpy(), df["longitude"].to_numpy())
     elev = df["elevation_m"].fillna(df["elevation_m"].median()).to_numpy(dtype=np.float64)
-    src, dst = knn_edges(coords_m, k)
+    hnd = df["hnd"].fillna(df["hnd"].median()).to_numpy(dtype=np.float64) if "hnd" in df.columns else None
+    upa = df["upa"].fillna(df["upa"].median()).to_numpy(dtype=np.float64) if "upa" in df.columns else None
+    src, dst = knn_edges(coords_m, k=k, elev=elev, hnd=hnd, upa=upa)
     edge_raw = physical_edge_attributes(coords_m, elev, src, dst)
     edge_mu, edge_sd = edge_raw.mean(0), edge_raw.std(0)
+    edge_sd = np.where(edge_sd == 0, 1.0, edge_sd)
     edge_attr = (edge_raw - edge_mu) / edge_sd
 
     logger.info(f"[{feature_set}] {len(df)} nodes, {len(src)} edges, {len(cols)} features, {n_imputed} imputed values")

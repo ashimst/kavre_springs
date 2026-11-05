@@ -1,0 +1,12 @@
+quantity,value
+n sources with up- and downslope neighbours,2961.0
+P(dried | all upslope nbrs dried),0.5022935779816514
+P(dried | all downslope nbrs dried),0.5210084033613446
+P(dried | no upslope nbr dried),0.13647246608140462
+P(dried | no downslope nbr dried),0.15073529411764705
+beta_up (std),0.5683709709207658
+beta_down (std),0.5068663337837171
+beta_up - beta_down,0.06150463713704868
+permutation p (two-sided),0.406
+null 95% interval low,-0.13915809649156186
+null 95% interval high,0.13450223155369045

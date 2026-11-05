@@ -55,7 +55,11 @@ def drying_years(df: pd.DataFrame) -> pd.DataFrame:
 
 def cause_specific_auc(df: pd.DataFrame, models=("Logistic Regression", "HydroBoost-GAT", "CatBoost"), n_boot=2000):
     preds = pd.read_parquet(PRED_PATH)
-    preds = preds[(preds.buffer_m == 0) & (preds.feature_set == PRIMARY_FEATURE_SET)]
+    # leak-free, season-free env_hydro predictions (main profile) when available (the seasonal-flow flag may be
+    # confounded by dry-season fieldwork); otherwise fall back to the configured primary set
+    preds = preds[preds.buffer_m == 0]
+    fs = next((f for f in ["env_hydro", PRIMARY_FEATURE_SET, "env"] if (preds.feature_set == f).any()), PRIMARY_FEATURE_SET)
+    preds = preds[preds.feature_set == fs]
     rng = np.random.default_rng(0)
     rows = []
     reason = df.set_index("id")["reason_of_drying"]

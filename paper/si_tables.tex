@@ -1,0 +1,1477 @@
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S2. Survey skip-logic leakage audit}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{llll}
+\toprule
+\textbf{column} & \textbf{missing\_active} & \textbf{missing\_dried} & \textbf{missingness\_gap} \\
+\midrule
+reason\_of\_drying & 1 & 0 & -1 \\
+water\_quality\_ordinal & 0 & 1 & 1 \\
+has\_user\_group & 0 & 1 & 1 \\
+in\_use & 0 & 1 & 1 \\
+water\_quality\_change & 0 & 1 & 1 \\
+water\_quality & 0 & 1 & 1 \\
+Are there water user groups for management?\_binary & 0 & 1 & 1 \\
+Is this source in use?\_binary & 0 & 1 & 1 \\
+years\_since\_dried & 1 & 0 & -1 \\
+cultural\_significance & 0 & 1 & 1 \\
+Is water source significant for cultural/religious purpose?\_binary & 0 & 1 & 1 \\
+revival\_activity\_done & 1 & 0.001 & -0.999 \\
+Is this source tapped?\_binary & 0.001 & 1 & 0.999 \\
+revival\_measures\_taken & 0.001 & 1 & 0.999 \\
+is\_tapped & 0.001 & 1 & 0.999 \\
+community\_accessible & 0.001 & 0.999 & 0.998 \\
+Is this source accessible to everyone in community? (in term of use access)\_binary & 0.001 & 0.999 & 0.998 \\
+post\_drying\_action & 1 & 0.006 & -0.994 \\
+earthquake\_impact & 0.062 & 1 & 0.938 \\
+fill\_20l\_before\_10yr\_min & 0.063 & 1 & 0.937 \\
+bucket\_volume\_liters & 0.063 & 1 & 0.937 \\
+discharge\_trend & 0.063 & 1 & 0.937 \\
+flow\_rate\_lpm & 0.063 & 1 & 0.937 \\
+target\_trend & 0.063 & 1 & 0.937 \\
+source\_condition\_detail & 0.063 & 1 & 0.937 \\
+fetch\_time\_minutes & 0.063 & 0.999 & 0.936 \\
+distance\_to\_household\_m & 0.063 & 0.999 & 0.936 \\
+fill\_time\_seconds & 0.063 & 0.999 & 0.936 \\
+emergence\_point & 0.064 & 1 & 0.936 \\
+discharge\_nature & 0.064 & 1 & 0.936 \\
+fill\_time\_change\_ratio & 0.065 & 1 & 0.935 \\
+fill\_20l\_current\_min & 0.063 & 0.997 & 0.934 \\
+purpose\_livestock & 0.23 & 1 & 0.77 \\
+purpose\_household & 0.23 & 1 & 0.77 \\
+ethnicity\_dalit & 0.23 & 1 & 0.77 \\
+purpose\_drinking & 0.23 & 1 & 0.77 \\
+ethnicity\_bcts & 0.23 & 1 & 0.77 \\
+ethnicity\_mixed & 0.23 & 1 & 0.77 \\
+purpose\_irrigation & 0.23 & 1 & 0.77 \\
+ethnicity\_janajati & 0.23 & 1 & 0.77 \\
+ethnicity\_users & 0.23 & 1 & 0.77 \\
+purpose\_agriculture & 0.23 & 1 & 0.77 \\
+purpose\_of\_use & 0.23 & 1 & 0.77 \\
+hh\_dependent\_total & 0.231 & 1 & 0.769 \\
+hh\_dependent\_exclusive & 0.355 & 0.998 & 0.643 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}\par\footnotesize Missingness of survey fields among active vs dried sources (fields with $|$gap$|$ > 0.05).
+\par\footnotesize 10 further rows in \texttt{paper/si\_generated\_tables.md} and \texttt{results/metrics}.
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S3. ROC-AUC of single features used alone (no model)}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{ll}
+\toprule
+\textbf{feature} & \textbf{single\_feature\_auc} \\
+\midrule
+earthquake\_impact\_ordinal & 0.958 \\
+earthquake\_impact\_known & 0.958 \\
+Perennial / Seasonal\_encoded & 0.652 \\
+longitude & 0.611 \\
+precip\_monsoon\_mm & 0.607 \\
+precip\_annual\_mm & 0.605 \\
+ndvi\_mean & 0.587 \\
+elevation\_m & 0.586 \\
+ndwi\_mean & 0.577 \\
+Source Type\_encoded & 0.553 \\
+precip\_dry\_season\_mm & 0.546 \\
+landuse\_settlement & 0.544 \\
+aspect\_sin & 0.539 \\
+landuse\_dense\_forest & 0.534 \\
+spring\_density\_500m & 0.53 \\
+ownership\_private & 0.528 \\
+landuse\_agriculture & 0.528 \\
+ownership\_community & 0.524 \\
+latitude & 0.521 \\
+aspect\_cos & 0.521 \\
+landuse\_grassland & 0.513 \\
+landuse\_fallow & 0.508 \\
+landuse\_sparse\_forest & 0.504 \\
+ownership\_public & 0.504 \\
+slope\_deg & 0.502 \\
+landuse\_others & 0.501 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S4a. Spatial block 5-fold CV, no buffer (interpolation), env\_hydro (5 seeds x 5 folds)}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{llllll}
+\toprule
+\textbf{Model} & \textbf{ROC-AUC} & \textbf{PR-AUC} & \textbf{Macro-F1} & \textbf{Bal. acc.} & \textbf{Brier} \\
+\midrule
+Logistic Regression & 0.669 $\pm$ 0.052 & 0.421 $\pm$ 0.090 & 0.583 $\pm$ 0.041 & 0.596 $\pm$ 0.041 & 0.225 \\
+Random Forest & 0.683 $\pm$ 0.061 & 0.443 $\pm$ 0.096 & 0.578 $\pm$ 0.058 & 0.602 $\pm$ 0.062 & 0.182 \\
+XGBoost & 0.672 $\pm$ 0.057 & 0.434 $\pm$ 0.099 & 0.575 $\pm$ 0.054 & 0.592 $\pm$ 0.043 & 0.201 \\
+CatBoost & 0.678 $\pm$ 0.057 & 0.438 $\pm$ 0.099 & 0.589 $\pm$ 0.048 & 0.601 $\pm$ 0.046 & 0.197 \\
+kNN label interpolation & 0.598 $\pm$ 0.043 & 0.348 $\pm$ 0.055 & 0.530 $\pm$ 0.052 & 0.553 $\pm$ 0.028 & 0.220 \\
+MLP & 0.666 $\pm$ 0.058 & 0.428 $\pm$ 0.090 & 0.581 $\pm$ 0.046 & 0.591 $\pm$ 0.047 & 0.226 \\
+ResGATv2 & 0.665 $\pm$ 0.058 & 0.425 $\pm$ 0.093 & 0.587 $\pm$ 0.044 & 0.598 $\pm$ 0.049 & 0.225 \\
+HydroBoost-GAT & 0.685 $\pm$ 0.057 & 0.449 $\pm$ 0.098 & 0.583 $\pm$ 0.051 & 0.603 $\pm$ 0.049 & 0.207 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S4a (continued). Paired comparison against the best tabular model (ROC-AUC)}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{llllll}
+\toprule
+\textbf{Model} & \textbf{Reference} & \textbf{$\Delta$ROC-AUC [95\% CI]} & \textbf{Wins} & \textbf{p (corrected)} & \textbf{p (Holm)} \\
+\midrule
+Logistic Regression & Random Forest & -0.014 [-0.047, +0.019] & 8/25 & 0.385 & 1 \\
+XGBoost & Random Forest & -0.011 [-0.038, +0.017] & 8/25 & 0.437 & 1 \\
+CatBoost & Random Forest & -0.004 [-0.025, +0.017] & 10/25 & 0.669 & 1 \\
+kNN label interpolation & Random Forest & -0.085 [-0.148, -0.022] & 0/25 & 0.0102 & 0.0715 \\
+MLP & Random Forest & -0.017 [-0.060, +0.026] & 8/25 & 0.419 & 1 \\
+ResGATv2 & Random Forest & -0.018 [-0.057, +0.021] & 6/25 & 0.355 & 1 \\
+HydroBoost-GAT & Random Forest & +0.002 [-0.018, +0.022] & 16/25 & 0.808 & 1 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S4b. Spatial block 5-fold CV, 500 m buffer (extrapolation), env\_hydro (5 seeds x 5 folds)}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{llllll}
+\toprule
+\textbf{Model} & \textbf{ROC-AUC} & \textbf{PR-AUC} & \textbf{Macro-F1} & \textbf{Bal. acc.} & \textbf{Brier} \\
+\midrule
+Logistic Regression & 0.668 $\pm$ 0.052 & 0.420 $\pm$ 0.088 & 0.579 $\pm$ 0.044 & 0.596 $\pm$ 0.041 & 0.226 \\
+Random Forest & 0.681 $\pm$ 0.056 & 0.440 $\pm$ 0.099 & 0.569 $\pm$ 0.053 & 0.600 $\pm$ 0.061 & 0.183 \\
+XGBoost & 0.665 $\pm$ 0.054 & 0.425 $\pm$ 0.105 & 0.576 $\pm$ 0.061 & 0.597 $\pm$ 0.054 & 0.201 \\
+CatBoost & 0.670 $\pm$ 0.056 & 0.432 $\pm$ 0.102 & 0.587 $\pm$ 0.051 & 0.601 $\pm$ 0.048 & 0.199 \\
+kNN label interpolation & 0.595 $\pm$ 0.051 & 0.346 $\pm$ 0.078 & 0.523 $\pm$ 0.065 & 0.551 $\pm$ 0.035 & 0.222 \\
+MLP & 0.668 $\pm$ 0.057 & 0.431 $\pm$ 0.092 & 0.584 $\pm$ 0.048 & 0.596 $\pm$ 0.050 & 0.226 \\
+ResGATv2 & 0.662 $\pm$ 0.058 & 0.423 $\pm$ 0.092 & 0.585 $\pm$ 0.048 & 0.593 $\pm$ 0.047 & 0.227 \\
+HydroBoost-GAT & 0.678 $\pm$ 0.057 & 0.443 $\pm$ 0.102 & 0.587 $\pm$ 0.054 & 0.603 $\pm$ 0.049 & 0.209 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S4b (continued). Paired comparison against the best tabular model (ROC-AUC)}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{llllll}
+\toprule
+\textbf{Model} & \textbf{Reference} & \textbf{$\Delta$ROC-AUC [95\% CI]} & \textbf{Wins} & \textbf{p (corrected)} & \textbf{p (Holm)} \\
+\midrule
+Logistic Regression & Random Forest & -0.013 [-0.051, +0.025] & 9/25 & 0.486 & 1 \\
+XGBoost & Random Forest & -0.016 [-0.057, +0.025] & 6/25 & 0.423 & 1 \\
+CatBoost & Random Forest & -0.011 [-0.034, +0.013] & 9/25 & 0.352 & 1 \\
+kNN label interpolation & Random Forest & -0.086 [-0.159, -0.014] & 0/25 & 0.021 & 0.147 \\
+MLP & Random Forest & -0.013 [-0.056, +0.030] & 7/25 & 0.536 & 1 \\
+ResGATv2 & Random Forest & -0.019 [-0.067, +0.028] & 8/25 & 0.413 & 1 \\
+HydroBoost-GAT & Random Forest & -0.003 [-0.031, +0.026] & 12/25 & 0.857 & 1 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S5. Leave-one-municipality-out (500 m buffer), env\_hydro}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{llllll}
+\toprule
+\textbf{Model} & \textbf{ROC-AUC} & \textbf{PR-AUC} & \textbf{Macro-F1} & \textbf{Bal. acc.} & \textbf{Brier} \\
+\midrule
+Logistic Regression & 0.630 $\pm$ 0.035 & 0.361 $\pm$ 0.123 & 0.518 $\pm$ 0.052 & 0.559 $\pm$ 0.035 & 0.238 \\
+Random Forest & 0.635 $\pm$ 0.046 & 0.372 $\pm$ 0.141 & 0.508 $\pm$ 0.082 & 0.555 $\pm$ 0.045 & 0.193 \\
+CatBoost & 0.639 $\pm$ 0.043 & 0.371 $\pm$ 0.129 & 0.535 $\pm$ 0.062 & 0.569 $\pm$ 0.043 & 0.213 \\
+kNN label interpolation & 0.513 $\pm$ 0.071 & 0.282 $\pm$ 0.130 & 0.445 $\pm$ 0.065 & 0.496 $\pm$ 0.052 & 0.244 \\
+MLP & 0.616 $\pm$ 0.046 & 0.358 $\pm$ 0.131 & 0.515 $\pm$ 0.056 & 0.551 $\pm$ 0.038 & 0.235 \\
+ResGATv2 & 0.614 $\pm$ 0.048 & 0.358 $\pm$ 0.131 & 0.513 $\pm$ 0.047 & 0.548 $\pm$ 0.041 & 0.239 \\
+HydroBoost-GAT & 0.633 $\pm$ 0.042 & 0.375 $\pm$ 0.130 & 0.514 $\pm$ 0.068 & 0.562 $\pm$ 0.041 & 0.219 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S5 (continued). Paired comparison (LOMO)}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{llllll}
+\toprule
+\textbf{Model} & \textbf{Reference} & \textbf{$\Delta$ROC-AUC [95\% CI]} & \textbf{Wins} & \textbf{p (corrected)} & \textbf{p (Holm)} \\
+\midrule
+Logistic Regression & CatBoost & -0.010 [-0.047, +0.028] & 8/21 & 0.6 & 1 \\
+Random Forest & CatBoost & -0.004 [-0.031, +0.023] & 9/21 & 0.741 & 1 \\
+kNN label interpolation & CatBoost & -0.126 [-0.216, -0.037] & 1/21 & 0.00798 & 0.0479 \\
+MLP & CatBoost & -0.023 [-0.059, +0.013] & 6/21 & 0.196 & 0.785 \\
+ResGATv2 & CatBoost & -0.025 [-0.060, +0.010] & 5/21 & 0.157 & 0.783 \\
+HydroBoost-GAT & CatBoost & -0.006 [-0.030, +0.019] & 9/21 & 0.633 & 1 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S5 (continued). ROC-AUC per held-out municipality (mean over seeds)}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{lllllllllll}
+\toprule
+\textbf{Held-out municipality} & \textbf{N} & \textbf{dried} & \textbf{Drying rate} & \textbf{Logistic Regression} & \textbf{Random Forest} & \textbf{CatBoost} & \textbf{kNN label interpolation} & \textbf{MLP} & \textbf{ResGATv2} & \textbf{HydroBoost-GAT} \\
+\midrule
+Bethanchownk & 385 & 74 & 19.2\% & 0.667 & 0.633 & 0.659 & 0.541 & 0.645 & 0.64 & 0.648 \\
+Dhulikhel & 1174 & 338 & 28.8\% & 0.601 & 0.583 & 0.594 & 0.501 & 0.594 & 0.612 & 0.612 \\
+Namobuudha & 478 & 96 & 20.1\% & 0.593 & 0.586 & 0.599 & 0.562 & 0.55 & 0.537 & 0.572 \\
+Panauti & 880 & 83 & 9.4\% & 0.659 & 0.676 & 0.678 & 0.52 & 0.632 & 0.629 & 0.659 \\
+Panchkhal & 1067 & 426 & 39.9\% & 0.622 & 0.672 & 0.66 & 0.623 & 0.633 & 0.645 & 0.654 \\
+Roshi RM & 969 & 211 & 21.8\% & 0.661 & 0.695 & 0.681 & 0.416 & 0.68 & 0.669 & 0.685 \\
+Temal & 736 & 293 & 39.8\% & 0.604 & 0.599 & 0.603 & 0.426 & 0.581 & 0.566 & 0.603 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S6. Feature-set sensitivity (spatial CV, no buffer)}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{lllll}
+\toprule
+\textbf{Feature set} & \textbf{n features} & \textbf{Model} & \textbf{ROC-AUC} & \textbf{PR-AUC} \\
+\midrule
+env & 23 & CatBoost & 0.629 $\pm$ 0.057 & 0.382 $\pm$ 0.092 \\
+env & 23 & HydroBoost-GAT & 0.641 $\pm$ 0.057 & 0.397 $\pm$ 0.083 \\
+env & 23 & Logistic Regression & 0.634 $\pm$ 0.055 & 0.388 $\pm$ 0.086 \\
+env & 23 & MLP & 0.628 $\pm$ 0.056 & 0.386 $\pm$ 0.077 \\
+env & 23 & Random Forest & 0.638 $\pm$ 0.061 & 0.390 $\pm$ 0.088 \\
+env & 23 & ResGATv2 & 0.629 $\pm$ 0.062 & 0.385 $\pm$ 0.080 \\
+env & 23 & ResGATv2 $|$ placebo: random topology & 0.623 $\pm$ 0.054 & 0.382 $\pm$ 0.076 \\
+env & 23 & ResGATv2 $|$ placebo: shuffled edge attributes & 0.629 $\pm$ 0.061 & 0.386 $\pm$ 0.080 \\
+env & 23 & XGBoost & 0.625 $\pm$ 0.056 & 0.385 $\pm$ 0.096 \\
+env & 23 & kNN label interpolation & 0.598 $\pm$ 0.043 & 0.348 $\pm$ 0.055 \\
+env\_hydro & 39 & CatBoost & 0.678 $\pm$ 0.057 & 0.438 $\pm$ 0.099 \\
+env\_hydro & 39 & HydroBoost-GAT & 0.685 $\pm$ 0.057 & 0.449 $\pm$ 0.098 \\
+env\_hydro & 39 & Logistic Regression & 0.669 $\pm$ 0.052 & 0.421 $\pm$ 0.090 \\
+env\_hydro & 39 & MLP & 0.666 $\pm$ 0.058 & 0.428 $\pm$ 0.090 \\
+env\_hydro & 39 & Random Forest & 0.683 $\pm$ 0.061 & 0.443 $\pm$ 0.096 \\
+env\_hydro & 39 & ResGATv2 & 0.665 $\pm$ 0.058 & 0.425 $\pm$ 0.093 \\
+env\_hydro & 39 & ResGATv2 $|$ placebo: random topology & 0.665 $\pm$ 0.054 & 0.424 $\pm$ 0.089 \\
+env\_hydro & 39 & ResGATv2 $|$ placebo: shuffled edge attributes & 0.666 $\pm$ 0.057 & 0.428 $\pm$ 0.093 \\
+env\_hydro & 39 & XGBoost & 0.672 $\pm$ 0.057 & 0.434 $\pm$ 0.099 \\
+env\_hydro & 39 & kNN label interpolation & 0.598 $\pm$ 0.043 & 0.348 $\pm$ 0.055 \\
+env\_rich & 67 & CatBoost & 0.684 $\pm$ 0.052 & 0.442 $\pm$ 0.095 \\
+env\_rich & 67 & Logistic Regression & 0.664 $\pm$ 0.064 & 0.419 $\pm$ 0.095 \\
+env\_rich & 67 & MLP & 0.680 $\pm$ 0.059 & 0.438 $\pm$ 0.090 \\
+env\_rich & 67 & Random Forest & 0.692 $\pm$ 0.060 & 0.447 $\pm$ 0.105 \\
+env\_rich & 67 & XGBoost & 0.676 $\pm$ 0.056 & 0.432 $\pm$ 0.096 \\
+env\_hydro\_season & 40 & CatBoost & 0.749 $\pm$ 0.048 & 0.542 $\pm$ 0.081 \\
+env\_hydro\_season & 40 & HydroBoost-GAT & 0.747 $\pm$ 0.044 & 0.540 $\pm$ 0.077 \\
+env\_hydro\_season & 40 & Logistic Regression & 0.737 $\pm$ 0.036 & 0.518 $\pm$ 0.085 \\
+env\_hydro\_season & 40 & MLP & 0.742 $\pm$ 0.036 & 0.526 $\pm$ 0.081 \\
+env\_hydro\_season & 40 & ResGATv2 & 0.718 $\pm$ 0.043 & 0.493 $\pm$ 0.083 \\
+env\_hydro\_seismic & 45 & CatBoost & 0.674 $\pm$ 0.058 & 0.430 $\pm$ 0.094 \\
+env\_hydro\_seismic & 45 & Logistic Regression & 0.665 $\pm$ 0.059 & 0.422 $\pm$ 0.090 \\
+env\_hydro\_seismic & 45 & MLP & 0.676 $\pm$ 0.050 & 0.428 $\pm$ 0.087 \\
+env\_hydro\_seismic & 45 & Random Forest & 0.682 $\pm$ 0.059 & 0.434 $\pm$ 0.094 \\
+env\_hydro\_seismic & 45 & XGBoost & 0.666 $\pm$ 0.050 & 0.420 $\pm$ 0.096 \\
+leaky\_reference & 26 & CatBoost & 0.987 $\pm$ 0.006 & 0.956 $\pm$ 0.016 \\
+leaky\_reference & 26 & HydroBoost-GAT & 0.987 $\pm$ 0.006 & 0.956 $\pm$ 0.017 \\
+leaky\_reference & 26 & Logistic Regression & 0.986 $\pm$ 0.006 & 0.952 $\pm$ 0.017 \\
+leaky\_reference & 26 & MLP & 0.985 $\pm$ 0.006 & 0.951 $\pm$ 0.017 \\
+leaky\_reference & 26 & ResGATv2 & 0.982 $\pm$ 0.007 & 0.939 $\pm$ 0.025 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S6 (continued). ROC-AUC by distance between test and training sources, env\_hydro}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{llll}
+\toprule
+\textbf{design} & \textbf{CatBoost} & \textbf{Logistic Regression} & \textbf{Random Forest} \\
+\midrule
+spatial CV, buffer 0 m & 0.678 $\pm$ 0.057 & 0.669 $\pm$ 0.052 & 0.683 $\pm$ 0.061 \\
+spatial CV, buffer 500 m & 0.670 $\pm$ 0.056 & 0.668 $\pm$ 0.052 & 0.681 $\pm$ 0.056 \\
+spatial CV, buffer 1000 m & 0.659 $\pm$ 0.058 & 0.663 $\pm$ 0.052 & 0.671 $\pm$ 0.058 \\
+spatial CV, buffer 2000 m & 0.642 $\pm$ 0.049 & 0.650 $\pm$ 0.056 & 0.651 $\pm$ 0.058 \\
+LOMO (500 m buffer) & 0.639 $\pm$ 0.043 & 0.630 $\pm$ 0.035 & 0.635 $\pm$ 0.046 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}\par\footnotesize Spatial CV 5 seeds x 5 folds; LOMO 3 seeds x 7 municipalities. Distances in Table S53.
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S7. ResGATv2 placebo graphs (paired vs ResGATv2, ROC-AUC)}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{lllll}
+\toprule
+\textbf{Feature set} & \textbf{Buffer (m)} & \textbf{Model} & \textbf{dROC-AUC [95\% CI]} & \textbf{p (Holm)} \\
+\midrule
+env & 0 & ResGATv2 $|$ placebo: shuffled edge attributes & -0.000 [-0.010, +0.010] & 1 \\
+env & 0 & ResGATv2 $|$ placebo: random topology & -0.007 [-0.040, +0.027] & 1 \\
+env & 500 & ResGATv2 $|$ placebo: shuffled edge attributes & -0.000 [-0.005, +0.005] & 1 \\
+env & 500 & ResGATv2 $|$ placebo: random topology & -0.007 [-0.046, +0.032] & 1 \\
+env\_hydro & 0 & ResGATv2 $|$ placebo: shuffled edge attributes & +0.001 [-0.010, +0.012] & 1 \\
+env\_hydro & 0 & ResGATv2 $|$ placebo: random topology & -0.000 [-0.030, +0.029] & 1 \\
+env\_hydro & 500 & ResGATv2 $|$ placebo: shuffled edge attributes & +0.002 [-0.014, +0.017] & 1 \\
+env\_hydro & 500 & ResGATv2 $|$ placebo: random topology & +0.001 [-0.031, +0.032] & 1 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S8. Principal components of the static landscape covariates}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{ll}
+\toprule
+\textbf{pc} & \textbf{explained\_variance\_ratio} \\
+\midrule
+PC1 & 0.2346 \\
+PC2 & 0.1475 \\
+PC3 & 0.0966 \\
+PC4 & 0.0574 \\
+PC5 & 0.0502 \\
+PC6 & 0.0389 \\
+PC7 & 0.0348 \\
+PC8 & 0.0326 \\
+PC9 & 0.0296 \\
+PC10 & 0.0252 \\
+PC11 & 0.0244 \\
+PC12 & 0.0221 \\
+PC13 & 0.0197 \\
+PC14 & 0.0185 \\
+PC15 & 0.0162 \\
+PC16 & 0.0153 \\
+PC17 & 0.0145 \\
+PC18 & 0.0135 \\
+PC19 & 0.0123 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S9. Gaussian-mixture model selection: BIC and bootstrap stability}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{llllll}
+\toprule
+\textbf{K} & \textbf{bic} & \textbf{stability\_ari\_mean} & \textbf{stability\_ari\_sd} & \textbf{min\_type\_share} & \textbf{selected} \\
+\midrule
+2 & 306498 & 0.9464 & 0.0259 & 0.1455 & False \\
+3 & 297835 & 0.9446 & 0.028 & 0.0432 & False \\
+4 & 284895 & 0.892 & 0.0729 & 0.0408 & False \\
+5 & 278939 & 0.4664 & 0.2171 & 0.0355 & False \\
+6 & 275113 & 0.5562 & 0.1788 & 0.0464 & False \\
+7 & 270705 & 0.7347 & 0.1827 & 0.0396 & False \\
+8 & 267641 & 0.8393 & 0.1147 & 0.0357 & True \\
+9 & 265671 & 0.6597 & 0.0779 & 0.0388 & False \\
+10 & 263687 & 0.6487 & 0.0947 & 0.006 & False \\
+11 & 263193 & 0.5661 & 0.0708 & 0.0218 & False \\
+12 & 260907 & 0.6203 & 0.0688 & 0.006 & False \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S10. Drying rate by landscape type (95 \% Wilson CI)}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{lllllll}
+\toprule
+\textbf{type} & \textbf{n\_sources} & \textbf{share\_ponds} & \textbf{n\_wards\_present} & \textbf{drying\_rate} & \textbf{ci\_low} & \textbf{ci\_high} \\
+\midrule
+T1 & 305 & 0.1902 & 14 & 0.4 & 0.3466 & 0.4559 \\
+T2 & 471 & 0.2845 & 23 & 0.2951 & 0.2557 & 0.3378 \\
+T3 & 759 & 0.1028 & 33 & 0.2951 & 0.2638 & 0.3285 \\
+T4 & 203 & 0.0493 & 38 & 0.2611 & 0.2055 & 0.3255 \\
+T5 & 1514 & 0.0911 & 48 & 0.3686 & 0.3446 & 0.3932 \\
+T6 & 741 & 0.0364 & 24 & 0.1849 & 0.1586 & 0.2144 \\
+T7 & 1037 & 0.0608 & 55 & 0.1977 & 0.1746 & 0.223 \\
+T8 & 659 & 0.0197 & 12 & 0.1259 & 0.1028 & 0.1535 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S11. Mean standardised covariates (and survey composition) by landscape type}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{lllllllllllllllllllllllllllllllllllllllllllllllllllllll}
+\toprule
+\textbf{Unnamed: 0} & \textbf{elevation\_m} & \textbf{slope\_deg} & \textbf{aspect\_sin} & \textbf{aspect\_cos} & \textbf{precip\_annual\_mm} & \textbf{precip\_monsoon\_mm} & \textbf{precip\_dry\_season\_mm} & \textbf{ndvi\_mean} & \textbf{ndwi\_mean} & \textbf{log\_upa} & \textbf{hnd} & \textbf{elv} & \textbf{twi} & \textbf{tpi\_500m} & \textbf{tri\_90m} & \textbf{precip\_dry\_deficit\_mm} & \textbf{precip\_mon\_deficit\_mm} & \textbf{aet} & \textbf{def} & \textbf{soil} & \textbf{pdsi} & \textbf{dist\_to\_road\_m} & \textbf{road\_density\_500m} & \textbf{wc\_tree} & \textbf{wc\_shrub} & \textbf{wc\_grass} & \textbf{wc\_crop} & \textbf{wc\_built} & \textbf{wc\_bare} & \textbf{wc\_water} & \textbf{gfc\_treecover2000} & \textbf{gfc\_loss\_pre2015} & \textbf{soil\_clay} & \textbf{soil\_sand} & \textbf{soil\_soc} & \textbf{soil\_bdod} & \textbf{et\_mean} & \textbf{chirps\_trend} & \textbf{chirps\_anom\_2015} & \textbf{built\_2020} & \textbf{pop\_1km} & \textbf{nightlights} & \textbf{landform\_position} & \textbf{chili} & \textbf{mtpi} & \textbf{topo\_diversity} & \textbf{survey: Source Type\_encoded} & \textbf{survey: landuse\_agriculture} & \textbf{survey: landuse\_dense\_forest} & \textbf{survey: landuse\_fallow} & \textbf{survey: landuse\_grassland} & \textbf{survey: landuse\_others} & \textbf{survey: landuse\_settlement} & \textbf{survey: landuse\_sparse\_forest} \\
+\midrule
+T1 & 0.389 & -1.075 & -0.3807 & -0.369 & -0.7702 & -0.7506 & -1.299 & -1.449 & 1.564 & -0.3941 & -0.5322 & 0.3973 & 0.1001 & 0.5113 & -0.5996 & 0.4282 & -0.6424 & -0.4939 & -0.6317 & 0.2462 & -0.3291 & -0.7585 & 2.298 & -1.603 & 0 & -0.2942 & 0.9182 & 3.121 & 0.3004 & -0.0815 & -0.9564 & 0.5557 & -0.5865 & -0.0495 & -0.4923 & 0.3336 & -0.1207 & -0.9166 & -0.7605 & 2.989 & 1.931 & 3.053 & 0.3151 & 0.7055 & 0.2586 & -1.365 & 0.1902 & 0.3377 & 0.0295 & 0.0033 & 0.059 & 0.0066 & 0.4918 & 0.0721 \\
+T2 & -1.407 & -1.17 & -0.0412 & -0.222 & -0.5224 & -0.4918 & 0.121 & -0.675 & 0.7271 & 0.2236 & -0.8351 & -1.405 & 0.7279 & 0.1493 & -0.6114 & 0.0409 & 0.7219 & 1.066 & 1.185 & -1.105 & 0.7214 & -0.1831 & 0.309 & -1.123 & 0 & -0.3314 & 1.429 & 0.2265 & -0.0136 & -0.0803 & -0.8919 & -0.3878 & -0.1687 & -0.6735 & -1.136 & 1.299 & -0.2564 & -0.5676 & -0.7441 & 0.3944 & 0.976 & 0.1758 & -0.5312 & 0.5947 & -0.3507 & -1.51 & 0.2845 & 0.3907 & 0.0531 & 0.0127 & 0.1762 & 0.0021 & 0.1274 & 0.2378 \\
+T3 & -0.201 & 0.0887 & 0.2348 & 0.2376 & -1.157 & -1.159 & -1.017 & 0.029 & 0.0277 & -0.2002 & 0.2506 & -0.2048 & -0.2464 & 0.2869 & -0.158 & -0.0665 & 0.2461 & 0.4062 & 0.3692 & -0.6192 & 0.4538 & -0.258 & 0.4546 & 0.1506 & 0 & -0.3317 & 0.0447 & -0.0303 & -0.1589 & -0.0815 & -0.0873 & -0.0421 & -0.1621 & 0.0832 & -0.4692 & 0.1385 & 0.067 & -0.6136 & -0.5999 & 0.0847 & 0.5368 & 0.4152 & 0.2663 & -0.2131 & 0.2065 & 0.0301 & 0.1028 & 0.3294 & 0.1225 & 0.0171 & 0.0514 & 0.0066 & 0.0949 & 0.3781 \\
+T4 & -1.27 & -0.0841 & 0.0827 & 0.0521 & -0.0292 & -0.0401 & -0.0261 & -0.5065 & 0.5073 & 0.6331 & -0.6096 & -1.268 & 0.5735 & -0.7729 & 0.0604 & 0.5203 & 0.651 & 0.5105 & 0.7491 & -0.2828 & 0.2263 & 0.0078 & -0.3861 & -0.5227 & 0 & 0.9335 & -0.2032 & -0.1596 & 3.36 & 2.192 & -0.4875 & -0.2478 & -0.3555 & 0.1986 & -0.1837 & 1.072 & -0.557 & 0.7344 & 0.8 & -0.3835 & -0.0512 & -0.2211 & -0.9424 & -0.0095 & -1.385 & 0.6496 & 0.0493 & 0.1921 & 0.0887 & 0.0148 & 0.1626 & 0.0345 & 0.1034 & 0.4039 \\
+T5 & -0.4957 & 0.3932 & 0.0619 & 0.0336 & -0.1572 & -0.164 & 0.3924 & 0.0072 & -0.0368 & 0.0008 & 0.4141 & -0.4954 & -0.1446 & 0.0007 & 0.0942 & 0.0806 & 0.7768 & 0.7385 & 0.6913 & -0.7065 & 0.88 & 0.0068 & -0.1335 & 0.005 & 0 & 0.6062 & -0.2493 & -0.2774 & -0.1773 & -0.0805 & -0.1739 & -0.3875 & -0.0371 & 0.1497 & -0.1748 & 0.4398 & -0.3683 & 0.1916 & 0.163 & -0.3679 & -0.271 & -0.3958 & 0.1977 & -0.1915 & 0.1338 & 0.5649 & 0.0911 & 0.2345 & 0.1328 & 0.0277 & 0.1123 & 0.0092 & 0.0509 & 0.4326 \\
+T6 & 0.4402 & -0.5495 & -0.2923 & -0.2655 & 0.3125 & 0.3559 & -0.3647 & -0.0648 & 0.0665 & -0.1572 & -0.5529 & 0.4431 & 0.0144 & 0.2321 & -0.2437 & 0.6433 & -0.6899 & -0.6214 & -0.6694 & 0.344 & -0.6567 & 0.08 & -0.0639 & -0.2325 & 0 & -0.5343 & 0.6108 & -0.0324 & -0.1474 & -0.0815 & -0.1269 & -0.1133 & -0.314 & 0.0773 & -0.2575 & -0.1655 & 0.243 & -0.4807 & -0.5169 & 0.3443 & -0.0839 & 0.4384 & -0.0145 & 0.5534 & 0.0721 & -1.064 & 0.0364 & 0.4049 & 0.166 & 0.0108 & 0.0405 & 0.0027 & 0.0823 & 0.2928 \\
+T7 & 0.486 & 0.5372 & -0.058 & 0.2802 & 0.4146 & 0.3996 & 0.1833 & 0.5889 & -0.5839 & 0.131 & 0.4227 & 0.4818 & -0.065 & -0.2751 & 0.3563 & 0.2372 & 0.1386 & -0.2267 & -0.6091 & 0.9209 & -0.6402 & 0.4363 & -0.7717 & 0.7302 & 0 & -0.0229 & -0.6942 & -0.3607 & -0.1815 & -0.0815 & 0.8576 & 0.3337 & 0.0547 & 0.4084 & 0.6551 & -0.729 & 0.1611 & 1.204 & 1.103 & -0.6328 & -0.8076 & -0.6581 & 0.0427 & -0.4885 & 0.0979 & 0.768 & 0.0608 & 0.0887 & 0.2208 & 0.0116 & 0.1601 & 0.0058 & 0.0347 & 0.4773 \\
+T8 & 1.327 & 0.1265 & 0.1876 & -0.1797 & 1.429 & 1.393 & 0.9136 & 0.4054 & -0.5028 & 0.0271 & -0.2523 & 1.329 & -0.0413 & -0.2652 & 0.3747 & -1.593 & -1.929 & -1.799 & -1.088 & 1.263 & -1.232 & -0.0155 & -0.096 & 0.633 & 0 & -0.2885 & -0.4567 & -0.2808 & -0.1225 & -0.0815 & 0.5235 & 0.6374 & 1.04 & -0.7261 & 1.297 & -1.25 & 0.653 & -0.4843 & -0.2014 & -0.1911 & -0.2057 & -0.4968 & -0.2878 & 0.0831 & -0.2227 & 0.1665 & 0.0197 & 0.0986 & 0.1608 & 0.0121 & 0.1047 & 0.0015 & 0.085 & 0.5372 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S12. Landscape type vs ward: likelihood-ratio tests}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{lllll}
+\toprule
+\textbf{test} & \textbf{lr\_stat} & \textbf{df} & \textbf{p} & \textbf{adj\_pseudo\_r2\_model} \\
+\midrule
+type (vs null) & 237.5 & 7 & 0 & 0.0338 \\
+ward (vs null) & 846.1 & 74 & 0 & 0.1057 \\
+type $|$ ward & 55.92 & 7 & 0 & 0.112 \\
+ward $|$ type & 664.4 & 74 & 0 & 0.112 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S13. Association strengths (bias-corrected Cram\'er's V)}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{llllll}
+\toprule
+\textbf{chi2} & \textbf{df} & \textbf{p} & \textbf{cramers\_v\_type\_drying} & \textbf{cramers\_v\_ward\_drying} & \textbf{cramers\_v\_type\_ward} \\
+\midrule
+230.1 & 7 & 0 & 0.1981 & 0.3583 & 0.7416 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S14. HDBSCAN density clusters of landscape space}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{lllllll}
+\toprule
+\textbf{cluster} & \textbf{n\_sources} & \textbf{drying\_rate} & \textbf{ci\_low} & \textbf{ci\_high} & \textbf{dominant\_landscape\_type} & \textbf{share\_dominant\_type} \\
+\midrule
+noise & 2500 & 0.2688 & 0.2518 & 0.2865 & T7 & 0.2864 \\
+D1 & 2987 & 0.2769 & 0.2611 & 0.2932 & T5 & 0.2728 \\
+D2 & 202 & 0.1089 & 0.073 & 0.1594 & T7 & 0.9802 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S15. HDBSCAN summary and agreement with landscape types}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{llll}
+\toprule
+\textbf{n\_clusters} & \textbf{noise\_share} & \textbf{ari\_with\_types\_core} & \textbf{cramers\_v\_cluster\_drying} \\
+\midrule
+2 & 0.4394 & 0.0396 & 0.0667 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S16. Isolation-forest landscape anomalies and drying}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{llllllll}
+\toprule
+\textbf{n\_anomalous} & \textbf{drying\_rate\_anomalous} & \textbf{drying\_rate\_typical} & \textbf{odds\_ratio} & \textbf{fisher\_p} & \textbf{n\_wards\_with\_anomalies} & \textbf{max\_share\_in\_one\_ward} & \textbf{anomaly\_share\_by\_type} \\
+\midrule
+285 & 0.3368 & 0.2637 & 1.418 & 0.0074 & 43 & 0.1158 & T1: 0.243; T2: 0.011; T3: 0.004; T4: 0.433; T5: 0.005; T6: 0.008; T7: 0.055; T8: 0.068 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S17. Global Moran's I distance decay}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{lllll}
+\toprule
+\textbf{k\_neighbors} & \textbf{mean\_neighbor\_distance\_m} & \textbf{morans\_i} & \textbf{z\_score} & \textbf{p\_value} \\
+\midrule
+3 & 162.5 & 0.2788 & 27.34 & 0.001 \\
+5 & 216 & 0.2444 & 30.82 & 0.001 \\
+7 & 262 & 0.2234 & 33.36 & 0.001 \\
+10 & 321.7 & 0.2043 & 36.77 & 0.001 \\
+15 & 405.3 & 0.1888 & 41.25 & 0.001 \\
+20 & 477 & 0.1792 & 45.43 & 0.001 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S18. LISA clusters (k = 7; BH-FDR)}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{lll}
+\toprule
+\textbf{cluster} & \textbf{n\_springs\_fdr\_q<0.05} & \textbf{n\_springs\_uncorrected\_p<0.05} \\
+\midrule
+Not significant & 5564 & 5120 \\
+High-High (dried cluster) & 95 & 354 \\
+Low-High (active among dried) & 30 & 215 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S19. Environment vs Moran-eigenvector space (adjusted pseudo-R$^2$)}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{ll}
+\toprule
+\textbf{fraction} & \textbf{adj\_pseudo\_r2} \\
+\midrule
+[a] environment only & 0.0598 \\
+[b] shared (spatially structured environment) & 0.0526 \\
+[c] space only (MEMs) & 0.034 \\
+[d] unexplained & 0.8536 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S20. Spatial fraction by MEM scale band}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{llll}
+\toprule
+\textbf{scale} & \textbf{n\_mem} & \textbf{r2\_space\_alone} & \textbf{r2\_unique\_beyond\_env} \\
+\midrule
+broad (MEM 1-25) & 25 & 0.0149 & 0.0093 \\
+meso (MEM 26-100) & 75 & 0.0581 & 0.0189 \\
+fine (MEM 101-250) & 150 & 0.0136 & 0.0075 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S21. Bernoulli spatial scan clusters (999 Monte Carlo replicates)}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{llllllllllll}
+\toprule
+\textbf{analysis} & \textbf{rank} & \textbf{radius\_m} & \textbf{n\_sources} & \textbf{cases} & \textbf{observed\_rate} & \textbf{rate\_outside} & \textbf{relative\_risk} & \textbf{llr} & \textbf{p\_value} & \textbf{center\_lat} & \textbf{center\_lon} \\
+\midrule
+dried (high) & 1 & 4815 & 386 & 218 & 0.5648 & 0.2457 & 2.299 & 81.99 & 0.001 & 27.6 & 85.69 \\
+dried (high) & 2 & 5239 & 494 & 227 & 0.4595 & 0.2491 & 1.845 & 46.21 & 0.001 & 27.48 & 85.76 \\
+dried (high) & 3 & 1394 & 83 & 59 & 0.7108 & 0.2608 & 2.726 & 36 & 0.001 & 27.63 & 85.6 \\
+dried (high) & 4 & 426.8 & 85 & 53 & 0.6235 & 0.262 & 2.38 & 23.99 & 0.001 & 27.62 & 85.55 \\
+dried (high) & 5 & 602 & 26 & 21 & 0.8077 & 0.2649 & 3.049 & 16.62 & 0.001 & 27.51 & 85.69 \\
+dried (high) & 6 & 720 & 34 & 25 & 0.7353 & 0.2645 & 2.78 & 16.24 & 0.001 & 27.58 & 85.57 \\
+dried (high) & 7 & 395.3 & 29 & 21 & 0.7241 & 0.265 & 2.732 & 13.19 & 0.009 & 27.62 & 85.54 \\
+dried (high) & 8 & 318.7 & 17 & 14 & 0.8235 & 0.2657 & 3.1 & 11.52 & 0.047 & 27.61 & 85.59 \\
+dried (high) & 9 & 393.7 & 12 & 11 & 0.9167 & 0.266 & 3.446 & 11.41 & 0.058 & 27.65 & 85.64 \\
+dried (low) & 1 & 8842 & 548 & 43 & 0.0785 & 0.2875 & 0.2729 & 68.36 & 0.001 & 27.59 & 85.42 \\
+dried (low) & 2 & 3339 & 303 & 27 & 0.0891 & 0.2774 & 0.3212 & 31.81 & 0.001 & 27.66 & 85.54 \\
+dried (low) & 3 & 2837 & 453 & 57 & 0.1258 & 0.2796 & 0.45 & 28.97 & 0.001 & 27.59 & 85.54 \\
+dried (low) & 4 & 5223 & 230 & 18 & 0.0783 & 0.2753 & 0.2842 & 27.44 & 0.001 & 27.41 & 85.72 \\
+dried (low) & 5 & 3668 & 168 & 11 & 0.0655 & 0.2735 & 0.2394 & 23.26 & 0.001 & 27.46 & 85.65 \\
+dried (low) & 6 & 2364 & 146 & 13 & 0.089 & 0.2721 & 0.3273 & 14.99 & 0.002 & 27.56 & 85.62 \\
+dried (low) & 7 & 1083 & 81 & 4 & 0.0494 & 0.2705 & 0.1826 & 13.44 & 0.01 & 27.53 & 85.74 \\
+dried (low) & 8 & 692.1 & 38 & 0 & 0 & 0.2692 & 0 & 11.87 & 0.038 & 27.66 & 85.6 \\
+dried (low) & 9 & 6833 & 97 & 10 & 0.1031 & 0.2702 & 0.3815 & 8.186 & 0.555 & 27.46 & 85.46 \\
+earthquake-attributed among dried (high) & 1 & 1732 & 33 & 29 & 0.8788 & 0.3306 & 2.658 & 21.03 & 0.001 & 27.53 & 85.75 \\
+earthquake-attributed among dried (high) & 2 & 4962 & 126 & 77 & 0.6111 & 0.3183 & 1.92 & 20.69 & 0.001 & 27.65 & 85.68 \\
+earthquake-attributed among dried (high) & 3 & 5777 & 152 & 86 & 0.5658 & 0.3178 & 1.781 & 17.67 & 0.001 & 27.54 & 85.56 \\
+earthquake-attributed among dried (high) & 4 & 2562 & 22 & 18 & 0.8182 & 0.3356 & 2.438 & 10.69 & 0.034 & 27.66 & 85.55 \\
+earthquake-attributed among dried (high) & 5 & 5897 & 84 & 47 & 0.5595 & 0.3299 & 1.696 & 8.76 & 0.154 & 27.47 & 85.81 \\
+earthquake-attributed among dried (high) & 6 & 1492 & 23 & 17 & 0.7391 & 0.3364 & 2.197 & 7.652 & 0.305 & 27.6 & 85.67 \\
+earthquake-attributed among dried (high) & 7 & 320.9 & 7 & 7 & 1 & 0.3395 & 2.946 & 7.531 & 0.474 & 27.68 & 85.58 \\
+earthquake-attributed among dried (high) & 8 & 190.6 & 6 & 6 & 1 & 0.3399 & 2.942 & 6.451 & 0.81 & 27.6 & 85.69 \\
+earthquake-attributed among dried (high) & 9 & 1040 & 5 & 5 & 1 & 0.3404 & 2.938 & 5.373 & 0.992 & 27.59 & 85.53 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S22. Ward concentration of significant scan clusters vs random windows}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{lllllllll}
+\toprule
+\textbf{analysis} & \textbf{rank} & \textbf{n\_sources} & \textbf{relative\_risk} & \textbf{majority\_municipality} & \textbf{n\_wards\_spanned} & \textbf{dominant\_ward\_share} & \textbf{null\_mean\_share} & \textbf{percentile\_vs\_random\_windows} \\
+\midrule
+dried (high) & 1 & 386 & 2.299 & Panchkhal & 9 & 0.2513 & 0.2647 & 0.468 \\
+dried (high) & 2 & 494 & 1.845 & Temal & 10 & 0.1903 & 0.2162 & 0.29 \\
+dried (high) & 3 & 83 & 2.726 & Panchkhal & 4 & 0.5422 & 0.6605 & 0.3 \\
+dried (high) & 4 & 85 & 2.38 & Dhulikhel & 4 & 0.4824 & 0.6387 & 0.196 \\
+dried (high) & 5 & 26 & 3.049 & Roshi RM & 2 & 0.9615 & 0.846 & 0.526 \\
+dried (high) & 6 & 34 & 2.78 & Dhulikhel & 2 & 0.9706 & 0.816 & 0.674 \\
+dried (high) & 7 & 29 & 2.732 & Dhulikhel & 3 & 0.7931 & 0.8215 & 0.368 \\
+dried (high) & 8 & 17 & 3.1 & Dhulikhel & 1 & 1 & 0.878 & 0.48 \\
+dried (low) & 1 & 548 & 0.2729 & Panauti & 9 & 0.2044 & 0.2023 & 0.636 \\
+dried (low) & 2 & 303 & 0.3212 & Dhulikhel & 6 & 0.5314 & 0.3162 & 0.972 \\
+dried (low) & 3 & 453 & 0.45 & Panauti & 12 & 0.2274 & 0.2355 & 0.502 \\
+dried (low) & 4 & 230 & 0.2842 & Roshi RM & 7 & 0.3087 & 0.3845 & 0.208 \\
+dried (low) & 5 & 168 & 0.2394 & Roshi RM & 6 & 0.5119 & 0.4624 & 0.65 \\
+dried (low) & 6 & 146 & 0.3273 & Namobuudha & 10 & 0.3219 & 0.5053 & 0.064 \\
+dried (low) & 7 & 81 & 0.1826 & Temal & 4 & 0.5802 & 0.6696 & 0.33 \\
+dried (low) & 8 & 38 & 0 & Panchkhal & 2 & 0.9474 & 0.789 & 0.698 \\
+earthquake-attributed among dried (high) & 1 & 33 & 2.658 & Temal & 3 & 0.5152 & 0.6545 & 0.304 \\
+earthquake-attributed among dried (high) & 2 & 126 & 1.92 & Panchkhal & 6 & 0.2619 & 0.3146 & 0.324 \\
+earthquake-attributed among dried (high) & 3 & 152 & 1.781 & Dhulikhel & 16 & 0.2961 & 0.2787 & 0.562 \\
+earthquake-attributed among dried (high) & 4 & 22 & 2.438 & Dhulikhel & 2 & 0.8636 & 0.7462 & 0.624 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S23. ICC of drying: DEM catchments, wards, municipalities vs size-matched grids}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{llllllllll}
+\toprule
+\textbf{unit} & \textbf{n\_units} & \textbf{mean\_sources\_per\_unit} & \textbf{icc} & \textbf{grid\_cell\_km} & \textbf{grid\_icc\_mean} & \textbf{grid\_icc\_q025} & \textbf{grid\_icc\_q975} & \textbf{p\_above\_grid} & \textbf{grid\_units\_mean} \\
+\midrule
+catchment T=0.5 km2 & 619 & 9.191 & 0.1613 & 1.015 & 0.1851 & 0.1692 & 0.2001 & 1 & 615.9 \\
+catchment T=2 km2 & 176 & 32.32 & 0.1221 & 2.166 & 0.1255 & 0.1158 & 0.1349 & 0.7264 & 176.4 \\
+catchment T=10 km2 & 52 & 109.4 & 0.0882 & 4.535 & 0.088 & 0.0732 & 0.0995 & 0.5025 & 53.42 \\
+ward & 75 & 75.85 & 0.1318 & 3.563 & 0.0997 & 0.0921 & 0.1059 & 0.005 & 78.14 \\
+municipality & 7 & 812.7 & 0.0671 & 19.35 & 0.0439 & 0.0305 & 0.0585 & 0.005 & 7.39 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S24. Label-free regionalisations vs wards: landscape and drying homogeneity}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{llllllllllllllll}
+\toprule
+\textbf{partition} & \textbf{n\_units} & \textbf{mean\_sources\_per\_unit} & \textbf{env\_r2} & \textbf{icc\_drying} & \textbf{grid\_cell\_km} & \textbf{grid\_icc\_mean} & \textbf{grid\_icc\_q025} & \textbf{grid\_icc\_q975} & \textbf{p\_above\_grid} & \textbf{ari\_with\_ward} & \textbf{nmi\_with\_ward} & \textbf{grid\_env\_r2\_mean} & \textbf{grid\_ari\_with\_ward\_mean} & \textbf{louvain\_resolution} & \textbf{louvain\_modularity} \\
+\midrule
+ward (survey unit) & 75 & 75.85 & 0.5222 & 0.1318 & 3.563 & 0.0994 & 0.0929 & 0.1063 & 0.005 & 1 & 1 & 0.5025 & 0.4102 & -- & -- \\
+DEM catchment T=2 km$^2$ & 176 & 32.32 & 0.5672 & 0.1221 & 2.166 & 0.1263 & 0.1155 & 0.1352 & 0.801 & 0.4338 & 0.7959 & 0.5959 & 0.4281 & -- & -- \\
+municipality & 7 & 812.7 & 0.2938 & 0.0671 & 19.35 & 0.0434 & 0.029 & 0.0557 & 0.005 & 0.1528 & 0.6162 & 0.2116 & 0.055 & -- & -- \\
+landscape region (n=75) & 75 & 75.85 & 0.6482 & 0.1132 & 3.563 & 0.0992 & 0.0922 & 0.1057 & 0.005 & 0.3705 & 0.7566 & 0.5056 & 0.4118 & -- & -- \\
+landscape region (n=176) & 176 & 32.32 & 0.7351 & 0.1529 & 2.166 & 0.1251 & 0.1144 & 0.1353 & 0.005 & 0.3893 & 0.7776 & 0.5945 & 0.4258 & -- & -- \\
+Louvain landscape-similarity graph & 94 & 60.52 & 0.5949 & 0.1319 & 3.165 & 0.1057 & 0.0911 & 0.1189 & 0.005 & 0.5035 & 0.8121 & 0.523 & 0.4308 & 0.5 & 0.9789 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S25. Status concordance of spring pairs by distance band, within vs across wards}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{llllllllll}
+\toprule
+\textbf{distance\_band\_m} & \textbf{n\_same\_ward\_pairs} & \textbf{n\_diff\_ward\_pairs} & \textbf{concordance\_same\_ward} & \textbf{concordance\_diff\_ward} & \textbf{difference} & \textbf{ci\_low} & \textbf{ci\_high} & \textbf{mean\_distance\_same} & \textbf{mean\_distance\_diff} \\
+\midrule
+0-100 & 4890 & 346 & 0.7532 & 0.6243 & 0.1289 & 0.002 & 0.1874 & 47.65 & 35.5 \\
+100-200 & 6027 & 526 & 0.6944 & 0.5722 & 0.1221 & -0.0488 & 0.1569 & 153.1 & 155.3 \\
+200-400 & 17083 & 2821 & 0.6512 & 0.5448 & 0.1064 & 0.0019 & 0.1469 & 304.3 & 314.5 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S26. Pair concordance \textasciitilde{} same catchment + same ward + log distance}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{lllll}
+\toprule
+\textbf{term} & \textbf{log\_odds} & \textbf{ci\_low} & \textbf{ci\_high} & \textbf{odds\_ratio} \\
+\midrule
+same catchment (T=2 km2) & 0.1074 & -0.035 & 0.2364 & 1.113 \\
+same ward & 0.4438 & 0.0094 & 0.5975 & 1.559 \\
+log distance & -0.2267 & -0.3546 & -0.1155 & 0.7971 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S27. Upslope vs downslope neighbour dependence (permutation test)}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{ll}
+\toprule
+\textbf{quantity} & \textbf{value} \\
+\midrule
+n sources with up- and downslope neighbours & 2961 \\
+P(dried $|$ all upslope nbrs dried) & 0.5023 \\
+P(dried $|$ all downslope nbrs dried) & 0.521 \\
+P(dried $|$ no upslope nbr dried) & 0.1365 \\
+P(dried $|$ no downslope nbr dried) & 0.1507 \\
+beta\_up (std) & 0.5684 \\
+beta\_down (std) & 0.5069 \\
+beta\_up - beta\_down & 0.0615 \\
+permutation p (two-sided) & 0.406 \\
+null 95\% interval low & -0.1392 \\
+null 95\% interval high & 0.1345 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S28. Flow-path covariates with and without environmental adjustment}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{lllllll}
+\toprule
+\textbf{term} & \textbf{coef\_per\_sd} & \textbf{ci\_low} & \textbf{ci\_high} & \textbf{odds\_ratio\_per\_sd} & \textbf{ci\_excludes\_zero} & \textbf{model} \\
+\midrule
+log\_flowlen\_T2 & 0.2181 & 0.0722 & 0.3724 & 1.244 & True & drying \textasciitilde{} flow-path \\
+strahler\_T2p0 & 0.1857 & 0.0016 & 0.3196 & 1.204 & True & drying \textasciitilde{} flow-path \\
+log\_contrib\_area & -0.2739 & -0.3628 & -0.1739 & 0.7604 & True & drying \textasciitilde{} flow-path \\
+log\_flowlen\_T2 & -0.0515 & -0.2 & 0.1227 & 0.9498 & False & drying \textasciitilde{} flow-path + environment (no lat/lon) \\
+strahler\_T2p0 & 0.1233 & -0.0127 & 0.2212 & 1.131 & False & drying \textasciitilde{} flow-path + environment (no lat/lon) \\
+log\_contrib\_area & -0.0998 & -0.1876 & 0.0038 & 0.9051 & False & drying \textasciitilde{} flow-path + environment (no lat/lon) \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S29. Three-way variation partitioning: environment, space, ward}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{ll}
+\toprule
+\textbf{fraction} & \textbf{adj\_pseudo\_r2} \\
+\midrule
+environment only & 0.0498 \\
+space only & -0.0015 \\
+ward only & 0.0185 \\
+environment \& space & 0.0111 \\
+space \& ward & 0.0356 \\
+environment \& ward & 0.01 \\
+all three & 0.0415 \\
+unexplained & 0.835 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S30. Ward funnel plot against a landscape-only model: overdispersion}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{lllllllll}
+\toprule
+\textbf{n\_wards} & \textbf{overdispersion\_phi} & \textbf{chi2\_p} & \textbf{n\_outside\_95} & \textbf{expected\_outside\_95} & \textbf{n\_outside\_998} & \textbf{expected\_outside\_998} & \textbf{n\_high\_998} & \textbf{n\_low\_998} \\
+\midrule
+75 & 5.488 & 0 & 26 & 3.75 & 13 & 0.15 & 6 & 7 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S31. Observed and landscape-expected dried sources per ward}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{llllllllll}
+\toprule
+\textbf{ward} & \textbf{n} & \textbf{observed} & \textbf{expected} & \textbf{var} & \textbf{municipality} & \textbf{sdr} & \textbf{z} & \textbf{outside\_95} & \textbf{outside\_998} \\
+\midrule
+Bethanchownk\_1 & 67 & 8 & 5.53 & 4.987 & Bethanchownk & 1.447 & 1.106 & False & False \\
+Bethanchownk\_2 & 91 & 10 & 8.354 & 7.258 & Bethanchownk & 1.197 & 0.611 & False & False \\
+Bethanchownk\_3 & 48 & 9 & 6.689 & 5.598 & Bethanchownk & 1.345 & 0.9766 & False & False \\
+Bethanchownk\_4 & 71 & 15 & 9.333 & 7.682 & Bethanchownk & 1.607 & 2.045 & True & False \\
+Bethanchownk\_5 & 81 & 24 & 9.955 & 8.303 & Bethanchownk & 2.411 & 4.874 & True & True \\
+Bethanchownk\_6 & 27 & 8 & 7.252 & 4.955 & Bethanchownk & 1.103 & 0.3359 & False & False \\
+Dhulikhel\_1 & 163 & 19 & 30.11 & 23.84 & Dhulikhel & 0.6311 & -2.275 & True & False \\
+Dhulikhel\_10 & 90 & 15 & 18.7 & 14.33 & Dhulikhel & 0.8023 & -0.9765 & False & False \\
+Dhulikhel\_11 & 95 & 26 & 27.66 & 18.84 & Dhulikhel & 0.94 & -0.3824 & False & False \\
+Dhulikhel\_12 & 105 & 52 & 20.89 & 16.21 & Dhulikhel & 2.49 & 7.729 & True & True \\
+Dhulikhel\_2 & 86 & 3 & 26.12 & 17.39 & Dhulikhel & 0.1149 & -5.544 & True & True \\
+Dhulikhel\_3 & 101 & 24 & 24.28 & 16.96 & Dhulikhel & 0.9884 & -0.0685 & False & False \\
+Dhulikhel\_4 & 111 & 38 & 30.7 & 21.32 & Dhulikhel & 1.238 & 1.581 & False & False \\
+Dhulikhel\_5 & 16 & 5 & 3.922 & 2.819 & Dhulikhel & 1.275 & 0.6418 & False & False \\
+Dhulikhel\_6 & 89 & 25 & 23.62 & 13.44 & Dhulikhel & 1.058 & 0.3752 & False & False \\
+Dhulikhel\_7 & 75 & 44 & 39.79 & 17.38 & Dhulikhel & 1.106 & 1.01 & False & False \\
+Dhulikhel\_8 & 146 & 46 & 44.79 & 29.42 & Dhulikhel & 1.027 & 0.2235 & False & False \\
+Dhulikhel\_9 & 97 & 41 & 27.3 & 18.47 & Dhulikhel & 1.502 & 3.189 & True & True \\
+Namobuudha\_1 & 41 & 7 & 12.04 & 7.973 & Namobuudha & 0.5812 & -1.786 & False & False \\
+Namobuudha\_10 & 44 & 5 & 10.33 & 7.581 & Namobuudha & 0.4841 & -1.935 & False & False \\
+Namobuudha\_11 & 55 & 18 & 13.3 & 9.567 & Namobuudha & 1.353 & 1.52 & False & False \\
+Namobuudha\_2 & 61 & 3 & 19.61 & 12.92 & Namobuudha & 0.153 & -4.621 & True & True \\
+Namobuudha\_3 & 46 & 6 & 19.04 & 10.1 & Namobuudha & 0.3151 & -4.103 & True & True \\
+Namobuudha\_4 & 49 & 15 & 18.45 & 11.13 & Namobuudha & 0.8131 & -1.033 & False & False \\
+Namobuudha\_5 & 26 & 8 & 9.642 & 5.773 & Namobuudha & 0.8297 & -0.6834 & False & False \\
+Namobuudha\_6 & 25 & 9 & 10.1 & 5.758 & Namobuudha & 0.8907 & -0.4602 & False & False \\
+Namobuudha\_7 & 55 & 14 & 15.6 & 10.65 & Namobuudha & 0.8973 & -0.491 & False & False \\
+Namobuudha\_8 & 30 & 4 & 10.27 & 6.379 & Namobuudha & 0.3895 & -2.483 & True & False \\
+Namobuudha\_9 & 46 & 7 & 15.83 & 9.814 & Namobuudha & 0.4421 & -2.819 & True & False \\
+Panauti\_1 & 50 & 9 & 5.76 & 4.811 & Panauti & 1.562 & 1.477 & False & False \\
+Panauti\_10 & 76 & 13 & 11.89 & 9.864 & Panauti & 1.093 & 0.3532 & False & False \\
+Panauti\_11 & 37 & 2 & 4.973 & 4.116 & Panauti & 0.4022 & -1.465 & False & False \\
+Panauti\_12 & 101 & 7 & 9.818 & 8.546 & Panauti & 0.713 & -0.964 & False & False \\
+Panauti\_2 & 111 & 3 & 13.15 & 11.06 & Panauti & 0.2282 & -3.051 & True & False \\
+Panauti\_3 & 112 & 13 & 12.31 & 10.59 & Panauti & 1.056 & 0.213 & False & False \\
+Panauti\_4 & 91 & 2 & 12.14 & 10.27 & Panauti & 0.1647 & -3.164 & True & True \\
+Panauti\_5 & 124 & 8 & 16.81 & 14.2 & Panauti & 0.476 & -2.337 & True & False \\
+Panauti\_6 & 46 & 7 & 8.927 & 6.881 & Panauti & 0.7842 & -0.7345 & False & False \\
+Panauti\_7 & 21 & 2 & 3.716 & 2.848 & Panauti & 0.5382 & -1.017 & False & False \\
+Panauti\_8 & 60 & 13 & 9.242 & 7.518 & Panauti & 1.407 & 1.371 & False & False \\
+Panauti\_9 & 51 & 4 & 7.987 & 6.596 & Panauti & 0.5008 & -1.552 & False & False \\
+Panchkhal\_1 & 120 & 27 & 32.56 & 22.8 & Panchkhal & 0.8292 & -1.164 & False & False \\
+Panchkhal\_10 & 84 & 34 & 29.18 & 18.47 & Panchkhal & 1.165 & 1.122 & False & False \\
+Panchkhal\_11 & 93 & 53 & 33.18 & 19.53 & Panchkhal & 1.597 & 4.485 & True & True \\
+Panchkhal\_12 & 129 & 61 & 47.9 & 27.1 & Panchkhal & 1.274 & 2.517 & True & False \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\par\footnotesize 30 further rows in \texttt{paper/si\_generated\_tables.md} and \texttt{results/metrics}.
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S32. Apriori drying rules: counts, ward robustness, replication}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{llllll}
+\toprule
+\textbf{consequent} & \textbf{n\_rules} & \textbf{n\_ward\_robust} & \textbf{n\_reversed\_within\_wards} & \textbf{median\_heldout\_replication} & \textbf{median\_share\_wards\_lift\_gt1} \\
+\midrule
+active & 2337 & 1903 & 4 & 1 & 0.7778 \\
+dried & 3321 & 2613 & 11 & 1 & 0.6842 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S33. The survey seasonal-flow flag (analysed separately)}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{lllllllll}
+\toprule
+\textbf{item} & \textbf{support} & \textbf{drying\_rate\_if\_seasonal} & \textbf{drying\_rate\_if\_perennial} & \textbf{mh\_or\_ward} & \textbf{mh\_ci\_low} & \textbf{mh\_ci\_high} & \textbf{share\_wards\_lift\_gt1} & \textbf{n\_wards\_evaluable} \\
+\midrule
+flow=seasonal (survey) & 0.1635 & 0.6312 & 0.1963 & 6.945 & 5.776 & 8.35 & 0.8824 & 51 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S34. Significant productive apriori rules (BH-FDR q < 0.05), ranked by WRAcc}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{llllllllllllll}
+\toprule
+\textbf{consequent} & \textbf{antecedent} & \textbf{n} & \textbf{support} & \textbf{confidence} & \textbf{lift} & \textbf{wracc} & \textbf{q\_bh} & \textbf{mh\_or\_ward} & \textbf{mh\_ci\_low} & \textbf{mh\_ci\_high} & \textbf{share\_wards\_lift\_gt1} & \textbf{heldout\_replication} & \textbf{reverses\_within\_wards} \\
+\midrule
+dried & climatic water deficit=high & 1810 & 0.3182 & 0.3884 & 1.453 & 0.0385 & 0 & 1.513 & 1.193 & 1.919 & 0.6667 & 1 & False \\
+dried & TPI 500 m=high & 1897 & 0.3335 & 0.36 & 1.347 & 0.0309 & 0 & 2.27 & 1.97 & 2.615 & 0.8472 & 1 & False \\
+dried & soil moisture=low & 2133 & 0.3749 & 0.3479 & 1.301 & 0.0302 & 0 & 1.331 & 1.056 & 1.676 & 0.64 & 0.8 & False \\
+dried & multi-scale TPI=high & 1875 & 0.3296 & 0.3589 & 1.343 & 0.0302 & 0 & 1.893 & 1.637 & 2.189 & 0.7231 & 1 & False \\
+dried & HAND=high \& climatic water deficit=high & 663 & 0.1165 & 0.5219 & 1.952 & 0.0297 & 0 & 2.675 & 2.166 & 3.304 & 0.8571 & 1 & False \\
+dried & HAND=high \& multi-scale TPI=high & 1317 & 0.2315 & 0.391 & 1.463 & 0.0286 & 0 & 2.326 & 1.976 & 2.739 & 0.7222 & 1 & False \\
+dried & HAND=high & 1896 & 0.3333 & 0.3523 & 1.318 & 0.0283 & 0 & 2.073 & 1.776 & 2.418 & 0.6557 & 1 & False \\
+dried & landscape type=T5 & 1514 & 0.2661 & 0.3686 & 1.379 & 0.0269 & 0 & 1.577 & 1.302 & 1.912 & 0.6585 & 0.8 & False \\
+dried & climatic water deficit=high \& multi-scale TPI=high & 572 & 0.1005 & 0.528 & 1.975 & 0.0262 & 0 & 2.422 & 1.947 & 3.013 & 0.8214 & 1 & False \\
+dried & NDVI trend 2001-23=high \& climatic water deficit=high & 834 & 0.1466 & 0.446 & 1.668 & 0.0262 & 0 & 1.531 & 1.247 & 1.881 & 0.7037 & 1 & False \\
+dried & TPI 500 m=high \& multi-scale TPI=high & 1120 & 0.1969 & 0.4 & 1.496 & 0.0261 & 0 & 2.13 & 1.811 & 2.505 & 0.7627 & 1 & False \\
+dried & TPI 500 m=high \& upstream area=low & 1182 & 0.2078 & 0.3926 & 1.468 & 0.026 & 0 & 2.432 & 2.071 & 2.856 & 0.8033 & 1 & False \\
+dried & HAND=high \& TPI 500 m=high & 1007 & 0.177 & 0.4141 & 1.549 & 0.026 & 0 & 2.489 & 2.1 & 2.949 & 0.8302 & 1 & False \\
+dried & climatic water deficit=high \& landscape type=T5 & 926 & 0.1628 & 0.4255 & 1.591 & 0.0257 & 0 & 1.69 & 1.356 & 2.105 & 0.6538 & 1 & False \\
+dried & elevation=low & 1899 & 0.3338 & 0.3428 & 1.282 & 0.0252 & 0 & 0.8025 & 0.6647 & 0.9689 & 0.4054 & 0.8 & True \\
+dried & HAND=high \& landscape type=T5 & 800 & 0.1406 & 0.4462 & 1.669 & 0.0252 & 0 & 2.264 & 1.851 & 2.769 & 0.8235 & 0.8 & False \\
+dried & HAND=high \& climatic water deficit=high \& multi-scale TPI=high & 467 & 0.0821 & 0.5589 & 2.09 & 0.0239 & 0 & 2.784 & 2.201 & 3.521 & 0.88 & 1 & False \\
+dried & HAND=high \& soil moisture=low & 766 & 0.1346 & 0.4439 & 1.66 & 0.0238 & 0 & 2.178 & 1.784 & 2.659 & 0.75 & 0.8 & False \\
+dried & multi-scale TPI=high \& upstream area=low & 765 & 0.1345 & 0.4405 & 1.648 & 0.0233 & 0 & 2.347 & 1.954 & 2.82 & 0.7447 & 1 & False \\
+dried & TPI 500 m=high \& distance to road=low & 871 & 0.1531 & 0.4156 & 1.554 & 0.0227 & 0 & 2.322 & 1.954 & 2.76 & 0.8136 & 1 & False \\
+dried & upstream area=low & 1904 & 0.3347 & 0.3351 & 1.253 & 0.0227 & 0 & 1.914 & 1.655 & 2.214 & 0.7887 & 1 & False \\
+dried & NDVI trend 2001-23=high \& soil moisture=low & 984 & 0.173 & 0.3963 & 1.482 & 0.0223 & 0 & 1.399 & 1.155 & 1.694 & 0.625 & 0.8 & False \\
+dried & TPI 500 m=high \& climatic water deficit=high & 550 & 0.0967 & 0.4964 & 1.857 & 0.0221 & 0 & 2.244 & 1.821 & 2.764 & 0.7879 & 1 & False \\
+dried & cropland share (WorldCover)=mid \& multi-scale TPI=high & 796 & 0.1399 & 0.4246 & 1.588 & 0.022 & 0 & 1.835 & 1.534 & 2.195 & 0.7708 & 1 & False \\
+dried & HAND=high \& NDVI trend 2001-23=high & 812 & 0.1427 & 0.4212 & 1.575 & 0.022 & 0 & 2.121 & 1.746 & 2.577 & 0.8378 & 1 & False \\
+dried & annual precipitation=low & 1973 & 0.3468 & 0.3305 & 1.236 & 0.0219 & 0 & 1.175 & 0.907 & 1.522 & 0.4231 & 0.8 & False \\
+dried & landscape type=T5 \& multi-scale TPI=high & 669 & 0.1176 & 0.4529 & 1.694 & 0.0218 & 0 & 2.09 & 1.693 & 2.58 & 0.8 & 1 & False \\
+dried & annual precipitation=low \& upstream area=low & 828 & 0.1455 & 0.4155 & 1.554 & 0.0216 & 0 & 2.146 & 1.751 & 2.631 & 0.8519 & 1 & False \\
+dried & NDWI=high \& TPI 500 m=high & 749 & 0.1317 & 0.4299 & 1.608 & 0.0214 & 0 & 2.363 & 1.965 & 2.841 & 0.8889 & 1 & False \\
+dried & multi-scale TPI=high \& soil moisture=low & 646 & 0.1136 & 0.4551 & 1.702 & 0.0213 & 0 & 1.992 & 1.616 & 2.454 & 0.7333 & 1 & False \\
+dried & NDVI=low \& TPI 500 m=high & 766 & 0.1346 & 0.4256 & 1.592 & 0.0213 & 0 & 2.378 & 1.977 & 2.861 & 0.8723 & 1 & False \\
+dried & TWI=low \& climatic water deficit=high & 506 & 0.0889 & 0.5059 & 1.892 & 0.0212 & 0 & 2.158 & 1.745 & 2.668 & 0.8125 & 1 & False \\
+dried & climatic water deficit=high \& cropland share (WorldCover)=mid & 652 & 0.1146 & 0.4525 & 1.692 & 0.0212 & 0 & 1.501 & 1.227 & 1.836 & 0.7778 & 1 & False \\
+dried & distance to road=low \& multi-scale TPI=high & 741 & 0.1303 & 0.4291 & 1.605 & 0.0211 & 0 & 2.02 & 1.679 & 2.43 & 0.72 & 1 & False \\
+dried & TPI 500 m=high \& annual precipitation=low \& upstream area=low & 571 & 0.1004 & 0.4764 & 1.782 & 0.021 & 0 & 3.163 & 2.507 & 3.99 & 0.913 & 1 & False \\
+dried & distance to road=low & 1896 & 0.3333 & 0.3296 & 1.233 & 0.0208 & 0 & 1.563 & 1.363 & 1.793 & 0.6622 & 1 & False \\
+dried & TPI 500 m=high \& annual precipitation=low & 838 & 0.1473 & 0.4081 & 1.526 & 0.0207 & 0 & 2.588 & 2.093 & 3.201 & 0.8929 & 0.8 & False \\
+dried & source=pond & 521 & 0.0916 & 0.4933 & 1.845 & 0.0207 & 0 & 2.228 & 1.825 & 2.721 & 0.7353 & 1 & False \\
+dried & landscape type=T5 \& precipitation trend=high & 783 & 0.1376 & 0.4176 & 1.562 & 0.0207 & 0 & 1.608 & 1.255 & 2.059 & 0.7273 & 1 & False \\
+dried & HAND=high \& cropland share (WorldCover)=mid & 773 & 0.1359 & 0.4191 & 1.568 & 0.0206 & 0 & 1.917 & 1.597 & 2.302 & 0.7381 & 1 & False \\
+active & annual precipitation=high & 1865 & 0.3278 & 0.8429 & 1.151 & 0.0361 & 0 & 1.106 & 0.8021 & 1.525 & 0.4444 & 1 & False \\
+active & soil moisture=high & 1588 & 0.2791 & 0.8552 & 1.167 & 0.0342 & 0 & 1.823 & 1.313 & 2.531 & 0.6471 & 1 & False \\
+active & climatic water deficit=low & 2408 & 0.4233 & 0.809 & 1.104 & 0.0323 & 0 & 1.708 & 1.259 & 2.317 & 0.6667 & 0.8 & False \\
+active & TPI 500 m=low & 1896 & 0.3333 & 0.8244 & 1.125 & 0.0306 & 0 & 2.745 & 2.323 & 3.244 & 0.9016 & 1 & False \\
+active & TPI 500 m=low \& soil moisture=high & 771 & 0.1355 & 0.9287 & 1.268 & 0.0266 & 0 & 4.031 & 2.897 & 5.61 & 0.9565 & 1 & False \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\par\footnotesize 35 further rows in \texttt{paper/si\_generated\_tables.md} and \texttt{results/metrics}.
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S35. Reported reason of drying}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{lll}
+\toprule
+\textbf{reported\_reason} & \textbf{n\_dried} & \textbf{share} \\
+\midrule
+earthquake & 521 & 0.3425 \\
+drought & 477 & 0.3136 \\
+infrastructure\_development & 240 & 0.1578 \\
+natural\_disaster & 113 & 0.0743 \\
+source\_neglected & 96 & 0.0631 \\
+source\_disruption & 46 & 0.0302 \\
+deforestation & 16 & 0.0105 \\
+reduced precipitation & 8 & 0.0053 \\
+wa reason & 3 & 0.002 \\
+pine plantation & 1 & 0.0007 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S36. Reported timing of drying}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{lllllllll}
+\toprule
+\textbf{n\_dried} & \textbf{n\_valid\_year} & \textbf{n\_dried\_in\_2072BS} & \textbf{share\_dried\_in\_2072BS} & \textbf{share\_earthquake\_attributed\_among\_2072BS} & \textbf{n\_earthquake\_attributed} & \textbf{share\_of\_earthquake\_attributed\_in\_2072BS} & \textbf{share\_dried\_before\_2072BS} & \textbf{share\_dried\_after\_2072BS} \\
+\midrule
+1521 & 1513 & 538 & 0.3537 & 0.8401 & 521 & 0.8676 & 0.4057 & 0.2354 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S37. Knox space-time test of reported drying year, within vs across wards}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{llllllllll}
+\toprule
+\textbf{cohort} & \textbf{pairs} & \textbf{n\_sources} & \textbf{space\_m} & \textbf{time\_years} & \textbf{n\_close\_pairs} & \textbf{observed} & \textbf{expected} & \textbf{ratio\_obs\_exp} & \textbf{p\_value} \\
+\midrule
+all dried with valid year & all pairs & 1513 & 250 & 0 & 2242 & 529 & 342.8 & 1.543 & 0.001 \\
+all dried with valid year & all pairs & 1513 & 250 & 1 & 2242 & 627 & 456.7 & 1.373 & 0.001 \\
+all dried with valid year & same ward & 1513 & 250 & 0 & 2046 & 507 & 315.6 & 1.607 & 0.001 \\
+all dried with valid year & same ward & 1513 & 250 & 1 & 2046 & 603 & 417 & 1.446 & 0.001 \\
+all dried with valid year & different ward & 1513 & 250 & 0 & 196 & 22 & 29.95 & 0.7346 & 0.824 \\
+all dried with valid year & different ward & 1513 & 250 & 1 & 196 & 24 & 39.59 & 0.6062 & 0.97 \\
+all dried with valid year & all pairs & 1513 & 500 & 0 & 5597 & 1219 & 856.3 & 1.423 & 0.001 \\
+all dried with valid year & all pairs & 1513 & 500 & 1 & 5597 & 1472 & 1139 & 1.292 & 0.001 \\
+all dried with valid year & same ward & 1513 & 500 & 0 & 4630 & 1111 & 707.6 & 1.57 & 0.001 \\
+all dried with valid year & same ward & 1513 & 500 & 1 & 4630 & 1356 & 941.9 & 1.44 & 0.001 \\
+all dried with valid year & different ward & 1513 & 500 & 0 & 967 & 108 & 148.7 & 0.7262 & 0.948 \\
+all dried with valid year & different ward & 1513 & 500 & 1 & 967 & 116 & 196.1 & 0.5916 & 0.999 \\
+all dried with valid year & all pairs & 1513 & 1000 & 0 & 13904 & 2701 & 2136 & 1.265 & 0.001 \\
+all dried with valid year & all pairs & 1513 & 1000 & 1 & 13904 & 3407 & 2834 & 1.202 & 0.001 \\
+all dried with valid year & same ward & 1513 & 1000 & 0 & 10168 & 2309 & 1561 & 1.479 & 0.001 \\
+all dried with valid year & same ward & 1513 & 1000 & 1 & 10168 & 2903 & 2065 & 1.406 & 0.001 \\
+all dried with valid year & different ward & 1513 & 1000 & 0 & 3736 & 392 & 572.5 & 0.6847 & 1 \\
+all dried with valid year & different ward & 1513 & 1000 & 1 & 3736 & 504 & 765 & 0.6588 & 1 \\
+excluding 2072 BS cohort & all pairs & 975 & 250 & 0 & 1512 & 219 & 98.86 & 2.215 & 0.001 \\
+excluding 2072 BS cohort & all pairs & 975 & 250 & 1 & 1512 & 301 & 183.6 & 1.64 & 0.001 \\
+excluding 2072 BS cohort & same ward & 975 & 250 & 0 & 1376 & 209 & 89.35 & 2.339 & 0.001 \\
+excluding 2072 BS cohort & same ward & 975 & 250 & 1 & 1376 & 290 & 168.2 & 1.724 & 0.001 \\
+excluding 2072 BS cohort & different ward & 975 & 250 & 0 & 136 & 10 & 8.854 & 1.129 & 0.386 \\
+excluding 2072 BS cohort & different ward & 975 & 250 & 1 & 136 & 11 & 16.31 & 0.6744 & 0.891 \\
+excluding 2072 BS cohort & all pairs & 975 & 500 & 0 & 3618 & 454 & 236.7 & 1.918 & 0.001 \\
+excluding 2072 BS cohort & all pairs & 975 & 500 & 1 & 3618 & 645 & 438.7 & 1.47 & 0.001 \\
+excluding 2072 BS cohort & same ward & 975 & 500 & 0 & 2932 & 396 & 191.4 & 2.068 & 0.001 \\
+excluding 2072 BS cohort & same ward & 975 & 500 & 1 & 2932 & 582 & 355.7 & 1.636 & 0.001 \\
+excluding 2072 BS cohort & different ward & 975 & 500 & 0 & 686 & 58 & 44.69 & 1.298 & 0.089 \\
+excluding 2072 BS cohort & different ward & 975 & 500 & 1 & 686 & 63 & 84.34 & 0.747 & 0.975 \\
+excluding 2072 BS cohort & all pairs & 975 & 1000 & 0 & 8135 & 908 & 532.2 & 1.706 & 0.001 \\
+excluding 2072 BS cohort & all pairs & 975 & 1000 & 1 & 8135 & 1370 & 987.9 & 1.387 & 0.001 \\
+excluding 2072 BS cohort & same ward & 975 & 1000 & 0 & 5847 & 744 & 382.8 & 1.944 & 0.001 \\
+excluding 2072 BS cohort & same ward & 975 & 1000 & 1 & 5847 & 1141 & 708.4 & 1.611 & 0.001 \\
+excluding 2072 BS cohort & different ward & 975 & 1000 & 0 & 2288 & 164 & 149.3 & 1.098 & 0.208 \\
+excluding 2072 BS cohort & different ward & 975 & 1000 & 1 & 2288 & 229 & 276.5 & 0.8281 & 0.983 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S38. Ward and landscape-type structure of reported causes and years among dried sources}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{llllllllll}
+\toprule
+\textbf{outcome} & \textbf{share} & \textbf{unit} & \textbf{n\_units} & \textbf{icc} & \textbf{grid\_icc\_mean} & \textbf{grid\_icc\_q025} & \textbf{grid\_icc\_q975} & \textbf{p\_above\_grid} & \textbf{cramers\_v} \\
+\midrule
+earthquake attributed & 0.3425 & ward & 75 & 0.2283 & 0.1518 & 0.1308 & 0.1767 & 0.005 & 0.4624 \\
+earthquake attributed & 0.3425 & landscape type & 8 & 0.0495 & -- & -- & -- & -- & 0.1996 \\
+drought attributed & 0.3136 & ward & 75 & 0.2515 & 0.187 & 0.1549 & 0.224 & 0.005 & 0.4854 \\
+drought attributed & 0.3136 & landscape type & 8 & 0.0387 & -- & -- & -- & -- & 0.1761 \\
+infrastructure attributed & 0.1578 & ward & 75 & 0.2642 & 0.1801 & 0.1517 & 0.2079 & 0.005 & 0.4976 \\
+infrastructure attributed & 0.1578 & landscape type & 8 & 0.1436 & -- & -- & -- & -- & 0.3431 \\
+dated 2072 BS & 0.3537 & ward & 75 & 0.2802 & 0.1484 & 0.1105 & 0.1779 & 0.005 & 0.5125 \\
+dated 2072 BS & 0.3537 & landscape type & 8 & 0.0322 & -- & -- & -- & -- & 0.1605 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S39. Apriori narrative rules among dried sources (ward-stratified)}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{lllllllllll}
+\toprule
+\textbf{consequent} & \textbf{antecedent} & \textbf{n} & \textbf{support} & \textbf{confidence} & \textbf{lift} & \textbf{q\_bh} & \textbf{mh\_or\_ward} & \textbf{mh\_ci\_low} & \textbf{mh\_ci\_high} & \textbf{ward\_robust} \\
+\midrule
+reason=earthquake & period=2072 BS & 538 & 0.3537 & 0.8401 & 2.453 & 0 & 166.4 & 87.24 & 317.5 & True \\
+reason=earthquake & landscape type=T5 \& period=2072 BS & 220 & 0.1446 & 0.9 & 2.627 & 0 & 24.69 & 13.06 & 46.68 & True \\
+reason=earthquake & ownership=private \& period=2072 BS & 182 & 0.1197 & 0.9011 & 2.631 & 0 & 19.51 & 9.878 & 38.53 & True \\
+reason=earthquake & municipality=Panchkhal \& period=2072 BS & 168 & 0.1105 & 0.8988 & 2.624 & 0 & 114.2 & 46.61 & 279.9 & True \\
+reason=earthquake & ownership=community \& period=2072 BS & 128 & 0.0842 & 0.9219 & 2.691 & 0 & 28.02 & 13.28 & 59.09 & True \\
+reason=earthquake & municipality=Temal \& period=2072 BS & 100 & 0.0657 & 0.94 & 2.744 & 0 & 299.9 & 69.76 & 1289 & True \\
+reason=earthquake & landscape type=T5 \& source=spring & 474 & 0.3116 & 0.4346 & 1.269 & 0 & 1.209 & 0.8723 & 1.676 & False \\
+reason=earthquake & municipality=Panchkhal \& source=spring & 327 & 0.215 & 0.4679 & 1.366 & 0 & 3.411 & 1.919 & 6.061 & True \\
+reason=earthquake & landscape type=T5 \& surveyed land use=sparse\_forest & 249 & 0.1637 & 0.4578 & 1.337 & 0.0002 & 0.9496 & 0.663 & 1.36 & False \\
+reason=earthquake & landscape type=T5 \& municipality=Panchkhal & 205 & 0.1348 & 0.4732 & 1.381 & 0.0002 & 0.908 & 0.5075 & 1.625 & False \\
+reason=earthquake & landscape type=T8 \& period=2072 BS & 44 & 0.0289 & 0.8864 & 2.588 & 0 & 219.6 & 14.37 & 3357 & True \\
+reason=earthquake & municipality=Panchkhal \& surveyed land use=sparse\_forest & 155 & 0.1019 & 0.4839 & 1.413 & 0.0006 & 0.9493 & 0.5949 & 1.515 & False \\
+reason=earthquake & landscape type=T2 \& period=2072 BS & 39 & 0.0256 & 0.8974 & 2.62 & 0 & 21.69 & 5.636 & 83.44 & True \\
+reason=earthquake & ownership=private \& surveyed land use=sparse\_forest & 160 & 0.1052 & 0.475 & 1.387 & 0.0012 & 1.04 & 0.7019 & 1.541 & False \\
+reason=earthquake & municipality=Bethanchownk \& period=2072 BS & 36 & 0.0237 & 0.8889 & 2.595 & 0 & -- & -- & -- & False \\
+reason=earthquake & landscape type=T5 \& ownership=private & 159 & 0.1045 & 0.4654 & 1.359 & 0.0031 & 0.9764 & 0.6396 & 1.491 & False \\
+reason=earthquake & municipality=Panchkhal \& ownership=public & 186 & 0.1223 & 0.4409 & 1.287 & 0.0108 & 0.6693 & 0.3677 & 1.218 & False \\
+reason=earthquake & ownership=private \& surveyed land use=agriculture & 147 & 0.0966 & 0.4558 & 1.331 & 0.0106 & 1.458 & 0.9555 & 2.223 & False \\
+reason=earthquake & source=spring \& surveyed land use=dense\_forest & 124 & 0.0815 & 0.4677 & 1.365 & 0.0106 & 1.558 & 0.9747 & 2.491 & False \\
+reason=earthquake & landscape type=T8 \& source=spring & 74 & 0.0487 & 0.527 & 1.539 & 0.004 & 1.489 & 0.4954 & 4.473 & False \\
+reason=earthquake & landscape type=T5 \& surveyed land use=agriculture & 109 & 0.0717 & 0.4495 & 1.312 & 0.0468 & 1.178 & 0.7272 & 1.909 & False \\
+reason=earthquake & landscape type=T8 & 83 & 0.0546 & 0.4819 & 1.407 & 0.0251 & 0.6702 & 0.1464 & 3.068 & False \\
+reason=earthquake & municipality=Temal \& ownership=private & 95 & 0.0625 & 0.4632 & 1.352 & 0.037 & 0.9032 & 0.4723 & 1.727 & False \\
+reason=earthquake & ownership=public \& surveyed land use=dense\_forest & 79 & 0.0519 & 0.481 & 1.404 & 0.0309 & 1.715 & 0.9206 & 3.196 & False \\
+reason=earthquake & landscape type=T8 \& municipality=Bethanchownk & 50 & 0.0329 & 0.54 & 1.577 & 0.0147 & 1.638 & 0.2667 & 10.06 & False \\
+reason=earthquake & landscape type=T8 \& ownership=private & 47 & 0.0309 & 0.5319 & 1.553 & 0.0261 & 1.49 & 0.5397 & 4.116 & False \\
+reason=earthquake & landscape type=T6 \& ownership=private & 50 & 0.0329 & 0.52 & 1.518 & 0.0314 & 1.739 & 0.8164 & 3.704 & False \\
+reason=earthquake & municipality=Panchkhal \& surveyed land use=dense\_forest & 41 & 0.027 & 0.5366 & 1.567 & 0.0355 & 1.054 & 0.4647 & 2.393 & False \\
+reason=drought & period=before 2072 BS & 617 & 0.4057 & 0.5008 & 1.597 & 0 & 5.57 & 4.128 & 7.515 & True \\
+reason=drought & landscape type=T5 \& period=before 2072 BS & 240 & 0.1578 & 0.6375 & 2.033 & 0 & 7.497 & 4.93 & 11.4 & True \\
+reason=drought & municipality=Temal \& period=before 2072 BS & 120 & 0.0789 & 0.775 & 2.471 & 0 & 10.55 & 5.269 & 21.12 & True \\
+reason=drought & municipality=Panchkhal \& period=before 2072 BS & 161 & 0.1059 & 0.6335 & 2.02 & 0 & 5.894 & 3.51 & 9.896 & True \\
+reason=drought & period=before 2072 BS \& surveyed land use=sparse\_forest & 211 & 0.1387 & 0.5498 & 1.753 & 0 & 3.582 & 2.482 & 5.17 & True \\
+reason=drought & ownership=private \& period=before 2072 BS & 185 & 0.1216 & 0.5351 & 1.706 & 0 & 4.173 & 2.773 & 6.281 & True \\
+reason=drought & municipality=Temal & 293 & 0.1926 & 0.4334 & 1.382 & 0 & -- & -- & -- & False \\
+reason=drought & period=before 2072 BS \& surveyed land use=grassland & 88 & 0.0579 & 0.6932 & 2.21 & 0 & 5.499 & 2.854 & 10.6 & True \\
+reason=drought & landscape type=T3 \& period=before 2072 BS & 105 & 0.069 & 0.5905 & 1.883 & 0 & 5.916 & 2.877 & 12.16 & True \\
+reason=drought & landscape type=T5 \& surveyed land use=grassland & 84 & 0.0552 & 0.6429 & 2.05 & 0 & 2.801 & 1.54 & 5.095 & True \\
+reason=drought & municipality=Roshi RM \& period=before 2072 BS & 85 & 0.0559 & 0.6353 & 2.026 & 0 & 17.96 & 7.548 & 42.74 & True \\
+reason=drought & landscape type=T3 & 224 & 0.1473 & 0.433 & 1.381 & 0.0003 & 1.282 & 0.7182 & 2.289 & False \\
+reason=drought & landscape type=T3 \& municipality=Panchkhal & 78 & 0.0513 & 0.6154 & 1.962 & 0 & 1.602 & 0.7314 & 3.51 & False \\
+reason=drought & surveyed land use=grassland & 192 & 0.1262 & 0.4271 & 1.362 & 0.0022 & 1.344 & 0.8891 & 2.032 & False \\
+reason=drought & landscape type=T3 \& ownership=community & 75 & 0.0493 & 0.5867 & 1.871 & 0 & 1.443 & 0.6997 & 2.975 & False \\
+reason=drought & municipality=Temal \& surveyed land use=grassland & 53 & 0.0348 & 0.6604 & 2.106 & 0 & 1.917 & 0.8728 & 4.212 & False \\
+reason=drought & landscape type=T5 \& municipality=Roshi RM & 73 & 0.048 & 0.5479 & 1.747 & 0.0002 & 4.746 & 2.21 & 10.19 & True \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\par\footnotesize 39 further rows in \texttt{paper/si\_generated\_tables.md} and \texttt{results/metrics}.
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S40. Reported cause by landscape type (row shares)}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{lllll}
+\toprule
+\textbf{type} & \textbf{drought} & \textbf{earthquake} & \textbf{infrastructure\_development} & \textbf{other} \\
+\midrule
+T1 & 0.1967 & 0.082 & 0.5574 & 0.1639 \\
+T2 & 0.3165 & 0.3309 & 0.0647 & 0.2878 \\
+T3 & 0.433 & 0.2321 & 0.1696 & 0.1652 \\
+T4 & 0.3019 & 0.4151 & 0.0755 & 0.2075 \\
+T5 & 0.3656 & 0.4032 & 0.0968 & 0.1344 \\
+T6 & 0.2263 & 0.3723 & 0.1095 & 0.292 \\
+T7 & 0.2537 & 0.3659 & 0.1415 & 0.239 \\
+T8 & 0.1084 & 0.4819 & 0.2771 & 0.1325 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S41. Ward narrative regimes: silhouette by number of clusters}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{lll}
+\toprule
+\textbf{k} & \textbf{silhouette} & \textbf{selected} \\
+\midrule
+2 & 0.2068 & False \\
+3 & 0.191 & False \\
+4 & 0.1886 & False \\
+5 & 0.2159 & False \\
+6 & 0.2206 & True \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S42. Ward narrative regimes: mean profiles}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{lllllllllll}
+\toprule
+\textbf{regime} & \textbf{cause: drought} & \textbf{cause: earthquake} & \textbf{cause: infrastructure\_development} & \textbf{cause: other} & \textbf{period: 2072} & \textbf{period: after} & \textbf{period: before} & \textbf{period: unknown} & \textbf{n\_dried} & \textbf{n\_wards} \\
+\midrule
+R1 & 0.092 & 0.7079 & 0.1087 & 0.0915 & 0.7492 & 0.0555 & 0.1924 & 0.003 & 22.18 & 11 \\
+R2 & 0.5848 & 0.351 & 0.0058 & 0.0584 & 0.2958 & 0.171 & 0.5333 & 0 & 37.75 & 8 \\
+R3 & 0.5002 & 0.1105 & 0.1385 & 0.2508 & 0.2301 & 0.1731 & 0.5968 & 0 & 28.11 & 9 \\
+R4 & 0.1915 & 0.3334 & 0.264 & 0.2111 & 0.3461 & 0.3843 & 0.2624 & 0.0072 & 24.22 & 18 \\
+R5 & 0.0091 & 0.1738 & 0.0472 & 0.7699 & 0.1462 & 0.4274 & 0.4265 & 0 & 13.4 & 5 \\
+R6 & 0.1082 & 0.0765 & 0.5214 & 0.2938 & 0.0283 & 0.1629 & 0.8088 & 0 & 26.2 & 5 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S43. Mantel tests: narrative similarity vs geography and landscape}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{lll}
+\toprule
+\textbf{test} & \textbf{mantel\_r} & \textbf{p} \\
+\midrule
+narrative \textasciitilde{} geography & -0.0439 & 0.786 \\
+narrative \textasciitilde{} landscape & 0.0422 & 0.254 \\
+narrative \textasciitilde{} geography $|$ landscape & -0.085 & 0.915 \\
+narrative \textasciitilde{} landscape $|$ geography & 0.0841 & 0.132 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S44. Drivers of drying: pooled vs ward fixed effects (per SD, 95 \% block-bootstrap CI)}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{llllll}
+\toprule
+\textbf{model} & \textbf{term} & \textbf{coef\_per\_sd} & \textbf{ci\_low} & \textbf{ci\_high} & \textbf{ci\_excludes\_zero} \\
+\midrule
+pooled & spring\_density\_500m & 0.1012 & -0.0557 & 0.251 & False \\
+pooled & elevation\_m & -0.3052 & -2.466 & 1.973 & False \\
+pooled & slope\_deg & 0.0734 & -0.0772 & 0.2405 & False \\
+pooled & aspect\_sin & -0.0718 & -0.1562 & 0.0382 & False \\
+pooled & aspect\_cos & 0.0874 & -0.0468 & 0.2089 & False \\
+pooled & precip\_annual\_mm & -3.029 & -5.515 & 0.3462 & False \\
+pooled & precip\_monsoon\_mm & 2.63 & -0.6011 & 5.055 & False \\
+pooled & precip\_dry\_season\_mm & 0.1997 & -0.1458 & 0.4842 & False \\
+pooled & ndvi\_mean & -0.1572 & -0.4591 & 0.1535 & False \\
+pooled & ndwi\_mean & -0.1404 & -0.4786 & 0.1837 & False \\
+pooled & Source Type\_encoded & 0.176 & 0.0317 & 0.3127 & True \\
+pooled & landuse\_agriculture & -0.7845 & -1.59 & -0.0292 & True \\
+pooled & landuse\_dense\_forest & -0.6734 & -1.318 & -0.0755 & True \\
+pooled & landuse\_fallow & -0.113 & -0.3681 & 0.1354 & False \\
+pooled & landuse\_grassland & -0.4212 & -1.061 & 0.1277 & False \\
+pooled & landuse\_others & -0.1069 & -0.2933 & 0.0702 & False \\
+pooled & landuse\_settlement & -0.2858 & -0.877 & 0.2201 & False \\
+pooled & landuse\_sparse\_forest & -0.7531 & -1.716 & 0.0611 & False \\
+pooled & ownership\_community & 0.0265 & -0.0321 & 0.0895 & False \\
+pooled & ownership\_private & -0.0123 & -0.058 & 0.0364 & False \\
+pooled & ownership\_public & -0.0126 & -0.0758 & 0.0328 & False \\
+pooled & upa & -0.0809 & -1.02 & 0.2801 & False \\
+pooled & log\_upa & -0.129 & -0.5123 & 0.2768 & False \\
+pooled & hnd & -0.0184 & -0.1756 & 0.1343 & False \\
+pooled & elv & -0.2098 & -2.27 & 1.693 & False \\
+pooled & twi & -0.048 & -0.502 & 0.3656 & False \\
+pooled & tpi\_500m & 0.1724 & 0.0464 & 0.3783 & True \\
+pooled & tri\_90m & 0.0007 & -0.0825 & 0.1026 & False \\
+pooled & precip\_dry\_deficit\_mm & -0.0578 & -0.3997 & 0.1753 & False \\
+pooled & precip\_mon\_deficit\_mm & -0.2972 & -0.9487 & 0.6317 & False \\
+pooled & aet & -0.1647 & -0.8493 & 0.5635 & False \\
+pooled & def & -0.0653 & -0.8134 & 0.5278 & False \\
+pooled & soil & -0.6545 & -1.449 & -0.1236 & True \\
+pooled & pdsi & -0.1206 & -0.503 & 0.2356 & False \\
+pooled & dist\_to\_road\_m & 0.0529 & -0.0699 & 0.1879 & False \\
+pooled & road\_density\_500m & -0.0191 & -0.2731 & 0.1503 & False \\
+pooled & road\_upslope & -0.0466 & -0.1285 & 0.0288 & False \\
+pooled & wc\_tree & 0.0336 & -0.0909 & 0.1835 & False \\
+pooled & wc\_shrub & 0 & 0 & 0 & False \\
+pooled & wc\_grass & 0.0837 & -0.0555 & 0.1827 & False \\
+pooled & wc\_crop & -0.0528 & -0.1805 & 0.0939 & False \\
+pooled & wc\_built & -0.0955 & -0.2913 & 0.0127 & False \\
+pooled & wc\_bare & 0.0536 & -0.0337 & 0.1135 & False \\
+pooled & wc\_water & -0.1227 & -1.798 & -0.043 & True \\
+pooled & gfc\_treecover2000 & -0.016 & -0.2861 & 0.22 & False \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\par\footnotesize 85 further rows in \texttt{paper/si\_generated\_tables.md} and \texttt{results/metrics}.
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S45. Drying by quintile of 2015 shaking and aftershock exposure}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{llllll}
+\toprule
+\textbf{q} & \textbf{lo} & \textbf{hi} & \textbf{n} & \textbf{rate} & \textbf{variable} \\
+\midrule
+0 & 42.44 & 52.27 & 1138 & 0.1424 & pga\_main \\
+1 & 52.28 & 56.08 & 1138 & 0.2627 & pga\_main \\
+2 & 56.08 & 59.55 & 1137 & 0.2823 & pga\_main \\
+3 & 59.56 & 62.5 & 1138 & 0.3181 & pga\_main \\
+4 & 62.5 & 71.28 & 1138 & 0.3313 & pga\_main \\
+0 & 12.22 & 19.71 & 1138 & 0.1344 & pga\_may12 \\
+1 & 19.72 & 21.96 & 1138 & 0.2232 & pga\_may12 \\
+2 & 21.96 & 23.78 & 1137 & 0.2858 & pga\_may12 \\
+3 & 23.78 & 26.07 & 1138 & 0.3163 & pga\_may12 \\
+4 & 26.07 & 35.84 & 1138 & 0.377 & pga\_may12 \\
+0 & 5 & 14 & 1265 & 0.1708 & aftershocks\_20km \\
+1 & 15 & 19 & 1529 & 0.2583 & aftershocks\_20km \\
+2 & 20 & 20 & 686 & 0.2638 & aftershocks\_20km \\
+3 & 21 & 23 & 1207 & 0.285 & aftershocks\_20km \\
+4 & 24 & 39 & 1002 & 0.3842 & aftershocks\_20km \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S46. Seismic exposure models (per SD, 95 \% block-bootstrap CI)}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{lllllll}
+\toprule
+\textbf{term} & \textbf{coef\_per\_sd} & \textbf{ci\_low} & \textbf{ci\_high} & \textbf{odds\_ratio\_per\_sd} & \textbf{ci\_excludes\_zero} & \textbf{model} \\
+\midrule
+pga\_main & 0.2096 & -0.1355 & 0.4632 & 1.233 & False & drying \textasciitilde{} seismic \\
+pga\_may12 & 0.1655 & -0.1204 & 0.5632 & 1.18 & False & drying \textasciitilde{} seismic \\
+aftershocks\_20km & 0.1686 & -0.1899 & 0.4536 & 1.184 & False & drying \textasciitilde{} seismic \\
+pga\_main & -0.2307 & -0.6433 & 0.1051 & 0.794 & False & drying \textasciitilde{} seismic + environment (no lat/lon) \\
+pga\_may12 & 0.681 & 0.2527 & 0.9979 & 1.976 & True & drying \textasciitilde{} seismic + environment (no lat/lon) \\
+aftershocks\_20km & -0.2558 & -0.5915 & 0.1149 & 0.7743 & False & drying \textasciitilde{} seismic + environment (no lat/lon) \\
+pga\_main & 0.1632 & -0.2094 & 0.4728 & 1.177 & False & earthquake-attributed $|$ dried \\
+pga\_may12 & 0.061 & -0.4873 & 0.4575 & 1.063 & False & earthquake-attributed $|$ dried \\
+aftershocks\_20km & -0.1463 & -0.4626 & 0.1653 & 0.8639 & False & earthquake-attributed $|$ dried \\
+pga\_main & -0.0091 & -0.4186 & 0.2821 & 0.9909 & False & dried in 2072 BS $|$ dried \\
+pga\_may12 & 0.1615 & -0.2626 & 0.6476 & 1.175 & False & dried in 2072 BS $|$ dried \\
+aftershocks\_20km & -0.2439 & -0.6565 & 0.1515 & 0.7836 & False & dried in 2072 BS $|$ dried \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S47. Pooled out-of-fold ROC-AUC by reported cause (spatial CV, no buffer)}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{lllllll}
+\toprule
+\textbf{model} & \textbf{dried\_subset} & \textbf{n\_dried} & \textbf{n\_active} & \textbf{roc\_auc} & \textbf{ci\_low} & \textbf{ci\_high} \\
+\midrule
+Logistic Regression & all dried & 1521 & 4168 & 0.6909 & 0.6752 & 0.706 \\
+Logistic Regression & earthquake-attributed & 521 & 4168 & 0.6495 & 0.6235 & 0.6744 \\
+Logistic Regression & other causes & 1000 & 4168 & 0.7125 & 0.6959 & 0.7301 \\
+HydroBoost-GAT & all dried & 1521 & 4168 & 0.7051 & 0.6893 & 0.7201 \\
+HydroBoost-GAT & earthquake-attributed & 521 & 4168 & 0.6664 & 0.6411 & 0.6919 \\
+HydroBoost-GAT & other causes & 1000 & 4168 & 0.7252 & 0.708 & 0.742 \\
+CatBoost & all dried & 1521 & 4168 & 0.7015 & 0.6862 & 0.7167 \\
+CatBoost & earthquake-attributed & 521 & 4168 & 0.6779 & 0.6542 & 0.7023 \\
+CatBoost & other causes & 1000 & 4168 & 0.7138 & 0.6951 & 0.7306 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S48. Graph topologies: edge length and label assortativity}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{llllll}
+\toprule
+\textbf{topology} & \textbf{n\_edges} & \textbf{mean\_edge\_length\_m} & \textbf{median\_edge\_length\_m} & \textbf{share\_same\_status} & \textbf{assortativity\_kappa} \\
+\midrule
+knn & 39823 & 262 & 209.1 & 0.6957 & 0.2233 \\
+catchment & 39325 & 295.2 & 215.4 & 0.699 & 0.2318 \\
+ridge & 39823 & 286.4 & 213.1 & 0.698 & 0.2291 \\
+ward & 39823 & 336 & 220.2 & 0.6982 & 0.2297 \\
+random & 39823 & 14113 & 13067 & 0.6096 & 0.0035 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S49. GNN performance by graph topology}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{lllll}
+\toprule
+\textbf{model} & \textbf{topology} & \textbf{roc\_auc} & \textbf{roc\_auc\_sd} & \textbf{pr\_auc} \\
+\midrule
+GraphSAGE & catchment & 0.6485 & 0.0587 & 0.4148 \\
+GraphSAGE & knn & 0.6614 & 0.0539 & 0.4244 \\
+GraphSAGE & random & 0.6689 & 0.0518 & 0.4312 \\
+GraphSAGE & ridge & 0.6613 & 0.0565 & 0.427 \\
+GraphSAGE & ward & 0.6591 & 0.0551 & 0.4257 \\
+MLP & none & 0.6657 & 0.0584 & 0.4282 \\
+ResGATv2 & catchment & 0.6633 & 0.0585 & 0.4234 \\
+ResGATv2 & knn & 0.6689 & 0.0591 & 0.4289 \\
+ResGATv2 & random & 0.6699 & 0.0549 & 0.428 \\
+ResGATv2 & ridge & 0.665 & 0.058 & 0.4253 \\
+ResGATv2 & ward & 0.6643 & 0.0597 & 0.424 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S50. GNN topology comparisons (corrected resampled t-test)}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{lllllll}
+\toprule
+\textbf{model} & \textbf{topology} & \textbf{reference} & \textbf{mean\_diff} & \textbf{ci\_low} & \textbf{ci\_high} & \textbf{p\_corrected} \\
+\midrule
+GraphSAGE & knn & MLP & -0.0043 & -0.0404 & 0.0318 & 0.8084 \\
+GraphSAGE & catchment & knn & -0.0129 & -0.0487 & 0.0228 & 0.4619 \\
+GraphSAGE & catchment & MLP & -0.0172 & -0.0596 & 0.0251 & 0.4093 \\
+GraphSAGE & ridge & knn & -0.0001 & -0.0256 & 0.0254 & 0.9914 \\
+GraphSAGE & ridge & MLP & -0.0044 & -0.045 & 0.0361 & 0.824 \\
+GraphSAGE & ward & knn & -0.0023 & -0.0147 & 0.0101 & 0.7035 \\
+GraphSAGE & ward & MLP & -0.0066 & -0.0383 & 0.0251 & 0.6715 \\
+GraphSAGE & random & knn & 0.0075 & -0.0237 & 0.0387 & 0.6247 \\
+GraphSAGE & random & MLP & 0.0032 & -0.0206 & 0.027 & 0.784 \\
+ResGATv2 & knn & MLP & 0.0032 & -0.0281 & 0.0345 & 0.8336 \\
+ResGATv2 & catchment & knn & -0.0056 & -0.032 & 0.0209 & 0.6679 \\
+ResGATv2 & catchment & MLP & -0.0023 & -0.0339 & 0.0292 & 0.8791 \\
+ResGATv2 & ridge & knn & -0.0039 & -0.0188 & 0.0109 & 0.5893 \\
+ResGATv2 & ridge & MLP & -0.0007 & -0.0294 & 0.028 & 0.959 \\
+ResGATv2 & ward & knn & -0.0046 & -0.0263 & 0.0171 & 0.6662 \\
+ResGATv2 & ward & MLP & -0.0014 & -0.039 & 0.0362 & 0.9403 \\
+ResGATv2 & random & knn & 0.001 & -0.0276 & 0.0296 & 0.9416 \\
+ResGATv2 & random & MLP & 0.0042 & -0.0165 & 0.025 & 0.6763 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S51. HydroBoost-GAT blend parameters selected on validation folds}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{llllllll}
+\toprule
+\textbf{profile} & \textbf{feature\_set} & \textbf{buffer\_m} & \textbf{folds} & \textbf{mean\_w\_catboost} & \textbf{share\_w0} & \textbf{share\_w1} & \textbf{share\_no\_diffusion} \\
+\midrule
+features & env\_hydro\_season & 0 & 25 & 0.64 & 0 & 0.16 & 0.04 \\
+features & leaky\_reference & 0 & 25 & 0.76 & 0 & 0.28 & 0.36 \\
+lomo & env\_hydro & 500 & 21 & 0.4381 & 0.1429 & 0 & 0.0476 \\
+main & env\_hydro & 0 & 25 & 0.352 & 0.12 & 0 & 0.04 \\
+main & env\_hydro & 500 & 25 & 0.336 & 0.12 & 0 & 0.04 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S52. Sensitivity of the main results to excluding ponds and seasonal sources}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{lllllllllllllllllllllllllllllllllllllllllll}
+\toprule
+\textbf{subset} & \textbf{n} & \textbf{n\_dried} & \textbf{drying\_rate} & \textbf{ward\_icc} & \textbf{ward\_grid\_q975} & \textbf{ward\_p\_grid} & \textbf{ward\_region\_q025} & \textbf{ward\_region\_q975} & \textbf{ward\_p\_region} & \textbf{catchment\_T2\_icc} & \textbf{catchment\_T2\_grid\_q975} & \textbf{catchment\_T2\_p\_grid} & \textbf{landscape\_region75\_icc} & \textbf{landscape\_region75\_grid\_q975} & \textbf{landscape\_region75\_p\_grid} & \textbf{type\_drying\_min} & \textbf{type\_drying\_max} & \textbf{funnel\_phi} & \textbf{funnel\_n\_outside\_998} & \textbf{funnel\_n\_wards} & \textbf{mh\_or[TPI high -> dried]} & \textbf{mh\_lo[TPI high -> dried]} & \textbf{mh\_hi[TPI high -> dried]} & \textbf{mh\_or[TPI low \& soil moisture high -> dried]} & \textbf{mh\_lo[TPI low \& soil moisture high -> dried]} & \textbf{mh\_hi[TPI low \& soil moisture high -> dried]} & \textbf{knox\_within\_pairs} & \textbf{knox\_within\_ratio} & \textbf{knox\_within\_p} & \textbf{knox\_across\_pairs} & \textbf{knox\_across\_ratio} & \textbf{knox\_across\_p} & \textbf{earthquake\_ward\_icc} & \textbf{earthquake\_grid\_q975} & \textbf{earthquake\_p\_grid} & \textbf{earthquake\_region\_q975} & \textbf{earthquake\_p\_region} & \textbf{dated\_2072\_ward\_icc} & \textbf{dated\_2072\_grid\_q975} & \textbf{dated\_2072\_p\_grid} & \textbf{dated\_2072\_region\_q975} & \textbf{dated\_2072\_p\_region} \\
+\midrule
+all sources & 5689 & 1521 & 0.2674 & 0.1318 & 0.1057 & 0.005 & 0.081 & 0.1107 & 0.005 & 0.1221 & 0.1342 & 0.7525 & 0.1132 & 0.1054 & 0.0099 & 0.1259 & 0.4 & 5.488 & 13 & 75 & 2.27 & 1.97 & 2.615 & 0.2481 & 0.1783 & 0.3452 & 2046 & 1.617 & 0.001 & 196 & 0.7227 & 0.828 & 0.2283 & 0.1769 & 0.0099 & 0.1649 & 0.005 & 0.2802 & 0.1774 & 0.0099 & 0.1759 & 0.005 \\
+springs only (ponds excluded) & 5168 & 1264 & 0.2446 & 0.1399 & 0.1091 & 0.005 & 0.0833 & 0.1124 & 0.005 & 0.1249 & 0.1385 & 0.8119 & 0.11 & 0.1086 & 0.0297 & 0.1146 & 0.3445 & 5.276 & 11 & 75 & 1.853 & 1.586 & 2.166 & 0.2594 & 0.1842 & 0.3652 & 1310 & 1.681 & 0.001 & 63 & 1.211 & 0.299 & 0.232 & 0.1916 & 0.0099 & 0.1811 & 0.005 & 0.2762 & 0.1929 & 0.0099 & 0.1922 & 0.005 \\
+perennial only (seasonal excluded) & 4759 & 934 & 0.1963 & 0.1704 & 0.1211 & 0.005 & 0.0866 & 0.126 & 0.005 & 0.1518 & 0.1704 & 0.4752 & 0.1152 & 0.1225 & 0.3069 & 0.0799 & 0.2944 & 6.25 & 15 & 75 & 2.345 & 1.959 & 2.807 & 0.1664 & 0.1024 & 0.2704 & 964 & 1.914 & 0.001 & 59 & 1.194 & 0.336 & 0.2486 & 0.2178 & 0.0099 & 0.2059 & 0.005 & 0.2692 & 0.2332 & 0.0099 & 0.2252 & 0.005 \\
+perennial springs only & 4477 & 835 & 0.1865 & 0.1847 & 0.1346 & 0.005 & 0.0947 & 0.1381 & 0.005 & 0.1633 & 0.1799 & 0.5545 & 0.1271 & 0.1372 & 0.2475 & 0.0739 & 0.2857 & 5.906 & 13 & 75 & 1.961 & 1.619 & 2.375 & 0.1761 & 0.1074 & 0.2886 & 763 & 1.839 & 0.001 & 25 & 1.447 & 0.241 & 0.2328 & 0.2198 & 0.0099 & 0.1945 & 0.005 & 0.2526 & 0.241 & 0.0198 & 0.2148 & 0.005 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S53. Distance from test sources to the nearest training source by validation design}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{llllllll}
+\toprule
+\textbf{design} & \textbf{buffer\_m} & \textbf{n\_splits} & \textbf{mean\_n\_train} & \textbf{median\_distance\_m} & \textbf{p05\_distance\_m} & \textbf{share\_test\_within\_500m} & \textbf{share\_test\_within\_1km} \\
+\midrule
+leave-one-municipality-out & 500 & 21 & 3787 & 2912 & 786.4 & 0 & 0.1035 \\
+spatial block CV & 0 & 25 & 3413 & 1899 & 356.9 & 0.0976 & 0.2525 \\
+spatial block CV & 500 & 25 & 3316 & 2185 & 653.4 & 0 & 0.1757 \\
+spatial block CV & 1000 & 25 & 3120 & 2658 & 1169 & 0 & 0 \\
+spatial block CV & 2000 & 25 & 2686 & 3697 & 2175 & 0 & 0 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S54. Share of earthquake-exposure variance within wards}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{llll}
+\toprule
+\textbf{variable} & \textbf{share\_of\_variance\_within\_wards} & \textbf{within\_ward\_sd} & \textbf{total\_sd} \\
+\midrule
+pga\_main & 0.1104 & 1.707 & 5.138 \\
+pga\_may12 & 0.1123 & 1.446 & 4.314 \\
+aftershocks\_20km & 0.0716 & 1.261 & 4.712 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage
+
+\begin{table}[!htbp]\centering\scriptsize
+\caption*{\textbf{Table S55. Earthquake exposure with ward fixed effects or Moran-eigenvector adjustment}}
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.85\textheight}
+\begin{tabular}{llllll}
+\toprule
+\textbf{model} & \textbf{term} & \textbf{coef\_per\_sd} & \textbf{ci\_low} & \textbf{ci\_high} & \textbf{ci\_excludes\_zero} \\
+\midrule
+seismic + environment & pga\_main & -0.2285 & -0.7043 & 0.0707 & False \\
+seismic + environment & pga\_may12 & 0.6882 & 0.2419 & 1.033 & True \\
+seismic + environment & aftershocks\_20km & -0.2434 & -0.5955 & 0.0403 & False \\
+seismic + environment + ward fixed effects & pga\_main & -0.4426 & -1.037 & 0.0728 & False \\
+seismic + environment + ward fixed effects & pga\_may12 & 0.3472 & -0.0978 & 0.778 & False \\
+seismic + environment + ward fixed effects & aftershocks\_20km & -0.0684 & -0.7204 & 0.3928 & False \\
+seismic + environment + 100 MEMs (broad and meso spatial structure) & pga\_main & -0.2672 & -0.6996 & 0.0762 & False \\
+seismic + environment + 100 MEMs (broad and meso spatial structure) & pga\_may12 & 0.7356 & 0.3679 & 1.037 & True \\
+seismic + environment + 100 MEMs (broad and meso spatial structure) & aftershocks\_20km & -0.2327 & -0.5881 & 0.047 & False \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+\clearpage

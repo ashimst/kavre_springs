@@ -1,14 +1,17 @@
 """
-Benchmark, ablations and negative controls -- every number is computed here.
+Predictive benchmark and placebo controls -- every number is computed here.
 
 Profiles
 --------
-main      Spatial block 5-fold CV, primary feature set (``env``), buffers 0 m
-          (interpolation) and 500 m (extrapolation), 5 seeds (each seed
-          reshuffles the block-to-fold assignment AND re-initialises models).
-          All models, ResGATv2 ablations/placebos and HydroBoost ablations.
-features  Same CV (buffer 0 m) for the sensitivity feature set ``env_season``
-          and the diagnostic ``leaky_reference`` set, on a subset of models.
+main      Spatial block 5-fold CV on ``env`` (basic covariates) and ``env_hydro`` (primary: + catchment
+          hydrology and roads), buffers 0 m (interpolation) and 500 m (extrapolation), 5 seeds (each seed
+          reshuffles the block-to-fold assignment AND re-initialises models). Includes two ResGATv2 placebos
+          (shuffled edge attributes, random topology).
+features  Same CV (buffer 0 m) for the seasonal-flow sensitivity set ``env_hydro_season`` and the diagnostic
+          ``leaky_reference`` set (skip-logic earthquake fields), on a subset of models.
+seismic   Does 2015 shaking (``env_hydro_seismic``) add skill?
+enriched  Do the Earth Engine enrichment layers (``env_rich``) add skill?
+buffers   Wider 1 and 2 km buffers around test sources (tabular models).
 lomo      Leave-one-municipality-out with a 500 m buffer, 3 seeds.
 
 Protocol (identical for all models)
@@ -64,19 +67,36 @@ SEEDS = [42, 123, 456, 789, 2024]
 
 CORE_MODELS = ["Logistic Regression", "Random Forest", "XGBoost", "CatBoost", "kNN label interpolation",
                "MLP", "GCN", "GraphSAGE", "GATv2", "ResGATv2", "HydroBoost-GAT"]
+# Architecture ablations (kept for use with --models; not part of the reported profiles):
 CONTROL_MODELS = ["ResGATv2 - no edge attributes", "ResGATv2 - no ego skip", "ResGATv2 + LayerNorm",
                   "ResGATv2 (2 layers)", "ResGATv2 | placebo: shuffled edge attributes",
                   "ResGATv2 | placebo: random topology",
                   "HydroBoost | CatBoost + diffusion only", "HydroBoost | CatBoost + GAT, no diffusion"]
 
+BENCHMARK_MODELS = [
+    "Logistic Regression", "Random Forest", "XGBoost", "CatBoost", "kNN label interpolation",
+    "MLP", "ResGATv2", "HydroBoost-GAT",
+    "ResGATv2 | placebo: shuffled edge attributes",
+    "ResGATv2 | placebo: random topology",
+]
+
 PROFILES = {
-    "main": dict(scheme="spatial", feature_sets=[PRIMARY_FEATURE_SET], buffers=[0.0, 500.0], seeds=SEEDS,
-                 models=CORE_MODELS + CONTROL_MODELS),
-    "features": dict(scheme="spatial", feature_sets=["env_season", "leaky_reference"], buffers=[0.0], seeds=SEEDS,
+    "main": dict(scheme="spatial", feature_sets=["env", "env_hydro"], buffers=[0.0, 500.0], seeds=SEEDS,
+                 models=BENCHMARK_MODELS),
+    "features": dict(scheme="spatial", feature_sets=["leaky_reference", "env_hydro_season"], buffers=[0.0], seeds=SEEDS,
                      models=["Logistic Regression", "CatBoost", "MLP", "ResGATv2", "HydroBoost-GAT"]),
-    "lomo": dict(scheme="lomo", feature_sets=[PRIMARY_FEATURE_SET], buffers=[500.0], seeds=SEEDS[:3],
+    # Does 2015 shaking (USGS ShakeMap / aftershocks) add skill beyond terrain, hydrology and roads?
+    "seismic": dict(scheme="spatial", feature_sets=["env_hydro_seismic"], buffers=[0.0, 500.0], seeds=SEEDS,
+                    models=["Logistic Regression", "Random Forest", "XGBoost", "CatBoost", "MLP"]),
+    # Do the Earth Engine enrichment layers (land cover, forest loss, soils, vegetation dynamics, built-up) add skill?
+    "enriched": dict(scheme="spatial", feature_sets=["env_rich"], buffers=[0.0, 500.0], seeds=SEEDS,
+                     models=["Logistic Regression", "Random Forest", "XGBoost", "CatBoost", "MLP"]),
+    # Review: wider buffers (1 and 2 km) between test and training sources
+    "buffers": dict(scheme="spatial", feature_sets=["env_hydro"], buffers=[1000.0, 2000.0], seeds=SEEDS,
+                    models=["Logistic Regression", "Random Forest", "CatBoost"]),
+    "lomo": dict(scheme="lomo", feature_sets=["env", "env_hydro"], buffers=[500.0], seeds=SEEDS[:3],
                  models=["Logistic Regression", "Random Forest", "CatBoost", "kNN label interpolation", "MLP",
-                         "GraphSAGE", "ResGATv2", "HydroBoost-GAT"]),
+                         "ResGATv2", "HydroBoost-GAT"]),
 }
 SAVE_PRED_MODELS = {"CatBoost", "ResGATv2", "HydroBoost-GAT", "Logistic Regression", "kNN label interpolation"}
 

@@ -1,0 +1,2 @@
+n_anomalous,drying_rate_anomalous,drying_rate_typical,odds_ratio,fisher_p,n_wards_with_anomalies,max_share_in_one_ward,anomaly_share_by_type
+285,0.3368421052631579,0.2636935603256847,1.4183013088276246,0.007405873770345068,43,0.11578947368421053,T1: 0.243; T2: 0.011; T3: 0.004; T4: 0.433; T5: 0.005; T6: 0.008; T7: 0.055; T8: 0.068

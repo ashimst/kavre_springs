@@ -28,6 +28,8 @@ def graph(df):
 def test_primary_and_sensitivity_sets_pass_audit(df):
     assert check_feature_set(df, "env") == []
     assert check_feature_set(df, "env_season") == []
+    assert check_feature_set(df, "env_hydro") == []
+    assert check_feature_set(df, "env_hydro_season") == []
 
 
 def test_leaky_reference_is_detected(df):
@@ -36,9 +38,25 @@ def test_leaky_reference_is_detected(df):
 
 
 def test_no_forbidden_features_in_claim_sets():
-    for fs in ["env", "env_season"]:
+    for fs in ["env", "env_season", "env_hydro", "env_hydro_season"]:
         assert not set(FEATURE_SETS[fs]) & FORBIDDEN_FEATURES
         assert not set(FEATURE_SETS[fs]) & set(EARTHQUAKE_LEAKY)
+
+
+def test_hydro_and_road_features_present_and_finite(df):
+    from src.features import HYDRO_CATCHMENT, ROAD_FEATURES
+    for feat in HYDRO_CATCHMENT + ROAD_FEATURES:
+        assert feat in df.columns, f"Feature {feat} missing from master dataset"
+        assert df[feat].notna().all(), f"Feature {feat} contains NaN values"
+        assert np.isfinite(df[feat].to_numpy(dtype=float)).all(), f"Feature {feat} contains non-finite values"
+
+
+def test_skip_logic_multi_label_columns_detected_as_leaks(df):
+    from src.features import missingness_audit
+    audit = missingness_audit(df).set_index("column")
+    for col in ["purpose_drinking", "purpose_household", "ethnicity_janajati"]:
+        if col in audit.index:
+            assert audit.loc[col, "skip_logic_leak"], f"{col} should be detected as skip-logic leak"
 
 
 def test_graph_shapes(graph):
@@ -88,11 +106,13 @@ def test_reported_summary_matches_fold_results():
     s = pd.read_csv(summ)
     recomputed = folds.groupby(["profile", "feature_set", "buffer_m", "model"]).roc_auc.mean()
     merged = s.set_index(["profile", "feature_set", "buffer_m", "model"]).roc_auc_mean
-    assert np.allclose(merged.loc[recomputed.index], recomputed)
+    # the summary covers the current profiles only (src.report.current_runs); every reported value must be recomputable
+    assert np.allclose(merged, recomputed.loc[merged.index])
 
 
 def test_no_hardcoded_result_literals_in_pipeline():
     """The old ablation table was written from literals; make sure no pipeline module does that."""
-    for f in ["benchmark.py", "report.py", "explainability.py", "prioritization.py", "spatial_mining.py"]:
+    for f in ["benchmark.py", "report.py", "spatial_mining.py", "spatial_analysis.py", "catchment_analysis.py",
+              "drivers_analysis.py", "unsupervised.py", "graph_topology_experiment.py"]:
         src = (ROOT / "src" / f).read_text(encoding="utf-8")
         assert '"f1_macro": 0.' not in src and '"roc_auc": 0.' not in src

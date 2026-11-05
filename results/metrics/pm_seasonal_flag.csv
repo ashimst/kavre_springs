@@ -1,0 +1,2 @@
+item,support,drying_rate_if_seasonal,drying_rate_if_perennial,mh_or_ward,mh_ci_low,mh_ci_high,share_wards_lift_gt1,n_wards_evaluable
+flow=seasonal (survey),0.16347336966074882,0.6311827956989248,0.19625971842824122,6.94475711985041,5.7763493655173175,8.349503882439356,0.8823529411764706,51

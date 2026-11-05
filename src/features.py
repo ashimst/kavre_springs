@@ -56,15 +56,64 @@ SURVEY_STRUCTURAL = [
     "ownership_private",
     "ownership_public",
 ]
+HYDRO_CATCHMENT = [
+    "upa",
+    "log_upa",
+    "hnd",
+    "elv",
+    "twi",
+    "tpi_500m",
+    "tri_90m",
+    "precip_dry_deficit_mm",
+    "precip_mon_deficit_mm",
+    "aet",
+    "def",
+    "soil",
+    "pdsi",
+]
+ROAD_FEATURES = [
+    "dist_to_road_m",
+    "road_density_500m",
+    "road_upslope",
+]
 SEASONALITY = ["Perennial / Seasonal_encoded"]
 EARTHQUAKE_LEAKY = ["earthquake_impact_ordinal", "earthquake_impact_known"]
+# Google Earth Engine enrichment (src/extract_enrichment_gee.py): independent, label-free GIS layers.
+ENRICHMENT = [
+    "wc_tree", "wc_shrub", "wc_grass", "wc_crop", "wc_built", "wc_bare", "wc_water",   # ESA WorldCover fractions, 250 m
+    "gfc_treecover2000", "gfc_loss_pre2015", "gfc_loss_post2015",                       # Hansen forest cover and loss
+    "soil_clay", "soil_sand", "soil_soc", "soil_bdod",                                  # SoilGrids 0-30 cm
+    "ndvi_trend", "ndvi_change_2015", "et_mean", "et_trend",                            # MODIS vegetation / ET dynamics
+    "chirps_trend", "chirps_anom_2015",                                                 # CHIRPS 1981-2023
+    "built_2020", "built_change", "pop_1km", "nightlights",                             # GHSL, WorldPop, VIIRS
+    "landform_position", "chili", "mtpi", "topo_diversity",                             # ALOS landforms / morphometry
+]
+# USGS ShakeMap / ComCat covariates (src/seismic.py): independent of the survey, a-priori observable.
+SEISMIC = ["pga_main", "pgv_main", "pga_may12", "pgv_may12", "aftershocks_20km", "dist_nearest_aftershock_km"]
 
 FEATURE_SETS = {
+    "env_hydro_seismic": LOCATION + TERRAIN + CLIMATE + VEGETATION + SURVEY_STRUCTURAL + HYDRO_CATCHMENT + ROAD_FEATURES + SEISMIC,
     "env": LOCATION + TERRAIN + CLIMATE + VEGETATION + SURVEY_STRUCTURAL,
     "env_season": LOCATION + TERRAIN + CLIMATE + VEGETATION + SURVEY_STRUCTURAL + SEASONALITY,
+    "env_hydro": LOCATION + TERRAIN + CLIMATE + VEGETATION + SURVEY_STRUCTURAL + HYDRO_CATCHMENT + ROAD_FEATURES,
+    "env_rich": LOCATION + TERRAIN + CLIMATE + VEGETATION + SURVEY_STRUCTURAL + HYDRO_CATCHMENT + ROAD_FEATURES + ENRICHMENT,
+    "env_hydro_season": LOCATION + TERRAIN + CLIMATE + VEGETATION + SURVEY_STRUCTURAL + HYDRO_CATCHMENT + ROAD_FEATURES + SEASONALITY,
     "leaky_reference": LOCATION + TERRAIN + CLIMATE + VEGETATION + SURVEY_STRUCTURAL + SEASONALITY + EARTHQUAKE_LEAKY,
 }
-PRIMARY_FEATURE_SET = "env"
+PRIMARY_FEATURE_SET = "env_hydro"      # prediction benchmark (incl. GNNs)
+# Explanatory analyses (unsupervised, partitioning, drivers) use the enriched set when its layers are available.
+EXPLANATORY_SET = "env_rich"
+# Change / dynamics variables: may partly reflect drying itself (reverse causation), so they are excluded from the
+# static landscape typology and interpreted with care.
+DYNAMIC_FEATURES = ["ndvi_trend", "ndvi_change_2015", "et_trend", "gfc_loss_post2015", "built_change"]
+
+
+def explanatory_columns(df=None, drop_coordinates=True):
+    """Columns of the explanatory set (falls back to env_hydro if the enrichment layers are absent)."""
+    cols = FEATURE_SETS[EXPLANATORY_SET]
+    if df is not None and any(c not in df.columns for c in ENRICHMENT):
+        cols = FEATURE_SETS["env_hydro"]
+    return [c for c in cols if not (drop_coordinates and c in ("latitude", "longitude"))]
 
 # Raw survey column each model feature is derived from (pre-encoding, pre-imputation),
 # used by the audit so that fill values such as -1 cannot hide missingness.
@@ -73,20 +122,97 @@ FEATURE_SOURCE_COLUMN = {
     "Perennial / Seasonal_encoded": "seasonality",
     "earthquake_impact_ordinal": "earthquake_impact",
     "earthquake_impact_known": "earthquake_impact",
+    "water_quality_ordinal": "water_quality",
     "aspect_sin": "aspect_deg",
     "aspect_cos": "aspect_deg",
     **{c: "landuse" for c in SURVEY_STRUCTURAL if c.startswith("landuse_")},
     **{c: "ownership" for c in SURVEY_STRUCTURAL if c.startswith("ownership_")},
+    **{f"purpose_{p}": "purpose_of_use" for p in ["drinking", "household", "livestock", "agriculture", "irrigation"]},
+    **{f"ethnicity_{e}": "ethnicity_users" for e in ["janajati", "bcts", "dalit", "mixed"]},
 }
 
-# Columns that are computed from the label (or only exist because of it) and must never be features.
-FORBIDDEN_FEATURES = set(EARTHQUAKE_LEAKY) | {
+# The 46 survey skip-logic columns identified during the audit that must never be predictive features
+SKIP_LOGIC_SURVEY_COLUMNS = {
+    "reason_of_drying",
+    "years_since_dried",
+    "revival_activity_done",
+    "post_drying_action",
+    "List the activities done for source revival",
+    "flow_rate_lpm",
+    "bucket_volume_liters",
+    "fill_time_seconds",
+    "fill_time_change_ratio",
+    "fill_20l_before_10yr_min",
+    "fill_20l_current_min",
+    "discharge_trend",
+    "discharge_nature",
+    "emergence_point",
+    "source_condition_detail",
+    "earthquake_impact",
+    "earthquake_impact_ordinal",
+    "earthquake_impact_known",
+    "water_quality",
+    "water_quality_ordinal",
+    "water_quality_change",
+    "is_tapped",
+    "is_tapped_binary",
+    "Is this source tapped?_binary",
+    "in_use",
+    "in_use_binary",
+    "Is this source in use?_binary",
+    "community_accessible",
+    "community_accessible_binary",
+    "Is this source accessible to everyone in community? (in term of use access)_binary",
+    "cultural_significance",
+    "cultural_significance_binary",
+    "Is water source significant for cultural/religious purpose?_binary",
+    "has_user_group",
+    "has_user_group_binary",
+    "Are there water user groups for management?_binary",
+    "user_group_type",
+    "who_is_chairperson",
+    "women_leadership",
+    "revival_measures_taken",
+    "revival_measures_detail",
+    "purpose_of_use",
+    "purpose_drinking",
+    "purpose_household",
+    "purpose_livestock",
+    "purpose_agriculture",
+    "purpose_irrigation",
+    "hh_dependent_total",
+    "hh_dependent_exclusive",
+    "dependency_ratio",
+    "distance_to_household_m",
+    "fetch_time_minutes",
+    "supply_municipality_scope",
+    "supply_ward_scope",
+    "ethnicity_users",
+    "ethnicity_exclusive",
+    "ethnicity_janajati",
+    "ethnicity_bcts",
+    "ethnicity_dalit",
+    "ethnicity_mixed",
+    "pond_area_m2",
+    "pond_depth_m",
+    "pond_area_10yr_m2",
+    "pond_depth_10yr_m",
+    "pond_area_change_ratio",
+    "Remarks (source specific comment)",
+    "List the events associated with sources",
+    "If not who are restricted?",
+}
+
+LABEL_DERIVED_COLUMNS = {
     "target_dried",
     "target_trend",
     "dist_to_nearest_dried_m",
     "dist_to_nearest_active_m",
     "muni_drying_rate",
 }
+
+# Columns that are computed from the label (or only exist because of it) and must never be features.
+FORBIDDEN_FEATURES = set(EARTHQUAKE_LEAKY) | SKIP_LOGIC_SURVEY_COLUMNS | LABEL_DERIVED_COLUMNS
 
 # A model feature whose source column's missingness differs by more than this between
 # dried and active sources is treated as skip-logic leakage.
@@ -128,11 +254,13 @@ def check_feature_set(df: pd.DataFrame, feature_set: str, target: str = "target_
     violations = []
     for f in feats:
         if f in FORBIDDEN_FEATURES:
-            violations.append(f"{f}: forbidden (label-derived)")
+            violations.append(f"{f}: forbidden (label-derived or skip-logic leak)")
             continue
         src = FEATURE_SOURCE_COLUMN.get(f, f)
         if src in audit.index and audit.loc[src, "skip_logic_leak"]:
             violations.append(f"{f}: source column '{src}' missingness gap {audit.loc[src, 'missingness_gap']:+.3f}")
+        elif f in audit.index and audit.loc[f, "skip_logic_leak"]:
+            violations.append(f"{f}: column missingness gap {audit.loc[f, 'missingness_gap']:+.3f}")
     return violations
 
 

@@ -1,5 +1,0 @@
-model,statistic,n_receivers,mean,ci_low,ci_high
-real,"within-receiver Spearman(attention, edge length)",5396,0.25935205370272457,0.2458878031746943,0.27354083668491386
-real,attention(upslope senders) - attention(downslope senders),4659,-0.016749991104006767,-0.019047593371942638,-0.014395751897245646
-placebo_shuffled_edges,"within-receiver Spearman(attention, edge length)",5396,0.03206643535622292,0.020219960091901853,0.04395716059913903
-placebo_shuffled_edges,attention(upslope senders) - attention(downslope senders),4659,0.001528875669464469,-0.0002949864094262011,0.003348916507093235

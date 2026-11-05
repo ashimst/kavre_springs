@@ -1,0 +1,5 @@
+test,mantel_r,p
+narrative ~ geography,-0.04385510151044279,0.786
+narrative ~ landscape,0.04215650265227349,0.254
+narrative ~ geography | landscape,-0.08495387243121284,0.915
+narrative ~ landscape | geography,0.08409420997941276,0.132
