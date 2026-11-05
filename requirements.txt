@@ -15,3 +15,4 @@ esda>=2.5.0
 libpysal>=4.9.0
 mlxtend>=0.23.0
 pytest>=8.0.0
+

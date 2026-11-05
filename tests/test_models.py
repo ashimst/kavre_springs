@@ -36,3 +36,4 @@ def test_hydroboost_gat_initialization():
     hb = HydroBoostGAT(in_dim=25, hidden_dim=64, edge_dim=5, heads=2, num_layers=1, random_state=42)
     assert hb.cb_params["random_seed"] == 42
     assert hb.gat_params["num_layers"] == 1
+
