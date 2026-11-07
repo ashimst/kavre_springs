@@ -9,7 +9,7 @@ export default function App() {
   const [data] = useState(dataJson);
   const [selectedPalika, setSelectedPalika] = useState('All Palikas');
   const [statusFilter, setStatusFilter] = useState('all'); // 'all' | 'dried' | 'active'
-  const [activeBasemap, setActiveBasemap] = useState('carto-light');
+  const [activeBasemap, setActiveBasemap] = useState('topo');
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
   const [hoveredPalika, setHoveredPalika] = useState(null);
 

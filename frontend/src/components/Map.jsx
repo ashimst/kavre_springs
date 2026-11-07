@@ -17,12 +17,11 @@ export default function Map({
   const springsLayerRef = useRef(null);
   const canvasRendererRef = useRef(null);
 
-  // Basemap URLs
+  // Zero-API-Key Open GIS Basemaps
   const basemaps = {
-    'carto-light': {
-      url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-      attrib: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-      subdomains: 'abcd'
+    'topo': {
+      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+      attrib: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community'
     },
     'osm': {
       url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -32,9 +31,9 @@ export default function Map({
       url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
       attrib: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
     },
-    'topo': {
-      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
-      attrib: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community'
+    'gray': {
+      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+      attrib: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'
     }
   };
 
@@ -93,7 +92,7 @@ export default function Map({
     L.control.zoom({ position: 'topright' }).addTo(map);
 
     // Initial tile layer
-    const conf = basemaps[activeBasemap] || basemaps['carto-light'];
+    const conf = basemaps[activeBasemap] || basemaps['topo'];
     const tileLayer = L.tileLayer(conf.url, {
       attribution: conf.attrib,
       subdomains: conf.subdomains || 'abc',
@@ -113,7 +112,7 @@ export default function Map({
   useEffect(() => {
     if (!mapInstanceRef.current || !tileLayerRef.current) return;
 
-    const conf = basemaps[activeBasemap] || basemaps['carto-light'];
+    const conf = basemaps[activeBasemap] || basemaps['topo'];
     mapInstanceRef.current.removeLayer(tileLayerRef.current);
 
     const newLayer = L.tileLayer(conf.url, {
@@ -313,3 +312,4 @@ export default function Map({
     </div>
   );
 }
+

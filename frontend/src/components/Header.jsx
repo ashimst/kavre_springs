@@ -114,10 +114,10 @@ export default function Header({
             className="header-select"
             aria-label="Select Basemap"
           >
-            <option value="carto-light">Light (Carto)</option>
-            <option value="osm">OpenStreetMap</option>
-            <option value="satellite">Satellite (Esri Imagery)</option>
             <option value="topo">Topographic (Esri)</option>
+            <option value="satellite">Satellite (Esri Imagery)</option>
+            <option value="osm">OpenStreetMap</option>
+            <option value="gray">Light Canvas (Esri)</option>
           </select>
         </div>
       </div>
@@ -147,3 +147,4 @@ export default function Header({
     </header>
   );
 }
+
