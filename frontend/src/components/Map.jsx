@@ -307,7 +307,7 @@ export default function Map({
 
         <div className="legend-footer">
           <div>Data: <strong>ICIMOD</strong> Field Inventory</div>
-          <div>Analysis: <a href="https://noesisframeworks.com" target="_blank" rel="noopener noreferrer" style="color:#2563eb; text-decoration:none;">Noesis Frameworks</a></div>
+          <div>Analysis: <a href="https://noesisframeworks.com" target="_blank" rel="noopener noreferrer" style={{ color: '#2563eb', textDecoration: 'none', fontWeight: 600 }}>Noesis Frameworks</a></div>
         </div>
       </div>
     </div>
