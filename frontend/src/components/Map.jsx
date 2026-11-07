@@ -306,7 +306,8 @@ export default function Map({
         </div>
 
         <div className="legend-footer">
-          Datum: WGS84 &bull; CRS: EPSG:4326
+          <div>Data: <strong>ICIMOD</strong> Field Inventory</div>
+          <div>Analysis: <a href="https://noesisframeworks.com" target="_blank" rel="noopener noreferrer" style="color:#2563eb; text-decoration:none;">Noesis Frameworks</a></div>
         </div>
       </div>
     </div>

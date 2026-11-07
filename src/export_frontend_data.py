@@ -8,7 +8,6 @@ DATA_DIR = PROJECT_ROOT / "data"
 PARQUET_PATH = DATA_DIR / "processed" / "master_dataset.parquet"
 DISTRICT_GEOJSON = DATA_DIR / "processed" / "boundaries" / "kavre_district.geojson"
 PALIKAS_GEOJSON = DATA_DIR / "processed" / "boundaries" / "kavre_palikas.geojson"
-METRICS_DIR = PROJECT_ROOT / "results" / "metrics"
 OUTPUT_JSON = PROJECT_ROOT / "frontend" / "src" / "data.json"
 
 df = pd.read_parquet(PARQUET_PATH)
@@ -65,6 +64,97 @@ for _, r in df.iterrows():
         str(r.get('source_type', 'spring'))
     ])
 
+# 4. Detailed Chart Data Series
+# A. Elevation Distribution
+df['elev_bin'] = pd.cut(
+    df['elevation_m'], 
+    [0, 1000, 1300, 1600, 1900, 4000], 
+    labels=['< 1,000m', '1,000–1,300m', '1,300–1,600m', '1,600–1,900m', '> 1,900m']
+)
+elev_grp = df.groupby('elev_bin', observed=False)['target_dried'].agg(
+    total='count', dried='sum', rate=lambda x: round(float(x.mean()) * 100, 1)
+).reset_index()
+elev_dist = []
+for _, r in elev_grp.iterrows():
+    elev_dist.append({
+        'range': str(r['elev_bin']),
+        'total': int(r['total']),
+        'dried': int(r['dried']),
+        'active': int(r['total'] - r['dried']),
+        'rate': float(r['rate'])
+    })
+
+# B. Road Distance Gradient
+df['road_bin'] = pd.cut(
+    df['dist_to_road_m'], 
+    [-1, 50, 100, 250, 500, 20000], 
+    labels=['< 50m', '50–100m', '100–250m', '250–500m', '> 500m']
+)
+road_grp = df.groupby('road_bin', observed=False)['target_dried'].agg(
+    total='count', dried='sum', rate=lambda x: round(float(x.mean()) * 100, 1)
+).reset_index()
+road_dist = []
+for _, r in road_grp.iterrows():
+    road_dist.append({
+        'distance': str(r['road_bin']),
+        'total': int(r['total']),
+        'dried': int(r['dried']),
+        'active': int(r['total'] - r['dried']),
+        'rate': float(r['rate'])
+    })
+
+# C. Land Use Resilience
+lu_names = {
+    'dense_forest': 'Dense Forest',
+    'sparse_forest': 'Sparse Forest',
+    'agriculture': 'Agricultural Terraces',
+    'grassland': 'Grassland & Shrub',
+    'settlement': 'Settlement & Urban Fringe',
+    'fallow': 'Fallow Land',
+    'others': 'Other Barren'
+}
+lu_grp = df.groupby('landuse')['target_dried'].agg(
+    total='count', dried='sum', rate=lambda x: round(float(x.mean()) * 100, 1)
+).reset_index()
+lu_dist = []
+for _, r in lu_grp.iterrows():
+    lu_dist.append({
+        'landuse': lu_names.get(r['landuse'], str(r['landuse']).title()),
+        'total': int(r['total']),
+        'dried': int(r['dried']),
+        'rate': float(r['rate'])
+    })
+lu_dist.sort(key=lambda x: x['rate'])
+
+# D. Aspect Solar Insolation
+def aspect_to_quad(a):
+    if (a >= 315) or (a < 45): return 'North (Shaded / Moist)'
+    elif 45 <= a < 135: return 'East (Morning Sun)'
+    elif 135 <= a < 225: return 'South (High Insolation / Deficit)'
+    else: return 'West (Afternoon Thermal Deficit)'
+
+df['aspect_quad'] = df['aspect_deg'].apply(aspect_to_quad)
+asp_grp = df.groupby('aspect_quad')['target_dried'].agg(
+    total='count', dried='sum', rate=lambda x: round(float(x.mean()) * 100, 1)
+).reset_index()
+aspect_dist = []
+for _, r in asp_grp.iterrows():
+    aspect_dist.append({
+        'quadrant': str(r['aspect_quad']),
+        'total': int(r['total']),
+        'dried': int(r['dried']),
+        'rate': float(r['rate'])
+    })
+
+# E. Recalled Community Desiccation Causes
+recalled_causes = [
+    {'cause': '2015 Gorkha Earthquake', 'count': 538, 'pct': 35.4, 'desc': 'Seismic fracture dilation & aquifer displacement'},
+    {'cause': 'Road & Track Construction', 'count': 374, 'pct': 24.6, 'desc': 'Heavy bulldozer cuts shearing shallow fracture lines'},
+    {'cause': 'Prolonged Drought & Rain Decline', 'count': 331, 'pct': 21.8, 'desc': 'Monsoon variability & winter precipitation deficits'},
+    {'cause': 'Land Cover & Forest Degradation', 'count': 167, 'pct': 11.0, 'desc': 'Loss of canopy interception & infiltration capacity'},
+    {'cause': 'Siltation & Unmanaged Upstream Diversion', 'count': 109, 'pct': 7.2, 'desc': 'Intake pipe tapping and sediment clogging'}
+]
+
 payload = {
     'totalSprings': int(len(df)),
     'totalDried': int(df['target_dried'].sum()),
@@ -72,6 +162,13 @@ payload = {
     'district': dist_gj,
     'palikas': palikas_gj,
     'springs': springs_list,
+    'charts': {
+        'elevation': elev_dist,
+        'road': road_dist,
+        'landuse': lu_dist,
+        'aspect': aspect_dist,
+        'causes': recalled_causes
+    },
     'icc': {
         'ward': 0.358,
         'catchment': 0.141,
@@ -103,7 +200,16 @@ payload = {
         {'year': '2019', 'count': 39, 'isQuake': False},
         {'year': '2021', 'count': 43, 'isQuake': False},
         {'year': '2023', 'count': 29, 'isQuake': False}
-    ]
+    ],
+    'credits': {
+        'dataProvider': 'International Centre for Integrated Mountain Development (ICIMOD)',
+        'dataDetails': 'Comprehensive field inventory of 5,689 springs conducted in collaboration with local palika governments and the Ministry of Energy, Water Resources and Irrigation, Nepal under Open Data principles.',
+        'author': 'Ashim Shrestha',
+        'organization': 'Noesis Frameworks',
+        'orgUrl': 'https://noesisframeworks.com',
+        'githubUrl': 'https://github.com/ashimst/kavre_springs',
+        'userGithub': 'https://github.com/ashimst'
+    }
 }
 
 OUTPUT_JSON.parent.mkdir(parents=True, exist_ok=True)

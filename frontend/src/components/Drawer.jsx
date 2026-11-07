@@ -4,13 +4,24 @@ import {
   Map, 
   Layers, 
   Activity, 
-  ChevronDown, 
-  ChevronUp, 
-  AlertTriangle, 
-  ShieldCheck, 
-  Compass, 
-  ArrowUpRight 
+  BarChart2, 
+  BookOpen, 
+  Globe, 
+  ExternalLink,
+  ShieldCheck,
+  TrendingUp,
+  Mountain,
+  Compass,
+  Trees,
+  Truck
 } from 'lucide-react';
+
+const GithubIcon = ({ size = 14 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
+    <path d="M9 18c-4.51 2-5-2-7-2" />
+  </svg>
+);
 
 export default function Drawer({
   isOpen,
@@ -19,7 +30,7 @@ export default function Drawer({
   selectedPalika,
   onSelectPalika
 }) {
-  const [activeTab, setActiveTab] = useState('governance');
+  const [activeTab, setActiveTab] = useState('analytics');
 
   if (!isOpen) return null;
 
@@ -33,6 +44,8 @@ export default function Drawer({
     { name: 'Panchkhal', rate: 39.9, count: 1006, dried: 401, elev: 1074, road: 110 },
   ];
 
+  const charts = data?.charts || {};
+
   return (
     <aside className="insights-drawer glass-panel" aria-label="Scientific Insights Panel">
       {/* Drawer Header & Tabs */}
@@ -40,35 +53,43 @@ export default function Drawer({
         <div className="drawer-nav">
           <button
             type="button"
+            className={`tab-btn ${activeTab === 'analytics' ? 'active' : ''}`}
+            onClick={() => setActiveTab('analytics')}
+          >
+            <BarChart2 size={14} />
+            <span>Charts &amp; Analytics</span>
+          </button>
+          <button
+            type="button"
             className={`tab-btn ${activeTab === 'governance' ? 'active' : ''}`}
             onClick={() => setActiveTab('governance')}
           >
-            <Building2 size={15} />
-            <span>Governance vs Catchment</span>
+            <Building2 size={14} />
+            <span>Governance (2.5&times;)</span>
           </button>
           <button
             type="button"
             className={`tab-btn ${activeTab === 'palikas' ? 'active' : ''}`}
             onClick={() => setActiveTab('palikas')}
           >
-            <Map size={15} />
-            <span>Palika Benchmarks</span>
+            <Map size={14} />
+            <span>Palikas</span>
           </button>
           <button
             type="button"
             className={`tab-btn ${activeTab === 'typology' ? 'active' : ''}`}
             onClick={() => setActiveTab('typology')}
           >
-            <Layers size={15} />
-            <span>Landscape Typology</span>
+            <Layers size={14} />
+            <span>Typology (T1–T8)</span>
           </button>
           <button
             type="button"
-            className={`tab-btn ${activeTab === 'earthquake' ? 'active' : ''}`}
-            onClick={() => setActiveTab('earthquake')}
+            className={`tab-btn ${activeTab === 'credits' ? 'active' : ''}`}
+            onClick={() => setActiveTab('credits')}
           >
-            <Activity size={15} />
-            <span>Earthquake &amp; Rules</span>
+            <BookOpen size={14} />
+            <span>ICIMOD &amp; Credits</span>
           </button>
         </div>
         <button 
@@ -83,7 +104,173 @@ export default function Drawer({
 
       {/* Drawer Body Content */}
       <div className="drawer-content">
-        {/* TAB 1: GOVERNANCE VS CATCHMENT */}
+
+        {/* TAB 1: CHARTS & ANALYTICS */}
+        {activeTab === 'analytics' && (
+          <div className="tab-pane">
+            <div className="tab-intro">
+              <h4>Spatial Hydro-Geological Analytics</h4>
+              <p>Key empirical distributions mined across 5,689 surveyed springs in Kavrepalanchok.</p>
+            </div>
+
+            {/* CHART 1: Elevation Gradient */}
+            <div className="chart-card">
+              <div className="chart-card-header">
+                <div className="chart-title-group">
+                  <Mountain size={14} className="chart-icon" />
+                  <h5>Elevation Gradient &amp; Desiccation Rate</h5>
+                </div>
+                <span className="chart-badge">Orography</span>
+              </div>
+              <p className="chart-sub">
+                Higher mountain zones (&gt;1,600m) maintain higher resilience (17% dried) compared to low-elevation valley fringes (&gt;34% dried).
+              </p>
+              <div className="custom-bar-chart">
+                {(charts.elevation || []).map((b) => (
+                  <div key={b.range} className="chart-bar-row">
+                    <span className="bar-label tabular-nums">{b.range}</span>
+                    <div className="bar-track-stacked">
+                      <div 
+                        className="bar-seg-active" 
+                        style={{ width: `${(b.active / 2300) * 100}%` }} 
+                        title={`Active: ${b.active}`}
+                      />
+                      <div 
+                        className="bar-seg-dried" 
+                        style={{ width: `${(b.dried / 2300) * 100}%` }} 
+                        title={`Dried: ${b.dried}`}
+                      />
+                    </div>
+                    <span className={`bar-rate-pill ${b.rate > 30 ? 'high' : b.rate > 20 ? 'med' : 'low'} tabular-nums`}>
+                      {b.rate}%
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <div className="chart-legend-inline">
+                <span className="legend-item"><span className="legend-chip active-chip"></span> Active Springs</span>
+                <span className="legend-item"><span className="legend-chip dried-chip"></span> Dried Springs</span>
+              </div>
+            </div>
+
+            {/* CHART 2: Road Distance Hazard Curve */}
+            <div className="chart-card">
+              <div className="chart-card-header">
+                <div className="chart-title-group">
+                  <Truck size={14} className="chart-icon" />
+                  <h5>Distance to Motorable Road Hazard Gradient</h5>
+                </div>
+                <span className="chart-badge warning">Infrastructure</span>
+              </div>
+              <p className="chart-sub">
+                Desiccation hazards drop sharply from <strong>30.1%</strong> within 50m of unpaved rural roads to <strong>18.3%</strong> at distances &gt;250m.
+              </p>
+              <div className="custom-bar-chart">
+                {(charts.road || []).map((r) => (
+                  <div key={r.distance} className="chart-bar-row">
+                    <span className="bar-label tabular-nums">{r.distance}</span>
+                    <div className="bar-track-simple">
+                      <div 
+                        className={`bar-simple-fill ${r.rate > 28 ? 'high' : r.rate > 22 ? 'med' : 'low'}`}
+                        style={{ width: `${r.rate * 2.8}%` }}
+                      />
+                    </div>
+                    <span className="bar-count-inline tabular-nums">
+                      <strong>{r.rate}%</strong> <small>({r.total} springs)</small>
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* CHART 3: Land Use Resilience */}
+            <div className="chart-card">
+              <div className="chart-card-header">
+                <div className="chart-title-group">
+                  <Trees size={14} className="chart-icon" />
+                  <h5>Land Cover Hydrological Resilience</h5>
+                </div>
+                <span className="chart-badge success">Ecology</span>
+              </div>
+              <p className="chart-sub">
+                Dense forest canopy provides strong groundwater buffer (17.3% dried), while settlement fringes exceed 45% desiccation.
+              </p>
+              <div className="custom-bar-chart">
+                {(charts.landuse || []).map((lu) => (
+                  <div key={lu.landuse} className="chart-bar-row">
+                    <span className="bar-label truncate" title={lu.landuse}>{lu.landuse}</span>
+                    <div className="bar-track-simple">
+                      <div 
+                        className={`bar-simple-fill ${lu.rate > 35 ? 'high' : lu.rate > 25 ? 'med' : 'low'}`}
+                        style={{ width: `${lu.rate * 2.1}%` }}
+                      />
+                    </div>
+                    <span className="bar-count-inline tabular-nums">
+                      <strong>{lu.rate}%</strong>
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* CHART 4: Aspect Solar Deficit */}
+            <div className="chart-card">
+              <div className="chart-card-header">
+                <div className="chart-title-group">
+                  <Compass size={14} className="chart-icon" />
+                  <h5>Slope Aspect &amp; Solar Insolation Polarity</h5>
+                </div>
+                <span className="chart-badge">Microclimate</span>
+              </div>
+              <p className="chart-sub">
+                South and West facing slopes experience severe afternoon vapor pressure deficit and evapotranspiration stress.
+              </p>
+              <div className="custom-bar-chart">
+                {(charts.aspect || []).map((asp) => (
+                  <div key={asp.quadrant} className="chart-bar-row">
+                    <span className="bar-label truncate" title={asp.quadrant}>{asp.quadrant}</span>
+                    <div className="bar-track-simple">
+                      <div 
+                        className={`bar-simple-fill ${asp.rate > 28 ? 'high' : 'med'}`}
+                        style={{ width: `${asp.rate * 2.8}%` }}
+                      />
+                    </div>
+                    <span className="bar-count-inline tabular-nums">
+                      <strong>{asp.rate}%</strong>
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* CHART 5: Recalled Community Causes */}
+            <div className="chart-card">
+              <div className="chart-card-header">
+                <div className="chart-title-group">
+                  <Activity size={14} className="chart-icon" />
+                  <h5>Community Recalled Desiccation Drivers</h5>
+                </div>
+                <span className="chart-badge">Oral History</span>
+              </div>
+              <div className="causes-list">
+                {(charts.causes || []).map((c) => (
+                  <div key={c.cause} className="cause-item">
+                    <div className="cause-header">
+                      <span className="cause-name">{c.cause}</span>
+                      <span className="cause-pct tabular-nums">{c.pct}% ({c.count})</span>
+                    </div>
+                    <div className="cause-bar-track">
+                      <div className="cause-bar-fill" style={{ width: `${c.pct * 2.5}%` }} />
+                    </div>
+                    <div className="cause-desc">{c.desc}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* TAB 2: GOVERNANCE VS CATCHMENT */}
         {activeTab === 'governance' && (
           <div className="tab-pane">
             <div className="insight-hero-card">
@@ -133,7 +320,7 @@ export default function Drawer({
           </div>
         )}
 
-        {/* TAB 2: PALIKA BENCHMARKS */}
+        {/* TAB 3: PALIKA BENCHMARKS */}
         {activeTab === 'palikas' && (
           <div className="tab-pane">
             <div className="tab-intro">
@@ -162,7 +349,6 @@ export default function Drawer({
                       </div>
                     </div>
 
-                    {/* Bar visualization */}
                     <div className="palika-bar-track">
                       <div 
                         className={`palika-bar-fill ${p.rate > 30 ? 'high' : p.rate > 20 ? 'med' : 'low'}`} 
@@ -181,7 +367,7 @@ export default function Drawer({
           </div>
         )}
 
-        {/* TAB 3: LANDSCAPE TYPOLOGY */}
+        {/* TAB 4: LANDSCAPE TYPOLOGY */}
         {activeTab === 'typology' && (
           <div className="tab-pane">
             <div className="tab-intro">
@@ -208,55 +394,83 @@ export default function Drawer({
           </div>
         )}
 
-        {/* TAB 4: EARTHQUAKE & RULES */}
-        {activeTab === 'earthquake' && (
+        {/* TAB 5: ICIMOD & CREDITS */}
+        {activeTab === 'credits' && (
           <div className="tab-pane">
-            <div className="tab-intro">
-              <h4>2015 Gorkha Earthquake Desiccation Pulse</h4>
-              <p>Historical recording year of dried springs reveals an unprecedented spike immediately following the April 2015 Mw 7.8 seismic rupture.</p>
-            </div>
-
-            <div className="timeline-container">
-              <div className="timeline-bars">
-                {(data?.timeline || []).map((item) => (
-                  <div key={item.year} className={`timeline-col ${item.isQuake ? 'quake-year' : ''}`}>
-                    <div className="bar-wrapper">
-                      <span className="bar-val tabular-nums">{item.count}</span>
-                      <div 
-                        className={`bar-visual ${item.isQuake ? 'quake' : ''}`}
-                        style={{ height: `${Math.min(100, Math.max(10, (item.count / 538) * 90))}px` }}
-                      />
-                    </div>
-                    <span className="timeline-year tabular-nums">{item.year}</span>
-                    {item.isQuake && <span className="quake-tag">Mw 7.8</span>}
-                  </div>
-                ))}
+            {/* ICIMOD Attribution Card */}
+            <div className="credits-card primary">
+              <div className="credits-header">
+                <ShieldCheck size={18} className="credits-icon icimod" />
+                <div>
+                  <h4>Data Collection &amp; Field Survey</h4>
+                  <h5>International Centre for Integrated Mountain Development (ICIMOD)</h5>
+                </div>
+              </div>
+              <p className="credits-body">
+                The baseline dataset of <strong>5,689 springs</strong> across Kavrepalanchok District was surveyed and published by <strong>ICIMOD</strong> in direct partnership with local municipal governments and the <em>Ministry of Energy, Water Resources and Irrigation, Government of Nepal</em> under Open Data principles.
+              </p>
+              <div className="credits-meta">
+                <span>Coverage: 13 Municipalities (7 completely surveyed)</span>
+                <span>Coordinates: WGS84 GPS Field Verification</span>
               </div>
             </div>
 
-            <div className="tab-intro" style={{ marginTop: '20px' }}>
-              <h4>Top Spatial Association Rules (Apriori Mining)</h4>
-              <p>Discovered high-confidence feature co-occurrences explaining spring state transitions.</p>
+            {/* Author & Organization Attribution */}
+            <div className="credits-card secondary">
+              <div className="credits-header">
+                <Globe size={18} className="credits-icon noesis" />
+                <div>
+                  <h4>Research &amp; Spatial Data Mining</h4>
+                  <h5>Ashim Shrestha &bull; Noesis Frameworks</h5>
+                </div>
+              </div>
+              <p className="credits-body">
+                Spatial data mining, graph-based hydrological modeling, causal inference, and interactive GIS engineering developed at <strong>Noesis Frameworks</strong>.
+              </p>
+              
+              <div className="links-group">
+                <a 
+                  href="https://noesisframeworks.com" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="credit-link-btn"
+                >
+                  <Globe size={14} />
+                  <span>noesisframeworks.com</span>
+                  <ExternalLink size={12} />
+                </a>
+
+                <a 
+                  href="https://github.com/ashimst/kavre_springs" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="credit-link-btn"
+                >
+                  <GithubIcon size={14} />
+                  <span>GitHub Repository</span>
+                  <ExternalLink size={12} />
+                </a>
+
+                <a 
+                  href="https://github.com/ashimst" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="credit-link-btn"
+                >
+                  <GithubIcon size={14} />
+                  <span>Author GitHub Profile (@ashimst)</span>
+                  <ExternalLink size={12} />
+                </a>
+              </div>
             </div>
 
-            <div className="rules-list">
-              {(data?.rules || []).map((r, idx) => (
-                <div key={idx} className="rule-card">
-                  <div className="rule-header">
-                    <span className="rule-antecedent">{r.rule}</span>
-                    <span className="rule-arrow">&rarr;</span>
-                    <span className={`rule-consequent ${r.consequent.toLowerCase()}`}>{r.consequent}</span>
-                  </div>
-                  <div className="rule-metrics">
-                    <span>Confidence: <strong className="tabular-nums">{r.confidence}</strong></span>
-                    <span>Lift: <strong className="tabular-nums">{r.lift}</strong></span>
-                  </div>
-                  <p className="rule-desc">{r.desc}</p>
-                </div>
-              ))}
+            {/* Open Source / Cloudflare Edge Notice */}
+            <div className="credits-footer-note">
+              Designed for static edge deployment on <strong>Cloudflare Pages</strong> using React 19, Vite, and Leaflet hardware-accelerated Canvas.
             </div>
           </div>
         )}
+
       </div>
     </aside>
   );
