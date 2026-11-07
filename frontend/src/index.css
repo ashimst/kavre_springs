@@ -1,0 +1,149 @@
+/* 
+  Kavre Springs GIS Explorer — Academic Cartographic Design System
+  Clean, high-legibility, publication-grade styling with zero unnecessary clutter
+*/
+
+:root {
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', Menlo, Consolas, monospace;
+  
+  --bg-app: #f8fafc;
+  --bg-card: rgba(255, 255, 255, 0.94);
+  --bg-card-solid: #ffffff;
+  --bg-subtle: #f1f5f9;
+  
+  --border-subtle: #e2e8f0;
+  --border-strong: #cbd5e1;
+  
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --text-light: #94a3b8;
+  
+  --color-active: #2b8a3e;
+  --color-active-bg: #e6f4ea;
+  --color-active-border: #a3d9a5;
+  
+  --color-dried: #c92a2a;
+  --color-dried-bg: #fce8e6;
+  --color-dried-border: #f5c2c7;
+  
+  --color-accent: #2563eb;
+  --color-accent-bg: #eff6ff;
+  
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 10px 25px -5px rgba(15, 23, 42, 0.12), 0 8px 10px -6px rgba(15, 23, 42, 0.06);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: var(--font-sans);
+  color: var(--text-main);
+  background-color: var(--bg-app);
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+input, select {
+  font-family: inherit;
+}
+
+/* Tabular numbers for clean stats alignment */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-mono);
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Map Container */
+.map-container {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+/* Glassmorphism panel styling */
+.glass-panel {
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+}
+
+/* Leaflet Overrides */
+.leaflet-container {
+  font-family: var(--font-sans) !important;
+  background-color: #e2e8f0;
+}
+
+.leaflet-control-zoom {
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: var(--radius-sm) !important;
+  box-shadow: var(--shadow-sm) !important;
+  overflow: hidden;
+}
+
+.leaflet-control-zoom a {
+  background-color: #ffffff !important;
+  color: var(--text-main) !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background-color: var(--bg-subtle) !important;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: var(--radius-md) !important;
+  padding: 0 !important;
+  box-shadow: var(--shadow-md) !important;
+  border: 1px solid var(--border-subtle);
+  overflow: hidden;
+}
+
+.leaflet-popup-content {
+  margin: 0 !important;
+  line-height: 1.4 !important;
+}
+
+.leaflet-popup-tip {
+  background: #ffffff !important;
+}

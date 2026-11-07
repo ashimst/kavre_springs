@@ -28,17 +28,22 @@ cache/
 .pytest_cache/
 *.log
 
-# Large Raw Artifacts / Intermediates (if any)
-tmp/
-scratch/
+# Frontend build & dependencies
+frontend/node_modules/
+frontend/dist/
+
 
 
 # Smoke-test outputs (reproduce_all.py --quick)
 results/metrics/*_quick.csv
 results/predictions/*_quick.parquet
 
-# arXiv build directory (paper/arxiv_submission.zip is the deliverable)
-paper/arxiv/
+# Manuscript sources are kept locally and not published with the code
+paper/
 
 # third-party downloads (Copernicus DEM, USGS ShakeMap); fetched and cached automatically
 data/external/
+
+# Removed experiments and superseded files, kept locally for reference only
+deleted/
+.ruff_cache/
