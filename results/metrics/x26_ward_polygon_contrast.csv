@@ -1,0 +1,2 @@
+contrast,interval,difference,se,ci_low,ci_high,p_one_sided,n_blocks
+ICC: recorded ward - polygon ward (same sources),delete-one-block jackknife,0.01721799508663252,0.006003091593080057,0.00545193556419561,0.02898405460906943,0.00206415092812508,41

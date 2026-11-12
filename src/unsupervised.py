@@ -8,19 +8,16 @@ U1  Landscape typology. The continuous GIS / remote-sensing covariates of env_hy
     stability (mean adjusted Rand index between mixtures fitted to 80 % subsamples and the full-data mixture).
     Drying is then compared between types (rates with Wilson CIs, chi-square), and type and ward are compared with
     likelihood-ratio tests and adjusted McFadden pseudo-R^2.
-U2  Regionalisation. Label-free partitions of the springs are built from the environment and the spring graph:
-      * spatially constrained Ward clustering of the PCA scores on the k-NN graph (contiguous landscape
-        regions), with as many regions as there are wards (75) and as there are 2 km^2 DEM catchments (176);
-      * Louvain communities of the k-NN graph with edges weighted by landscape similarity.
+U2  Regionalisation. Label-free contiguous landscape regions: spatially constrained Ward clustering of the PCA
+    scores on the k-NN graph, with as many regions as there are wards (75) and as 2 km^2 DEM catchments (176).
     For each partition (and for wards, DEM catchments and municipalities) we report the share of landscape
     variance it explains (landscape homogeneity), the ICC of drying against 200 randomly shifted grids with the
     same number of units (drying homogeneity), and agreement with wards (ARI, NMI).
-U3  Mining of dried sources. Among dried sources, ward-level structure of the reported cause (earthquake) and of the
-    reported year (2072 BS) is compared with matched grids, and with landscape types; association rules
-    (one- and two-item antecedents over type, source type, land use, municipality and period) are screened for
-    reported causes with Fisher's exact test and BH-FDR.
+U3  Recalled attributes of dried sources. Ward-level structure of the reported causes and of dating to 2072 BS is
+    compared with matched grids and with landscape types.
+U4  Ward funnel. Observed vs landscape-expected dried sources per ward, funnel limits and overdispersion.
 
-Outputs: results/metrics/un_*.csv, results/figures/un_typology.png, un_regionalisation.png, un_dried_mining.png
+Outputs: results/metrics/un_*.csv and data/processed/landscape_types.csv (figures: src/figures.py)
 Usage:   python -m src.unsupervised
 """
 
@@ -36,14 +33,8 @@ if str(PROJECT_ROOT) not in sys.path:
 import logging
 import os
 
-os.environ.setdefault("MPLCONFIGDIR", str(PROJECT_ROOT / ".matplotlib"))
 os.environ.setdefault("LOKY_MAX_CPU_COUNT", str(os.cpu_count() or 1))  # silences a joblib core-count probe on Windows
 
-import matplotlib
-
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-import networkx as nx
 import numpy as np
 import pandas as pd
 import scipy.sparse as sp
@@ -59,8 +50,7 @@ from sklearn.preprocessing import StandardScaler
 
 from src.catchment_analysis import grid_labels, icc1, matched_grid_null
 from src.features import DYNAMIC_FEATURES, EXPLANATORY_SET, FEATURE_SETS
-from src.graph_builder import coords_to_metric, load_master
-from src.spatial_mining import bh_fdr
+from src.dataset import coords_to_metric, load_master
 
 logger = logging.getLogger("unsupervised")
 METRICS = PROJECT_ROOT / "results/metrics"
@@ -208,22 +198,6 @@ def env_r2(P, groups):
     return 1 - ((P - gm) ** 2).sum() / tot
 
 
-def louvain_communities(coords, Z, resolution, k=7):
-    _, idx = cKDTree(coords).query(coords, k=k + 1)
-    G = nx.Graph()
-    G.add_nodes_from(range(len(coords)))
-    d2 = np.array([[np.sum((Z[i] - Z[j]) ** 2) for j in idx[i, 1:]] for i in range(len(coords))])
-    s2 = np.median(d2)
-    for i in range(len(coords)):
-        for jj, j in enumerate(idx[i, 1:]):
-            G.add_edge(i, int(j), weight=float(np.exp(-d2[i, jj] / s2)))
-    comms = nx.community.louvain_communities(G, weight="weight", resolution=resolution, seed=SEED)
-    lab = np.empty(len(coords), np.int64)
-    for c, nodes in enumerate(comms):
-        lab[list(nodes)] = c
-    return lab, nx.community.modularity(G, comms, weight="weight")
-
-
 def regionalisation(df, coords, P, ward, catch):
     y = df.target_dried.to_numpy()
     A = knn_graph(coords, k=10)
@@ -231,14 +205,6 @@ def regionalisation(df, coords, P, ward, catch):
     for n in (75, 176):
         parts[f"landscape region (n={n})"] = AgglomerativeClustering(n_clusters=n, linkage="ward",
                                                                            connectivity=A).fit_predict(P)
-    # Louvain resolution chosen (label-free) to give a partition closest to the number of wards
-    best = None
-    for res in [0.5, 1, 2, 4, 8, 16, 32]:
-        lab, Q = louvain_communities(coords, P, res)
-        nc = len(np.unique(lab))
-        if best is None or abs(nc - 75) < abs(best[2] - 75):
-            best = (lab, Q, nc, res)
-    parts["Louvain landscape-similarity graph"] = best[0]
     rows = []
     rng = np.random.default_rng(SEED)
     for name, g in parts.items():
@@ -260,8 +226,6 @@ def regionalisation(df, coords, P, ward, catch):
         env_grid.append((np.mean([env_r2(P, gg) for gg in grids]), np.mean([adjusted_rand_score(ward, gg) for gg in grids])))
     out["grid_env_r2_mean"] = [e for e, _ in env_grid]
     out["grid_ari_with_ward_mean"] = [a for _, a in env_grid]
-    out["louvain_resolution"] = np.where(out.partition.str.startswith("Louvain"), best[3], np.nan)
-    out["louvain_modularity"] = np.where(out.partition.str.startswith("Louvain"), best[1], np.nan)
     return out, parts
 
 
@@ -298,130 +262,7 @@ def dried_mining(df, coords, lab, ward):
 
 
 # ----------------------------------------------------------------------------- figures
-def figures(df, coords, sel, rates, prof, reg, parts, icc_tab, lab):
-    fig, axes = plt.subplots(2, 2, figsize=(14, 10.5), layout="constrained")
-    ax = axes[0, 0]
-    ax2 = ax.twinx()
-    ax.plot(sel.K, sel.bic / 1e3, "o-", c="#4C72B0", label="BIC")
-    ax2.errorbar(sel.K, sel.stability_ari_mean, yerr=sel.stability_ari_sd, fmt="s--", c="#C44E52", capsize=2, label="stability (ARI)")
-    ks = int(sel.K[sel.selected].iloc[0])
-    ax.axvline(ks, c="grey", ls=":")
-    ax.set_xlabel("Number of landscape types K")
-    ax.set_ylabel("BIC (×10³)", color="#4C72B0")
-    ax2.set_ylabel("Bootstrap stability (mean ARI)", color="#C44E52")
-    ax.set_title(f"(a) Gaussian-mixture model selection (selected K = {ks})", fontsize=10)
-    ax = axes[0, 1]
-    top = prof[LANDSCAPE_COLS].abs().max().sort_values(ascending=False).index[:16]
-    im = ax.imshow(prof[top].to_numpy(), cmap="RdBu_r", vmin=-1.5, vmax=1.5, aspect="auto")
-    ax.set_yticks(range(len(prof)))
-    ax.set_yticklabels(prof.index)
-    ax.set_xticks(range(len(top)))
-    ax.set_xticklabels(top, rotation=70, ha="right", fontsize=7)
-    fig.colorbar(im, ax=ax, label="mean z-score")
-    ax.set_title("(b) Landscape profile of each type (16 most distinctive covariates)", fontsize=10)
-    ax = axes[1, 0]
-    ax.errorbar(rates.type, rates.drying_rate, yerr=[rates.drying_rate - rates.ci_low, rates.ci_high - rates.drying_rate],
-                fmt="o", capsize=3, c="k")
-    ax.axhline(df.target_dried.mean(), ls=":", c="grey")
-    for i, r in rates.iterrows():
-        ax.text(i, r.ci_high + 0.01, f"n={r.n_sources}", ha="center", fontsize=7)
-    ax.set_ylabel("Share dried (95% Wilson CI)")
-    ax.set_title("(c) Drying rate by landscape type (types built without labels)", fontsize=10)
-    ax = axes[1, 1]
-    cmap = plt.get_cmap("tab10")
-    for k in np.unique(lab):
-        mm = lab == k
-        ax.scatter(df.longitude[mm], df.latitude[mm], s=1.5, color=cmap(k % 10), label=f"T{k + 1}", linewidths=0)
-    ax.set_aspect(1 / np.cos(np.radians(27.57)))
-    ax.legend(markerscale=6, fontsize=7, loc="lower left", ncol=2)
-    ax.set_title("(d) Map of landscape types", fontsize=10)
-    fig.savefig(FIGS / "un_typology.png", dpi=300)
-    plt.close(fig)
-
-    fig, axes = plt.subplots(1, 2, figsize=(14, 5.2), layout="constrained")
-    ax = axes[0]
-    r = reg.reset_index(drop=True)
-    y = np.arange(len(r))
-    ax.hlines(y, r.grid_icc_q025, r.grid_icc_q975, color="#bbbbbb", lw=6, label="size-matched random grids (95%)")
-    ax.plot(r.icc_drying, y, "o", c="#C44E52", label="partition")
-    ax.set_yticks(y)
-    ax.set_yticklabels([p if "n=" in p else f"{p} (n={n})" for p, n in zip(r.partition, r.n_units)], fontsize=8)
-    ax.set_xlabel("ICC of drying")
-    ax.set_title("(a) Drying homogeneity of label-free partitions", fontsize=10)
-    ax.legend(fontsize=8, loc="upper center", bbox_to_anchor=(0.5, -0.12), ncol=2, frameon=False)
-    ax = axes[1]
-    for i, q in r.iterrows():
-        ax.scatter(q.env_r2, q.icc_drying - q.grid_icc_mean, s=40)
-        ax.annotate(q.partition, (q.env_r2, q.icc_drying - q.grid_icc_mean), fontsize=7,
-                    xytext=(5, 6 if i % 2 else -10), textcoords="offset points")
-    ax.axvline(r.grid_env_r2_mean[r.partition.str.startswith("ward")].iloc[0], ls=":", c="grey")
-    ax.text(r.grid_env_r2_mean[r.partition.str.startswith("ward")].iloc[0], ax.get_ylim()[0],
-            " random squares,\n ward size", fontsize=7, color="grey", va="bottom")
-    ax.axhline(0, c="k", lw=0.8)
-    ax.set_xlabel("Landscape homogeneity (share of PCA variance explained by units)")
-    ax.set_ylabel("ICC of drying minus matched-grid mean")
-    ax.set_title("(b) Landscape vs drying homogeneity of each partition", fontsize=10)
-    fig.savefig(FIGS / "un_regionalisation.png", dpi=300)
-    plt.close(fig)
-
-    fig, ax = plt.subplots(figsize=(8, 4.2), layout="constrained")
-    t = icc_tab[icc_tab.unit == "ward"].reset_index(drop=True)
-    yy = np.arange(len(t))
-    ax.hlines(yy, t.grid_icc_q025, t.grid_icc_q975, color="#bbbbbb", lw=6, label="size-matched random grids (95%)")
-    ax.plot(t.icc, yy, "o", c="#C44E52", label="wards")
-    e = icc_tab[icc_tab.unit == "landscape type"].reset_index(drop=True)
-    ax.plot(e.icc, yy, "D", c="#4C72B0", label="landscape types")
-    ax.set_yticks(yy)
-    ax.set_yticklabels(t.outcome)
-    ax.set_xlabel("ICC among dried sources")
-    ax.set_title("Reported causes and years of drying: shared within wards, not within landscape types", fontsize=10)
-    ax.legend(fontsize=8)
-    fig.savefig(FIGS / "un_dried_mining.png", dpi=300)
-    plt.close(fig)
-
-
 # ----------------------------------------------------------------------------- U4-U8 extensions
-def density_structure(P, lab, y, n_pc=5):
-    """U4: HDBSCAN on the leading principal components; does density-based structure agree with the mixture types?"""
-    from sklearn.cluster import HDBSCAN
-    hd = HDBSCAN(min_cluster_size=100, min_samples=20).fit(P[:, :n_pc])
-    h = hd.labels_
-    rows = []
-    for k in np.unique(h):
-        m = h == k
-        lo, hi = wilson(y[m].sum(), m.sum())
-        rows.append({"cluster": "noise" if k < 0 else f"D{k + 1}", "n_sources": int(m.sum()), "drying_rate": y[m].mean(),
-                     "ci_low": lo, "ci_high": hi,
-                     "dominant_landscape_type": f"T{np.bincount(lab[m]).argmax() + 1}",
-                     "share_dominant_type": np.bincount(lab[m]).max() / m.sum()})
-    tab = pd.DataFrame(rows)
-    core = h >= 0
-    summ = pd.DataFrame([{"n_clusters": int(len(np.unique(h[core]))), "noise_share": float((~core).mean()),
-                          "ari_with_types_core": adjusted_rand_score(lab[core], h[core]),
-                          "cramers_v_cluster_drying": cramers_v(h, y)}])
-    return h, tab, summ
-
-
-def embedding(P, seed=SEED):
-    """U5: t-SNE of the PCA scores (visual check of landscape structure)."""
-    from sklearn.manifold import TSNE
-    return TSNE(n_components=2, perplexity=50, init="pca", learning_rate="auto", random_state=seed).fit_transform(P)
-
-
-def anomalies(P, y, lab, ward, contamination=0.05):
-    """U6: isolation-forest landscape anomalies: are atypical settings more likely to be dried?"""
-    from sklearn.ensemble import IsolationForest
-    iso = IsolationForest(n_estimators=500, contamination=contamination, random_state=SEED).fit(P)
-    a = iso.predict(P) == -1
-    k1, n1, k0, n0 = y[a].sum(), a.sum(), y[~a].sum(), (~a).sum()
-    odds, p = stats.fisher_exact([[k1, n1 - k1], [k0, n0 - k0]])
-    _, cnt = np.unique(ward[a], return_counts=True)
-    return a, pd.DataFrame([{"n_anomalous": int(n1), "drying_rate_anomalous": k1 / n1, "drying_rate_typical": k0 / n0,
-                             "odds_ratio": odds, "fisher_p": p, "n_wards_with_anomalies": len(cnt),
-                             "max_share_in_one_ward": cnt.max() / n1,
-                             "anomaly_share_by_type": "; ".join(f"T{k + 1}: {a[lab == k].mean():.3f}" for k in np.unique(lab))}])
-
-
 def ward_funnel(df, Z, ward):
     """U7: indirectly standardised drying ratios of wards against a landscape-only model, with funnel limits and
     an overdispersion factor (mean squared z; ~1 if wards differ only by chance given landscape)."""
@@ -440,133 +281,6 @@ def ward_funnel(df, Z, ward):
                           "n_outside_998": int(w.outside_998.sum()), "expected_outside_998": 0.002 * len(w),
                           "n_high_998": int((w.z > 3.09).sum()), "n_low_998": int((w.z < -3.09).sum())}])
     return w, summ
-
-
-def mantel(D1, D2, n_perm=999, rng=None):
-    rng = rng or np.random.default_rng(SEED)
-    iu = np.triu_indices_from(D1, 1)
-    r0 = stats.pearsonr(D1[iu], D2[iu])[0]
-    null = []
-    for _ in range(n_perm):
-        o = rng.permutation(len(D1))
-        null.append(stats.pearsonr(D1[np.ix_(o, o)][iu], D2[iu])[0])
-    return r0, (np.sum(np.array(null) >= r0) + 1) / (n_perm + 1)
-
-
-def partial_mantel(D1, D2, D3, n_perm=999, rng=None):
-    """Mantel correlation of D1 and D2 controlling for D3 (residuals of both on D3; permutation of D1)."""
-    rng = rng or np.random.default_rng(SEED)
-    iu = np.triu_indices_from(D1, 1)
-
-    def resid(a, b):
-        A = np.c_[np.ones(len(b)), b]
-        return a - A @ np.linalg.lstsq(A, a, rcond=None)[0]
-
-    r2 = resid(D2[iu], D3[iu])
-    r0 = stats.pearsonr(resid(D1[iu], D3[iu]), r2)[0]
-    null = []
-    for _ in range(n_perm):
-        o = rng.permutation(len(D1))
-        null.append(stats.pearsonr(resid(D1[np.ix_(o, o)][iu], D3[iu]), r2)[0])
-    return r0, (np.sum(np.array(null) >= r0) + 1) / (n_perm + 1)
-
-
-def ward_narratives(df, coords, P, ward, min_dried=8):
-    """U8: cluster wards by the profile of reported causes and periods of their dried sources (Hellinger geometry,
-    Ward linkage, K by silhouette) and test whether narrative similarity follows geography or landscape (Mantel)."""
-    from scipy.cluster.hierarchy import fcluster, linkage
-    from scipy.spatial.distance import pdist, squareform
-    from sklearn.metrics import silhouette_score
-    d = df.assign(ward_id=ward)
-    yr = pd.to_numeric(d["years_since_dried"], errors="coerce").where(lambda v: (v >= 2000) & (v <= 2085))
-    d["period"] = np.select([yr < 2072, yr == 2072, yr > 2072], ["before", "2072", "after"], "unknown")
-    d["cause"] = d.reason_of_drying.where(d.reason_of_drying.isin(["earthquake", "drought", "infrastructure_development"]), "other")
-    dd = d[d.target_dried == 1]
-    cnt = dd.groupby("ward_id").size()
-    keep = cnt[cnt >= min_dried].index
-    prof = pd.concat([pd.crosstab(dd.ward_id, dd.cause, normalize="index").add_prefix("cause: "),
-                      pd.crosstab(dd.ward_id, dd.period, normalize="index").add_prefix("period: ")], axis=1).loc[keep].fillna(0)
-    H = np.sqrt(prof.to_numpy())  # Hellinger embedding
-    Lk = linkage(H, method="ward")
-    sil = {k: silhouette_score(H, fcluster(Lk, k, "maxclust")) for k in range(2, 7)}
-    k_best = max(sil, key=sil.get)
-    regime = fcluster(Lk, k_best, "maxclust")
-    cen = pd.DataFrame(coords).groupby(ward).mean().loc[keep].to_numpy()
-    land = pd.DataFrame(P).groupby(ward).mean().loc[keep].to_numpy()
-    Dn, Dg, Dl = squareform(pdist(H)), squareform(pdist(cen)), squareform(pdist(land))
-    mt = []
-    for name, (A, B, C) in {"narrative ~ geography": (Dn, Dg, None), "narrative ~ landscape": (Dn, Dl, None),
-                            "narrative ~ geography | landscape": (Dn, Dg, Dl),
-                            "narrative ~ landscape | geography": (Dn, Dl, Dg)}.items():
-        r, p = mantel(A, B) if C is None else partial_mantel(A, B, C)
-        mt.append({"test": name, "mantel_r": r, "p": p})
-    prof = prof.assign(regime=[f"R{r}" for r in regime], n_dried=cnt.loc[keep].to_numpy(),
-                       municipality=d.groupby("ward_id").municipality.first().loc[keep].to_numpy())
-    reg_summary = prof.groupby("regime").mean(numeric_only=True).assign(n_wards=prof.groupby("regime").size())
-    sel = pd.DataFrame({"k": list(sil), "silhouette": list(sil.values()), "selected": [k == k_best for k in sil]})
-    return prof, reg_summary, pd.DataFrame(mt), sel, cen
-
-
-def figures_ext(df, coords, lab, h, emb, a, w, wsum, prof, ward):
-    y = df.target_dried.to_numpy()
-    fig, axes = plt.subplots(1, 3, figsize=(17, 5.4), layout="constrained")
-    cmap = plt.get_cmap("tab10")
-    ax = axes[0]
-    for k in np.unique(lab):
-        m = lab == k
-        ax.scatter(emb[m, 0], emb[m, 1], s=1.2, color=cmap(k), label=f"T{k + 1}", linewidths=0)
-    ax.legend(markerscale=6, fontsize=7)
-    ax.set_title("(a) t-SNE of landscape space: landscape types", fontsize=10)
-    ax = axes[1]
-    o = np.argsort(y)
-    ax.scatter(emb[o, 0], emb[o, 1], s=1.2, c=np.where(y[o] == 1, "#C44E52", "#c9d6e8"), linewidths=0)
-    ax.scatter(emb[a, 0], emb[a, 1], s=6, facecolors="none", edgecolors="k", linewidths=0.4, label="isolation-forest anomaly")
-    ax.legend(fontsize=7)
-    ax.set_title("(b) t-SNE: dried (red) vs active; landscape anomalies", fontsize=10)
-    ax = axes[2]
-    sdr_src = pd.Series(w.set_index("ward").sdr).reindex(ward).to_numpy()
-    sc = ax.scatter(emb[:, 0], emb[:, 1], s=1.2, c=np.log2(sdr_src), cmap="RdBu_r", vmin=-1.5, vmax=1.5, linewidths=0)
-    fig.colorbar(sc, ax=ax, label="log2 ward drying ratio (observed / landscape-expected)")
-    ax.set_title("(c) t-SNE coloured by the source's ward excess", fontsize=10)
-    for ax in axes:
-        ax.set_xticks([]); ax.set_yticks([])
-    fig.savefig(FIGS / "un_embedding.png", dpi=300)
-    plt.close(fig)
-
-    fig, axes = plt.subplots(1, 3, figsize=(18, 5.6), layout="constrained", gridspec_kw={"width_ratios": [1, 1, 1.2]})
-    ax = axes[0]
-    E = np.linspace(w.expected.min() * 0.8, w.expected.max() * 1.05, 200)
-    vbar = (w["var"] / w.expected).mean()  # average p(1-p)/p, to draw smooth limits
-    for z, ls in [(1.96, "--"), (3.09, ":")]:
-        ax.plot(E, 1 + z * np.sqrt(vbar * E) / E, "k" + ls, lw=0.8)
-        ax.plot(E, np.clip(1 - z * np.sqrt(vbar * E) / E, 0, None), "k" + ls, lw=0.8)
-    ax.scatter(w.expected, w.sdr, s=18, c=np.where(w.outside_998, "#C44E52", "#4C72B0"))
-    ax.axhline(1, c="grey", lw=0.8)
-    ax.set_xlabel("Expected dried sources in ward (landscape-only model)")
-    ax.set_ylabel("Observed / expected")
-    ax.set_title(f"(a) Ward funnel plot: {int(wsum.n_outside_998[0])} of {int(wsum.n_wards[0])} wards outside 99.8% "
-                 f"(expected {wsum.expected_outside_998[0]:.1f}); φ = {wsum.overdispersion_phi[0]:.1f}", fontsize=9)
-    ax = axes[1]
-    sdr_src = pd.Series(w.set_index("ward").sdr).reindex(ward).to_numpy()
-    sc = ax.scatter(df.longitude, df.latitude, s=1.5, c=np.log2(sdr_src), cmap="RdBu_r", vmin=-1.5, vmax=1.5, linewidths=0)
-    fig.colorbar(sc, ax=ax, label="log2 observed / expected")
-    ax.set_aspect(1 / np.cos(np.radians(27.57)))
-    ax.set_title("(b) Ward excess drying beyond landscape", fontsize=10)
-    ax = axes[2]
-    cols = [c for c in prof.columns if c.startswith(("cause:", "period:"))]
-    pr = prof.sort_values("regime")
-    im = ax.imshow(pr[cols].to_numpy(), aspect="auto", cmap="viridis", vmin=0, vmax=1)
-    ax.set_xticks(range(len(cols)))
-    ax.set_xticklabels([c.replace("infrastructure_development", "infrastructure") for c in cols], rotation=60, ha="right", fontsize=7)
-    b = np.r_[0, np.cumsum(pr.groupby("regime").size().to_numpy())]
-    for i in b[1:-1]:
-        ax.axhline(i - 0.5, c="w", lw=1.5)
-    ax.set_yticks((b[:-1] + b[1:]) / 2 - 0.5)
-    ax.set_yticklabels(sorted(pr.regime.unique()))
-    fig.colorbar(im, ax=ax, label="share of the ward's dried sources")
-    ax.set_title("(c) Narrative regimes of wards (clustered cause and period profiles)", fontsize=10)
-    fig.savefig(FIGS / "un_wards.png", dpi=300)
-    plt.close(fig)
 
 
 # ----------------------------------------------------------------------------- driver
@@ -607,32 +321,11 @@ def run():
     cross.to_csv(METRICS / "un_type_by_reason.csv")
     logger.info("\n" + icc_tab.round(3).to_string())
 
-    figures(df, coords, sel, rates, prof, reg, parts, icc_tab, lab)
-
-    y = df.target_dried.to_numpy()
-    logger.info("U4 density-based clusters (HDBSCAN)")
-    h, hd_tab, hd_sum = density_structure(P, lab, y)
-    hd_tab.to_csv(METRICS / "un_hdbscan_clusters.csv", index=False)
-    hd_sum.to_csv(METRICS / "un_hdbscan_summary.csv", index=False)
-    logger.info("\n" + hd_tab.round(3).to_string() + "\n" + hd_sum.round(3).to_string())
-    logger.info("U5 t-SNE embedding; U6 isolation-forest anomalies")
-    emb = embedding(P)
-    pd.DataFrame({"id": df.id, "tsne_1": emb[:, 0], "tsne_2": emb[:, 1]}).to_csv(METRICS / "un_tsne.csv", index=False)
-    a, an = anomalies(P, y, lab, ward)
-    an.to_csv(METRICS / "un_anomalies.csv", index=False)
-    logger.info("\n" + an.round(4).to_string())
-    logger.info("U7 ward funnel; U8 ward narrative regimes")
+    logger.info("U4 ward funnel against a landscape-only model")
     w, wsum = ward_funnel(df, Z, ward)
     w.to_csv(METRICS / "un_ward_funnel.csv", index=False)
     wsum.to_csv(METRICS / "un_ward_funnel_summary.csv", index=False)
     logger.info("\n" + wsum.round(3).to_string())
-    nprof, nreg, nmantel, nsel, _ = ward_narratives(df, coords, P, ward)
-    nprof.to_csv(METRICS / "un_ward_narratives.csv")
-    nreg.to_csv(METRICS / "un_narrative_regimes.csv")
-    nmantel.to_csv(METRICS / "un_narrative_mantel.csv", index=False)
-    nsel.to_csv(METRICS / "un_narrative_k_selection.csv", index=False)
-    logger.info("\n" + nreg.round(3).to_string() + "\n" + nmantel.round(4).to_string() + "\n" + nsel.round(3).to_string())
-    figures_ext(df, coords, lab, h, emb, a, w, wsum, nprof, ward)
 
 
 if __name__ == "__main__":

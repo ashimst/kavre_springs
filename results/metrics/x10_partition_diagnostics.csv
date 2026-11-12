@@ -1,0 +1,7 @@
+subset,null,n_draws,occupied_cells_mean,occupied_cells_min,occupied_cells_max,seed,share_draws_all_regions_connected,mean_size_l1_share,max_size_l1_share,median_max_abs_size_dev,max_abs_size_dev
+all sources,rotated matched grids,1000,74.676,67.0,84.0,2036,,,,,
+all sources,contiguous size-matched regions,1000,,,,2037,1.0,0.008325892072420462,0.03621023026894006,4.0,21.0
+all sources,contiguous size-matched regions within municipality,1000,,,,2038,1.0,0.0037482861662858145,0.054491123220249606,2.0,50.0
+springs only,rotated matched grids,1000,74.35,67.0,83.0,2036,,,,,
+springs only,contiguous size-matched regions,1000,,,,2037,1.0,0.008807275541795665,0.027476780185758515,4.0,28.0
+springs only,contiguous size-matched regions within municipality,1000,,,,2038,1.0,0.0018784829721362228,0.03212074303405573,2.0,39.0

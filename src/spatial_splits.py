@@ -4,8 +4,8 @@ Spatial cross-validation splits.
 1. Spatial block k-fold: the study area (~40 x 39 km) is cut into an
    ``n_blocks_side x n_blocks_side`` grid (default 5 x 5, ~8 km cells). Non-empty
    blocks are shuffled (seeded) and dealt into k folds. For fold i the test set
-   is block-group i and the validation set (early stopping, threshold choice,
-   HydroBoost blend selection) is block-group i+1.
+   is block-group i and the validation set (early stopping, threshold choice)
+   is block-group i+1.
 
    ``buffer_m`` removes from train *and* validation every spring lying within
    ``buffer_m`` metres of any test spring (Roberts et al., 2017, Ecography).

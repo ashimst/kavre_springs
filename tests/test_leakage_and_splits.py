@@ -9,7 +9,7 @@ import pytest
 
 from src.features import (EARTHQUAKE_LEAKY, FEATURE_SETS, FORBIDDEN_FEATURES, PRIMARY_FEATURE_SET,
                           check_feature_set)
-from src.graph_builder import build_graph, load_master
+from src.dataset import design_matrix, load_master
 from src.spatial_splits import leave_one_municipality_out, spatial_block_kfold
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -22,7 +22,7 @@ def df():
 
 @pytest.fixture(scope="module")
 def graph(df):
-    return build_graph(df, PRIMARY_FEATURE_SET)
+    return design_matrix(df, PRIMARY_FEATURE_SET)
 
 
 def test_primary_and_sensitivity_sets_pass_audit(df):
@@ -59,19 +59,12 @@ def test_skip_logic_multi_label_columns_detected_as_leaks(df):
             assert audit.loc[col, "skip_logic_leak"], f"{col} should be detected as skip-logic leak"
 
 
-def test_graph_shapes(graph):
+def test_design_matrix_shapes(graph):
     n = len(graph["y"])
     assert n == 5689
     assert graph["x"].shape == (n, len(FEATURE_SETS[PRIMARY_FEATURE_SET]))
-    assert graph["edge_attr"].shape == (graph["edge_index"].shape[1], 5)
-    assert np.isfinite(graph["x"].numpy()).all()
-
-
-def test_edge_attribute_convention(graph):
-    """dz column = z_receiver - z_sender (documented in graph_builder and SI Text S1)."""
-    src, dst = graph["edge_index"].numpy()
-    dz = graph["edge_attr_raw"][:, 3]
-    assert np.allclose(dz, graph["elevation"][dst] - graph["elevation"][src], atol=1e-3)
+    assert np.isfinite(graph["x"]).all()
+    assert np.allclose(graph["x"].mean(0), 0, atol=1e-4)
 
 
 @pytest.mark.parametrize("buffer_m", [0.0, 500.0])
@@ -113,6 +106,6 @@ def test_reported_summary_matches_fold_results():
 def test_no_hardcoded_result_literals_in_pipeline():
     """The old ablation table was written from literals; make sure no pipeline module does that."""
     for f in ["benchmark.py", "report.py", "spatial_mining.py", "spatial_analysis.py", "catchment_analysis.py",
-              "drivers_analysis.py", "unsupervised.py", "graph_topology_experiment.py"]:
+              "drivers_analysis.py", "unsupervised.py", "robustness.py", "pattern_mining.py"]:
         src = (ROOT / "src" / f).read_text(encoding="utf-8")
         assert '"f1_macro": 0.' not in src and '"roc_auc": 0.' not in src

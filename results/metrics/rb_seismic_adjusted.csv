@@ -1,10 +1,10 @@
 model,term,coef_per_sd,ci_low,ci_high,ci_excludes_zero
-seismic + environment,pga_main,-0.22850844545852872,-0.7042518244286553,0.0706503626802254,False
-seismic + environment,pga_may12,0.688249440994346,0.24191247579889907,1.0328802746074974,True
-seismic + environment,aftershocks_20km,-0.2434015634487424,-0.5954634898985333,0.04028025236588611,False
-seismic + environment + ward fixed effects,pga_main,-0.44259187945864104,-1.0372674888341176,0.07277492022969094,False
-seismic + environment + ward fixed effects,pga_may12,0.34721849308484587,-0.09777069988706001,0.7780175706649222,False
-seismic + environment + ward fixed effects,aftershocks_20km,-0.06838417630864578,-0.7203516232611259,0.39277294480712993,False
-seismic + environment + 100 MEMs (broad and meso spatial structure),pga_main,-0.26716465111204524,-0.6995762811396941,0.07623281830712453,False
-seismic + environment + 100 MEMs (broad and meso spatial structure),pga_may12,0.7355972860891268,0.3678763483801204,1.037019189178591,True
-seismic + environment + 100 MEMs (broad and meso spatial structure),aftershocks_20km,-0.23272131622301842,-0.5880984504787027,0.04701170314324676,False
+seismic + environment,pga_main,-0.22850736028442598,-0.7042519089898457,0.07066626159850789,False
+seismic + environment,pga_may12,0.6882478355977398,0.2435298789977753,1.032874273878622,True
+seismic + environment,aftershocks_20km,-0.2433975065068758,-0.5951438152032019,0.03880508486832471,False
+seismic + environment + ward fixed effects,pga_main,-0.4388805771807637,-1.0481971144364002,0.07438079806571679,False
+seismic + environment + ward fixed effects,pga_may12,0.34753591905929837,-0.11777362957114179,0.7813177129628547,False
+seismic + environment + ward fixed effects,aftershocks_20km,-0.06847451164797637,-0.7259220337251366,0.39152542034759485,False
+seismic + environment + 100 MEMs (broad and meso spatial structure),pga_main,-0.2676963834788824,-0.6999695143364403,0.08107757221291449,False
+seismic + environment + 100 MEMs (broad and meso spatial structure),pga_may12,0.7337550522641012,0.37900271150802645,1.032223264163235,True
+seismic + environment + 100 MEMs (broad and meso spatial structure),aftershocks_20km,-0.22969719361454746,-0.5984246228044092,0.046717930541362016,False

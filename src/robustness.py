@@ -2,8 +2,8 @@
 Robustness analyses requested in review.
 
 R1  Contiguous, size-matched random regions. Square grids differ from wards in shape and size distribution. We grow
-    random contiguous regions on the 10-nearest-neighbour spring graph with exactly the ward size distribution
-    (round-robin region growing from random seeds; 200 replicates) and use them as a second null for the ICC of
+    random regions on the 10-nearest-neighbour source graph with the ward size distribution; every region is
+    connected and sizes are balanced to the ward targets by boundary transfers (src/regions.py; 200 replicates) and use them as a second null for the ICC of
     drying (all sources) and of recalled attributes (dried sources).
 R2  Sensitivity subsets: all sources; springs only (ponds excluded); perennial only (sources recorded as seasonal
     excluded); springs and perennial. For each: drying rate; ICC of wards, DEM catchments and landscape regions
@@ -15,7 +15,7 @@ R3  Spatial-validation diagnostics: distance from every test source to the neare
 R4  Earthquake exposure with ward fixed effects and spatial (Moran eigenvector) adjustment, and the share of
     exposure variance that lies within wards.
 
-Outputs: results/metrics/rb_*.csv, results/figures/rb_robustness.png
+Outputs: results/metrics/rb_*.csv, incl. rb_null_distributions.csv (figures: src/figures.py)
 Usage:   python -m src.robustness
 """
 
@@ -36,10 +36,8 @@ os.environ.setdefault("MPLCONFIGDIR", str(PROJECT_ROOT / ".matplotlib"))
 import matplotlib
 
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from scipy import stats
 from scipy.spatial import cKDTree
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.decomposition import PCA
@@ -48,8 +46,9 @@ from sklearn.preprocessing import StandardScaler
 
 from src.catchment_analysis import icc1, matched_grid_null
 from src.features import explanatory_columns
-from src.graph_builder import coords_to_metric, load_master
+from src.dataset import coords_to_metric, load_master
 from src.pattern_mining import mantel_haenszel
+from src.regions import sample_partitions
 from src.spatial_analysis import mem_eigenvectors
 from src.spatial_splits import grid_block_ids, leave_one_municipality_out, spatial_block_kfold
 from src.unsupervised import env_matrix, knn_graph
@@ -63,70 +62,6 @@ SEED = 31
 N_NULL = 200
 
 
-# ----------------------------------------------------------------------------- R1 random contiguous regions
-def neighbours(coords, k=10):
-    A = knn_graph(coords, k=k).tocsr()
-    return [A.indices[A.indptr[i]:A.indptr[i + 1]] for i in range(A.shape[0])]
-
-
-def random_regions(nbrs, sizes, rng, coords):
-    """Grow len(sizes) contiguous, compact regions with the given sizes from random seeds: regions take turns adding
-    the unassigned graph neighbour closest to their seed until they reach their size. Sources left over (enclosed by
-    other regions) are attached, nearest first, to the closest region still below its target size."""
-    import heapq
-    n = len(nbrs)
-    lab = -np.ones(n, np.int64)
-    sizes = rng.permutation(sizes)
-    seeds = rng.choice(n, len(sizes), replace=False)
-    heaps, count = [], np.zeros(len(sizes), np.int64)
-    for r, s in enumerate(seeds):
-        lab[s] = r
-        count[r] = 1
-        h = [(float(np.hypot(*(coords[u] - coords[s]))), int(u)) for u in nbrs[s]]
-        heapq.heapify(h)
-        heaps.append(h)
-    active = [r for r in range(len(sizes)) if count[r] < sizes[r]]
-    while active:
-        nxt = []
-        for r in active:
-            h = heaps[r]
-            while h and lab[h[0][1]] >= 0:
-                heapq.heappop(h)
-            if not h:
-                continue
-            _, v = heapq.heappop(h)
-            lab[v] = r
-            count[r] += 1
-            s = seeds[r]
-            for u in nbrs[v]:
-                if lab[u] < 0:
-                    heapq.heappush(h, (float(np.hypot(*(coords[u] - coords[s]))), int(u)))
-            if count[r] < sizes[r]:
-                nxt.append(r)
-        active = nxt
-    # leftovers: attach to the nearest region that is still below its target size (else to the nearest region),
-    # one source at a time so that deficits are filled in turn
-    left = list(rng.permutation(np.where(lab < 0)[0]))
-    while left:
-        deficit = np.where(count < sizes)[0]
-        pool = np.where(np.isin(lab, deficit))[0] if len(deficit) else np.where(lab >= 0)[0]
-        tree = cKDTree(coords[pool])
-        _, j = tree.query(coords[left])
-        order = np.argsort(_)  # closest leftovers first
-        for k in order[: max(1, len(left) // 10)]:
-            v = left[k]
-            r = lab[pool[j[k]]]
-            lab[v] = r
-            count[r] += 1
-        left = [v for v in left if lab[v] < 0]
-    return lab
-
-
-def region_null(nbrs, sizes, coords, n_rep=N_NULL, seed=SEED):
-    rng = np.random.default_rng(seed)
-    return [random_regions(nbrs, sizes, rng, coords) for _ in range(n_rep)]
-
-
 def null_summary(obs, null):
     null = np.asarray(null)
     return {"null_mean": null.mean(), "null_q025": np.quantile(null, 0.025), "null_q975": np.quantile(null, 0.975),
@@ -135,6 +70,7 @@ def null_summary(obs, null):
 
 # ----------------------------------------------------------------------------- helpers
 def knox_within_across(coords, years, ward, d=250.0, n_perm=999, rng=None):
+    """Compare same-year neighbour counts with permutation expectations; upper-tail p tests excess matching only."""
     rng = rng or np.random.default_rng(SEED)
     pairs = np.array(sorted(cKDTree(coords).query_pairs(d)))
     if len(pairs) == 0:
@@ -163,7 +99,19 @@ def funnel_phi(Z, y, ward):
 
 
 # ----------------------------------------------------------------------------- R1 + R2
-def subset_analyses(df, coords, nbrs_all):
+def inside_recorded_palika(df) -> np.ndarray:
+    import geopandas as gpd
+
+    from src.boundaries import PALIKAS, build_boundaries
+    _, pal = build_boundaries()
+    pts = gpd.GeoDataFrame({"recorded": df.municipality.map(PALIKAS).to_numpy()},
+                           geometry=gpd.points_from_xy(df.longitude, df.latitude), crs=4326)
+    j = gpd.sjoin(pts, pal[["name", "geometry"]], how="left", predicate="within")
+    j = j[~j.index.duplicated()].reindex(pts.index)
+    return (j.recorded == j["name"]).to_numpy()
+
+
+def subset_analyses(df, coords):
     ward = (df.municipality.astype(str) + "_" + df.ward.astype(str)).to_numpy()
     types = df[["id"]].merge(pd.read_csv(TYPES), on="id", how="left").env_type.to_numpy()
     Z_all = env_matrix(df)
@@ -178,8 +126,10 @@ def subset_analyses(df, coords, nbrs_all):
         "springs only (ponds excluded)": (df["Source Type_encoded"] == 0).to_numpy(),
         "perennial only (seasonal excluded)": (df["Perennial / Seasonal_encoded"] == 0).to_numpy(),
         "perennial springs only": ((df["Source Type_encoded"] == 0) & (df["Perennial / Seasonal_encoded"] == 0)).to_numpy(),
+        # sources whose location lies inside the official polygon of their recorded palika (src/boundaries.py)
+        "located in recorded palika": inside_recorded_palika(df),
     }
-    rows, nulls = [], {}
+    rows, nulls = [], []
     for name, m in subsets.items():
         rng = np.random.default_rng(SEED)
         y = df.target_dried.to_numpy()[m].astype(float)
@@ -188,13 +138,12 @@ def subset_analyses(df, coords, nbrs_all):
         # ward ICC vs grids and vs contiguous random regions (regions grown on this subset's graph)
         icc_w = icc1(y, w)
         _, gnull, _ = matched_grid_null(c, y, len(np.unique(w)), rng=rng)
-        nb = nbrs_all if name == "all sources" else neighbours(c)
-        sizes = pd.Series(w).value_counts().to_numpy()
-        regs = region_null(nb, sizes, c, seed=SEED + 1)
+        # contiguous, size-balanced random regions grown on this subset's graph (src/regions.py)
+        regs = sample_partitions(c, w, N_NULL, SEED + 1)
         rnull = [icc1(y, g) for g in regs]
-        if name == "all sources":
-            nulls["drying"] = (icc_w, gnull, rnull)
-        r.update({"ward_icc": icc_w, "ward_grid_q975": np.quantile(gnull, .975), "ward_p_grid": null_summary(icc_w, gnull)["p"],
+        nulls += [{"subset": name, "outcome": "drying", "null": "grid", "value": v} for v in gnull]
+        nulls += [{"subset": name, "outcome": "drying", "null": "region", "value": v} for v in rnull]
+        r.update({"ward_icc": icc_w, "ward_grid_q025": np.quantile(gnull, .025), "ward_grid_q975": np.quantile(gnull, .975), "ward_p_grid": null_summary(icc_w, gnull)["p"],
                   "ward_region_q025": np.quantile(rnull, .025), "ward_region_q975": np.quantile(rnull, .975),
                   "ward_p_region": null_summary(icc_w, rnull)["p"]})
         for uname, lab in [("catchment_T2", df.catch_T2p0.to_numpy()[m]), ("landscape_region75", land_reg[m])]:
@@ -220,14 +169,14 @@ def subset_analyses(df, coords, nbrs_all):
             icc_a = icc1(vv, ward[dm])
             _, gn, _ = matched_grid_null(coords[dm], vv, len(np.unique(ward[dm])), n_shift=100, rng=rng)
             rn = [icc1(vv, g) for g in regs_d]
-            if name == "all sources":
-                nulls[aname] = (icc_a, gn, rn)
+            nulls += [{"subset": name, "outcome": aname, "null": "grid", "value": v} for v in gn]
+            nulls += [{"subset": name, "outcome": aname, "null": "region", "value": v} for v in rn]
             r.update({f"{aname}_ward_icc": icc_a, f"{aname}_grid_q975": np.quantile(gn, .975),
                       f"{aname}_p_grid": null_summary(icc_a, gn)["p"], f"{aname}_region_q975": np.quantile(rn, .975),
                       f"{aname}_p_region": null_summary(icc_a, rn)["p"]})
         rows.append(r)
         logger.info(f"{name}: done")
-    return pd.DataFrame(rows), nulls
+    return pd.DataFrame(rows), pd.DataFrame(nulls)
 
 
 # ----------------------------------------------------------------------------- R3
@@ -257,7 +206,7 @@ def validation_distances(df, coords):
 
 
 # ----------------------------------------------------------------------------- R4
-def earthquake_adjusted(df, coords, n_boot=200):
+def earthquake_adjusted(df, coords, n_boot=200, cols=None):
     y = df.target_dried.to_numpy()
     ward = (df.municipality.astype(str) + "_" + df.ward.astype(str)).to_numpy()
     seis = ["pga_main", "pga_may12", "aftershocks_20km"]
@@ -268,7 +217,7 @@ def earthquake_adjusted(df, coords, n_boot=200):
         var.append({"variable": c, "share_of_variance_within_wards": within / v.var(),
                     "within_ward_sd": np.sqrt(within), "total_sd": v.std()})
     S = StandardScaler().fit_transform(df[seis].to_numpy(float))
-    cols = explanatory_columns(df)
+    cols = cols or explanatory_columns(df)
     E = StandardScaler().fit_transform(df[cols].fillna(df[cols].median()).to_numpy(float))
     W = pd.get_dummies(ward, drop_first=True, dtype=float).to_numpy()
     _, V = mem_eigenvectors(coords)
@@ -294,43 +243,11 @@ def earthquake_adjusted(df, coords, n_boot=200):
     return pd.DataFrame(var), pd.DataFrame(rows)
 
 
-# ----------------------------------------------------------------------------- figure
-def figure(nulls, vsumm):
-    fig, axes = plt.subplots(1, 2, figsize=(13, 4.6), layout="constrained")
-    ax = axes[0]
-    labels = {"drying": "drying (all sources)", "earthquake": "earthquake attribution (dried)",
-              "dated_2072": "dated 2072 BS (dried)"}
-    for i, (k, lab) in enumerate(labels.items()):
-        obs, g, r = nulls[k]
-        for j, (nn, col) in enumerate([(g, "#9E9E9E"), (r, "#4C72B0")]):
-            ax.hlines(i + (j - 0.5) * 0.25, np.quantile(nn, .025), np.quantile(nn, .975), color=col, lw=7,
-                      label=(["matched square grids", "contiguous random regions (ward sizes)"][j] if i == 0 else None))
-        ax.plot(obs, i, "o", c="#C44E52", ms=8, label="wards" if i == 0 else None)
-    ax.set_yticks(range(len(labels)))
-    ax.set_yticklabels(labels.values())
-    ax.set_xlabel("ICC within units (95% null ranges)")
-    ax.set_title("(a) Ward ICC against two null partitions", fontsize=10)
-    ax.legend(fontsize=8, loc="lower right")
-    ax = axes[1]
-    s = vsumm[vsumm.design == "spatial block CV"]
-    ax.plot(s.buffer_m, s.median_distance_m, "o-", label="median distance test → nearest training source")
-    ax.plot(s.buffer_m, s.p05_distance_m, "s--", label="5th percentile")
-    l = vsumm[vsumm.design != "spatial block CV"]
-    ax.scatter(l.buffer_m, l.median_distance_m, marker="*", s=120, c="k", label="leave-one-municipality-out (median)")
-    ax.set_xlabel("Buffer (m)")
-    ax.set_ylabel("Distance (m)")
-    ax.set_title("(b) Separation of test and training sources", fontsize=10)
-    ax.legend(fontsize=8)
-    fig.savefig(FIGS / "rb_robustness.png", dpi=300)
-    plt.close(fig)
-
-
 def run():
     df = load_master()
     if "catch_T2p0" not in df:
         df = df.merge(pd.read_csv(HG)[["id", "catch_T2p0"]], on="id", how="left")
     coords = coords_to_metric(df.latitude.to_numpy(), df.longitude.to_numpy())
-    nbrs = neighbours(coords)
     logger.info("R3 validation distances")
     vfolds, vsumm = validation_distances(df, coords)
     vfolds.to_csv(METRICS / "rb_validation_distances_folds.csv", index=False)
@@ -342,10 +259,10 @@ def run():
     eq.to_csv(METRICS / "rb_seismic_adjusted.csv", index=False)
     logger.info("\n" + var.round(3).to_string() + "\n" + eq.round(3).to_string())
     logger.info("R1/R2 null regions and sensitivity subsets")
-    sub, nulls = subset_analyses(df, coords, nbrs)
+    sub, nulls = subset_analyses(df, coords)
     sub.to_csv(METRICS / "rb_sensitivity_subsets.csv", index=False)
     logger.info("\n" + sub.round(3).T.to_string())
-    figure(nulls, vsumm)
+    nulls.to_csv(METRICS / "rb_null_distributions.csv", index=False)
 
 
 if __name__ == "__main__":

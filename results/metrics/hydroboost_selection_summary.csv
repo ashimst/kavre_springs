@@ -1,6 +1,0 @@
-profile,feature_set,buffer_m,folds,mean_w_catboost,share_w0,share_w1,share_no_diffusion
-features,env_hydro_season,0.0,25,0.64,0.0,0.16,0.04
-features,leaky_reference,0.0,25,0.76,0.0,0.28,0.36
-lomo,env_hydro,500.0,21,0.43809523809523804,0.14285714285714285,0.0,0.047619047619047616
-main,env_hydro,0.0,25,0.35200000000000004,0.12,0.0,0.04
-main,env_hydro,500.0,25,0.336,0.12,0.0,0.04

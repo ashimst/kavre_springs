@@ -1275,3 +1275,102 @@
     display: none;
   }
 }
+
+/* ==========================================================================
+   Findings tables, reported-year chart and caution card
+   ========================================================================== */
+.tab-pane .insight-card + .insight-card { margin-top: 10px; }
+.tab-pane .insight-card { margin-bottom: 10px; }
+
+.table-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-main);
+  margin: 0 0 8px;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  color: #334155;
+}
+
+.data-table th {
+  text-align: left;
+  font-weight: 600;
+  font-size: 11px;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-strong);
+  padding: 4px 6px 4px 0;
+}
+
+.data-table td {
+  padding: 5px 6px 5px 0;
+  border-bottom: 1px solid var(--border-subtle);
+  vertical-align: top;
+}
+
+.data-table tr:last-child td { border-bottom: none; }
+.data-table .mark { color: var(--color-accent); font-size: 10px; }
+.data-table .warn-cell { color: #b45309; font-weight: 700; }
+
+.table-note {
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--text-muted);
+  margin: 8px 0 0;
+}
+
+.caution-card {
+  border-color: #fde68a;
+  background: #fffbeb;
+}
+
+.caution-card .card-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #fde68a;
+}
+
+.year-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 90px;
+  padding-top: 4px;
+}
+
+.year-col {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+}
+
+.year-bar {
+  width: 100%;
+  min-height: 1px;
+  background: #94a3b8;
+  border-radius: 2px 2px 0 0;
+}
+
+.year-col.quake .year-bar { background: var(--color-dried); }
+
+.year-axis {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.filter-btn.ward-toggle { white-space: nowrap; }
+.filter-btn.ward-toggle.active {
+  background: #1e3a8a;
+  color: #ffffff;
+  border-color: #1e3a8a;
+}

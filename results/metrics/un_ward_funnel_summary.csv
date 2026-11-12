@@ -1,2 +1,2 @@
 n_wards,overdispersion_phi,chi2_p,n_outside_95,expected_outside_95,n_outside_998,expected_outside_998,n_high_998,n_low_998
-75,5.487807472370326,2.6378939017390552e-48,26,3.75,13,0.15,6,7
+75,5.487807472273298,2.637893909667958e-48,26,3.75,13,0.15,6,7

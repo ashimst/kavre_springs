@@ -1,8 +1,8 @@
-Held-out municipality,N,dried,Drying rate,Logistic Regression,Random Forest,CatBoost,kNN label interpolation,MLP,ResGATv2,HydroBoost-GAT
-Bethanchownk,385,74,19.2%,0.667,0.633,0.659,0.541,0.645,0.64,0.648
-Dhulikhel,1174,338,28.8%,0.601,0.583,0.594,0.501,0.594,0.612,0.612
-Namobuudha,478,96,20.1%,0.593,0.586,0.599,0.562,0.55,0.537,0.572
-Panauti,880,83,9.4%,0.659,0.676,0.678,0.52,0.632,0.629,0.659
-Panchkhal,1067,426,39.9%,0.622,0.672,0.66,0.623,0.633,0.645,0.654
-Roshi RM,969,211,21.8%,0.661,0.695,0.681,0.416,0.68,0.669,0.685
-Temal,736,293,39.8%,0.604,0.599,0.603,0.426,0.581,0.566,0.603
+Held-out municipality,N,dried,Drying rate,Logistic Regression,Random Forest,CatBoost,kNN label interpolation
+Bethanchownk,385,74,19.2%,0.667,0.633,0.67,0.541
+Dhulikhel,1174,338,28.8%,0.601,0.587,0.605,0.501
+Namobuudha,478,96,20.1%,0.593,0.586,0.592,0.562
+Panauti,880,83,9.4%,0.658,0.671,0.669,0.52
+Panchkhal,1067,426,39.9%,0.622,0.676,0.653,0.623
+Roshi RM,969,211,21.8%,0.661,0.697,0.675,0.416
+Temal,736,293,39.8%,0.603,0.597,0.604,0.426

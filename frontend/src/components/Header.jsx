@@ -18,13 +18,14 @@ const GithubIcon = ({ size = 13 }) => (
 );
 
 export default function Header({
-  data,
   selectedPalika,
   onSelectPalika,
   statusFilter,
   onStatusFilterChange,
   activeBasemap,
   onBasemapChange,
+  showWards,
+  onToggleWards,
   onResetView,
   isDrawerOpen,
   onToggleDrawer,
@@ -59,12 +60,12 @@ export default function Header({
         <div className="brand-badge">
           <Droplets size={18} className="brand-icon" />
           <span className="brand-title">KAVRE SPRINGS</span>
-          <span className="brand-tag">GIS MINING</span>
+          <span className="brand-tag">SURVEY AUDIT</span>
         </div>
-        
+
         <div className="stats-pill">
           <span className="stat-item">
-            <strong>{filteredCount.toLocaleString()}</strong> <span className="stat-label">Springs</span>
+            <strong>{filteredCount.toLocaleString()}</strong> <span className="stat-label">Sources</span>
           </span>
           <span className="stat-divider">/</span>
           <span className="stat-item dried-stat">
@@ -77,7 +78,7 @@ export default function Header({
         </div>
 
         {/* Data Credit Pill */}
-        <div className="credit-pill" title="5,689 GPS spring survey conducted by ICIMOD (International Centre for Integrated Mountain Development)">
+        <div className="credit-pill" title="Inventory of springs and ponds collected and published by ICIMOD (International Centre for Integrated Mountain Development)">
           <Database size={12} className="credit-icon" />
           <span>Data: <strong>ICIMOD</strong></span>
         </div>
@@ -140,6 +141,17 @@ export default function Header({
             <option value="gray">Light Canvas (Esri)</option>
           </select>
         </div>
+
+        {/* Ward boundary overlay (OpenStreetMap) */}
+        <button
+          type="button"
+          className={`filter-btn ward-toggle ${showWards ? 'active' : ''}`}
+          onClick={onToggleWards}
+          aria-pressed={showWards}
+          title="Show OpenStreetMap ward boundaries, shaded by how many of each recorded ward's sources fall inside its polygon"
+        >
+          Ward boundaries
+        </button>
       </div>
 
       {/* Right Controls: External Links & Drawer Toggle */}
@@ -182,10 +194,10 @@ export default function Header({
           type="button" 
           onClick={onToggleDrawer}
           className={`header-action-btn drawer-toggle-btn ${isDrawerOpen ? 'drawer-active' : ''}`}
-          title="Toggle scientific findings and data mining drawer"
+          title="Toggle the findings panel"
         >
           <BarChart3 size={14} />
-          <span>{isDrawerOpen ? 'Close Insights' : 'Analytics & Insights'}</span>
+          <span>{isDrawerOpen ? 'Close findings' : 'Findings'}</span>
         </button>
       </div>
     </header>

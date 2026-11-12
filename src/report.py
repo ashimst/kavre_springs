@@ -1,6 +1,6 @@
 """
 Turn raw per-fold results into every summary table, statistical test, figure
-and the auto-generated SI tables (paper/si_generated_tables.md).
+and the auto-generated Markdown tables (results/tables/si_tables.md).
 Nothing in this file contains a result value; everything is read from
 results/metrics/benchmark_*_folds.csv and the other metric files.
 
@@ -34,24 +34,23 @@ os.environ.setdefault("MPLCONFIGDIR", str(PROJECT_ROOT / ".matplotlib"))
 import matplotlib
 
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from scipy import stats
 
 from src.features import FEATURE_SETS, PRIMARY_FEATURE_SET, missingness_audit, single_feature_rule_scores
-from src.graph_builder import load_master
+from src.dataset import load_master
 
 logger = logging.getLogger("report")
 METRICS_DIR = PROJECT_ROOT / "results/metrics"
 TABLE_DIR = PROJECT_ROOT / "results/tables"
 FIG_DIR = PROJECT_ROOT / "results/figures"
-SI_PATH = PROJECT_ROOT / "paper/si_generated_tables.md"
+SI_PATH = PROJECT_ROOT / "results/tables/si_tables.md"
+SI_TEX = PROJECT_ROOT / "paper/si_tables.tex"
 
 METRICS = ["roc_auc", "pr_auc", "f1_macro", "bal_acc", "brier"]
-TABULAR = ["Logistic Regression", "Random Forest", "XGBoost", "CatBoost"]
-CORE_ORDER = ["Logistic Regression", "Random Forest", "XGBoost", "CatBoost", "kNN label interpolation", "MLP",
-              "GCN", "GraphSAGE", "GATv2", "ResGATv2", "HydroBoost-GAT"]
+TABULAR = ["Logistic Regression", "Random Forest", "CatBoost"]
+CORE_ORDER = ["Logistic Regression", "Random Forest", "CatBoost", "kNN label interpolation"]
 GROUP_COLS = ["profile", "scheme", "feature_set", "buffer_m"]
 
 
@@ -160,64 +159,6 @@ def tests_table(tests: pd.DataFrame, profile, buffer_m, feature_set=PRIMARY_FEAT
     })
 
 
-def fig_benchmark(summary: pd.DataFrame):
-    panels = [("main", 0.0, "Spatial 5-fold CV, no buffer\n(interpolation)"),
-              ("main", 500.0, "Spatial 5-fold CV, 500 m buffer\n(extrapolation)"),
-              ("lomo", 500.0, "Leave-one-municipality-out\n(500 m buffer)")]
-    panels = [p for p in panels if ((summary.profile == p[0]) & (summary.buffer_m == p[1])).any()]
-    fig, axes = plt.subplots(1, len(panels), figsize=(5.2 * len(panels), 5), sharey=False)
-    axes = np.atleast_1d(axes)
-    for ax, (prof, buf, title) in zip(axes, panels):
-        cand_fs = ["env_hydro", PRIMARY_FEATURE_SET, "env"]
-        fs = next((f for f in cand_fs if ((summary.profile == prof) & (summary.buffer_m == buf) & (summary.feature_set == f)).any()), "env")
-        s = summary[(summary.profile == prof) & (summary.buffer_m == buf) & (summary.feature_set == fs)]
-        models_to_plot = [m for m in CORE_ORDER if m in set(s.model)]
-        if not models_to_plot:
-            continue
-        s = s.set_index("model").loc[models_to_plot]
-        colors = ["#4C72B0" if m in TABULAR else "#DD8452" if m == "kNN label interpolation" else
-                  "#8172B3" if m == "MLP" else "#55A868" for m in s.index]
-        y = np.arange(len(s))[::-1]
-        for yi, (_, r), c in zip(y, s.iterrows(), colors):
-            ax.errorbar(r.roc_auc_mean, yi, xerr=r.roc_auc_ci95, fmt="o", color=c, capsize=3)
-        ax.axvline(0.5, ls=":", c="grey")
-        ax.set_yticks(y)
-        ax.set_yticklabels(s.index, fontsize=9)
-        ax.set_xlabel("ROC-AUC (mean, corrected 95 % CI)")
-        ax.set_title(title, fontsize=10)
-    fig.suptitle("Spring drying prediction from a-priori covariates (primary feature set)", fontsize=11)
-    fig.tight_layout()
-    fig.savefig(FIG_DIR / "model_benchmark_comparison.png", dpi=300)
-    plt.close(fig)
-
-
-def fig_leakage(summary: pd.DataFrame, rule_auc: float):
-    names = {
-        "env": "Basic covariates (env)",
-        "env_hydro": "+ catchment hydrology & roads (env_hydro)",
-        "env_hydro_season": "+ seasonal-flow flag",
-        "leaky_reference": "basic + skip-logic earthquake fields (leaky)",
-    }
-    order = [fs for fs in names if (summary.feature_set == fs).any()]
-    s = summary[(summary.buffer_m == 0) & summary.feature_set.isin(order) & summary.profile.isin(["main", "features"])]
-    models = [m for m in ["Logistic Regression", "CatBoost", "MLP", "ResGATv2", "HydroBoost-GAT"] if m in set(s.model)]
-    fig, ax = plt.subplots(figsize=(9, 4.8))
-    w = 0.8 / len(order)
-    for i, fs in enumerate(order):
-        v = s[s.feature_set == fs].set_index("model").reindex(models)
-        ax.bar(np.arange(len(models)) + (i - (len(order) - 1) / 2) * w, v.roc_auc_mean, w, yerr=v.roc_auc_ci95,
-               capsize=2, label=names[fs])
-    ax.axhline(rule_auc, ls="--", c="crimson", label=f"one-line rule: earthquake question unanswered (AUC {rule_auc:.3f})")
-    ax.set_xticks(range(len(models)))
-    ax.set_xticklabels(models, fontsize=9)
-    ax.set_ylim(0.5, 1.0)
-    ax.set_ylabel("ROC-AUC (spatial CV, no buffer)")
-    ax.legend(fontsize=8, loc="upper center", bbox_to_anchor=(0.5, -0.1), ncol=2, frameon=False)
-    fig.tight_layout()
-    fig.savefig(FIG_DIR / "leakage_feature_sets.png", dpi=300)
-    plt.close(fig)
-
-
 def lomo_table(folds: pd.DataFrame, df: pd.DataFrame):
     l = folds[(folds.profile == "lomo") & (folds.feature_set == PRIMARY_FEATURE_SET)]
     if l.empty:
@@ -242,70 +183,188 @@ def current_runs(folds: pd.DataFrame) -> pd.DataFrame:
     return folds[keep].reset_index(drop=True)
 
 
-# SI tables in the order in which the manuscript cites them. (file, title, optional column subset)
-SI_TABLES = [
-    # landscape typology and unsupervised structure
-    ("un_pca_variance.csv", "Table S8. Principal components of the static landscape covariates", None),
-    ("un_typology_selection.csv", "Table S9. Gaussian-mixture model selection: BIC and bootstrap stability", None),
-    ("un_typology_drying.csv", "Table S10. Drying rate by landscape type (95 % Wilson CI)", None),
-    ("un_typology_profiles.csv", "Table S11. Mean standardised covariates (and survey composition) by landscape type", None),
-    ("un_typology_vs_ward_lrt.csv", "Table S12. Landscape type vs ward: likelihood-ratio tests", None),
-    ("un_typology_summary.csv", "Table S13. Association strengths (bias-corrected Cramér's V)", None),
-    ("un_hdbscan_clusters.csv", "Table S14. HDBSCAN density clusters of landscape space", None),
-    ("un_hdbscan_summary.csv", "Table S15. HDBSCAN summary and agreement with landscape types", None),
-    ("un_anomalies.csv", "Table S16. Isolation-forest landscape anomalies and drying", None),
+# Supplementary tables, in the order in which the manuscript first cites them; numbered S1, S2, ... by run_report.
+# Each entry is (key, title). Keys are either built in run_report ("leakage", "single", "featuresets", "paired")
+# or name a file in results/metrics via SI_FILES. Tables that only repeat a main-text table, a figure or a number
+# stated in the text are not reprinted; every result table remains in results/metrics.
+SI_ORDER = [
+    ("boundary_agreement.csv", "Recorded palika vs. official palika polygon containing each source"),
+    ("x0_raw_field_audit.csv", "Skip-logic audit of the 56 non-outcome raw survey fields: missingness, gap sensitivity and missingness-only AUC"),
+    ("single", "ROC-AUC of single features used alone (no model)"),
+    ("featuresets", "Feature-set sensitivity: the enrichment ladder (spatial CV, no buffer)"),
+    ("x1_tier_increments.csv", "Fold-matched ROC-AUC gains between feature tiers (corrected resampled t-test, Holm within design)"),
+    ("rb_validation_distances.csv", "Distance from test sources to the nearest training source by validation design"),
+    ("paired", "Paired comparisons against the best tabular model (ROC-AUC; corrected resampled t-test, Holm)"),
+    ("x2_within_ward_auc.csv", "Pooled, within-ward and ward-mean ROC-AUC of out-of-fold predictions (mean over 5 seeds)"),
+    ("x11_fold_variation.csv", "Spread of fold ROC-AUC by design, tier and model (SD over seed x fold; SD of seed means)"),
+    ("x11_lomo_by_municipality.csv", "Leave-one-municipality-out ROC-AUC of each held-out municipality (mean and SD over 3 seeds)"),
+    ("x11_springs_only_auc.csv", "Pooled and within-ward ROC-AUC of out-of-fold predictions, all sources vs springs only"),
+    ("ca_unit_icc.csv", "ICC of drying: DEM catchments, wards, municipalities vs size-matched grids"),
+    ("un_regionalisation.csv", "Label-free landscape regions vs wards: landscape and drying homogeneity"),
+    ("x10_partition_diagnostics.csv", "Placebo partitions: draws, seeds, connectivity and size match against the ward sizes"),
+    ("x10_strengthened_nulls.csv", "Ward and seasonal-status ICCs against sampled spatial partitions; nominal tail probabilities"),
+    ("x4_residual_ward_icc.csv", "Ward ICC of recorded drying and of covariate-model residuals against two spatial nulls"),
+    ("ca_pair_concordance_logit.csv", "Pair concordance ~ same catchment + same ward + log distance (spatial-block bootstrap CI)"),
+    ("x3_pair_placebo.csv", "Same-unit pair term for wards vs placebo units (matched grids, contiguous random regions)"),
+    ("x10_pair_placebo.csv", "Same-ward pair term against 200 contiguous size-matched and 200 municipality-nested placebo partitions"),
+    ("sa_directional_test.csv", "Upslope vs downslope neighbour dependence (permutation test)"),
+    ("ca_flowpath_logit.csv", "Flow-path covariates with and without environmental adjustment"),
+    ("x5_placebo_partition.csv", "Variation partitioning with ward indicators vs placebo-unit indicators (adjusted McFadden pseudo-R2)"),
+    ("x8_ward_correlates.csv", "Ward-level correlates of the ward funnel z-score (Spearman, BH-FDR)"),
+    ("sa_knox_test.csv", "Knox space-time test of reported drying year, within vs across wards"),
+    ("un_typology_selection.csv", "Gaussian-mixture model selection: BIC and bootstrap stability"),
+    ("un_typology_profiles.csv", "Mean standardised covariates (and survey composition) by terrain type"),
+    ("un_typology_vs_ward_lrt.csv", "Terrain type vs ward: likelihood-ratio tests"),
+    ("pm_drying_rules.csv", "Top 40 significant productive apriori rules per consequent (BH-FDR q < 0.05), ranked by WRAcc"),
+    ("x6_reversals_fdr.csv", "Rule counts, ward robustness, held-out replication and Simpson-type reversals with and without FDR control"),
+    ("dr_pooled_vs_within_ward.csv", "Covariates of drying: pooled vs ward fixed effects (per SD, 95 % block-bootstrap CI)"),
+    ("x9_grid_fe_survival.csv", "Covariate coefficients (per SD): pooled, ward fixed effects and matched-grid fixed effects (10 shifts)"),
+    ("x7_cause_auc_difference.csv", "Out-of-fold ROC-AUC for earthquake-attributed vs other dried sources (bootstrap CI of the difference)"),
+    ("sa_seismic_quintiles.csv", "Drying by quintile of 2015 shaking and aftershock exposure"),
+    ("sa_seismic_logit.csv", "Seismic exposure models, including attribution and dating among dried sources"),
+    ("rb_seismic_adjusted.csv", "Earthquake exposure with ward fixed effects or Moran-eigenvector adjustment"),
+    ("rb_seismic_within_ward_variance.csv", "Share of earthquake-exposure variance within wards"),
+    # appended, so that the numbers of the tables above stay as cited in the manuscript
+    ("x12_pair_contrast.csv", "Pair model: same-ward minus same-catchment log-odds (paired spatial-block bootstrap, 300 draws)"),
+    ("x13_matched_count_icc.csv", "ICC of drying for wards, 2 km2 catchments and count-matched catchments against 1,000 rotated grids"),
+    ("x13_matched_count_contrast.csv", "Ward minus catchment contrasts at 2 km2 and at matched unit count (block jackknife for ICC, block bootstrap for the pair term)"),
+    ("x14_pair_robustness.csv", "Pair model for all sources and springs only: block-bootstrap and dyadic-robust intervals, leave-one-block-out range"),
+    ("x15_joint_model_collinearity.csv", "Covariates with a within-ward signal: joint vs single-covariate coefficients, strongest correlate and VIF"),
+    ("x16_partition_geometry.csv", "Spatial extent diagnostics for wards and the three reference partition families"),
+    ("x17_top_decile_triage.csv", "PR-AUC and out-of-fold top-decile precision, recall and lift by model and feature tier"),
+    ("x18_terrain_type_block_permutation.csv", "Terrain-type and recorded-drying association tested by within-block outcome permutation"),
+    ("x19_within_unit_auc.csv", "Within-known-unit out-of-fold AUC in wards and DEM catchments at three thresholds"),
+    ("x20_coordinate_ablation.csv", "Paired spatial-CV model performance after dropping coordinates and source density"),
+    ("x21_ward_null_calibration.csv", "Simulated rejection rates of partition-based ward-ICC tests under spatial fields with and without ward effects"),
+    ("x22_reduced_covariates.csv", "Post hoc reduced full-rank continuous-covariate models, pooled and with ward indicators"),
+    ("x23_feature_family_ablation.csv", "Drop-one-family ablation of the enriched model on identical spatial folds"),
+    ("x24_within_ward_auc_block_bootstrap.csv", "Within-ward AUC with spatial-block bootstrap intervals"),
+    ("x25_ward_reported_year.csv", "Reported-year distribution by ward among dried sources with numeric year-like values"),
+    ("x25_recent_year_nulls.csv", "Ward ICC of reported values coded 2071-2085 among valid-year dried sources against spatial reference partitions"),
+    ("x25_worldcover_by_ward.csv", "Ward-level disagreement between recorded land use and dominant 2021 WorldCover fractions"),
+    ("x25_spatially_isolated_sources.csv", "Assigned-ward vs nearest-source majority agreement for spatially isolated records"),
+    ("x25_ascertainment_checks.csv", "Descriptive checks of serial order, reported years, cover disagreement and spatially isolated sources"),
+    ("ward_boundary_agreement.csv", "Recorded ward vs. OpenStreetMap ward polygon containing each source"),
+    ("x26_ward_polygon_icc.csv", "Ward ICC with wards assigned from OpenStreetMap polygons and from recorded labels, against 1,000 rotated grids and 1,000 contiguous size-matched regions"),
+    ("x26_ward_connectivity.csv", "Connectivity of recorded and polygon wards on the 10-nearest-neighbour source graph"),
+    ("x27_full_rank_residual_icc.csv", "Residual ward ICC after the 65-covariate set and after the 62-covariate full-rank set, against the three 1,000-draw reference families"),
+    ("x27_full_rank_earthquake.csv", "Earthquake-exposure coefficients with the 65-covariate set and with the 62-covariate full-rank set"),
+    ("x28_latent_icc.csv", "Observed-scale (ANOVA) and latent-scale (random-intercept logit) ICC against the same reference partitions"),
+    ("x28_latent_icc_contrasts.csv", "Ward minus catchment ICC differences on the observed and latent scales (delete-one-block jackknife)"),
+]
+SI_COLUMNS = {
+    "x10_strengthened_nulls.csv": ["subset", "outcome", "null", "obs", "null_q975", "null_max", "z", "n_exceed",
+                                   "p_one_sided"],
+    "x1_tier_increments.csv": ["design", "model", "from", "to", "auc_from", "auc_to", "mean_diff", "ci95_low",
+                               "ci95_high", "p_holm"],
+    "x0_raw_field_audit.csv": ["field", "missing_active", "missing_dried", "gap", "outcome_dependent",
+                               "direction", "missingness_only_auc", "gap_gt_1pp", "gap_gt_5pp", "gap_gt_10pp"],
+    "x16_partition_geometry.csv": ["partition", "n_draws", "n_units_mean", "n_units_min", "n_units_max",
+                                   "share_units_disconnected_mean", "mean_within_unit_pair_distance_m_mean",
+                                   "mean_within_unit_pair_distance_m_min", "mean_within_unit_pair_distance_m_max",
+                                   "median_unit_median_pair_distance_m_mean",
+                                   "mean_within_unit_nearest_neighbor_m_mean",
+                                   "share_100_400m_pairs_same_unit_mean"],
+    "x17_top_decile_triage.csv": ["model", "feature_set", "buffer_m", "n_test_folds", "roc_auc_mean", "pr_auc_mean",
+                                  "prevalence_mean",
+                                  "precision_at_10pct_mean", "precision_at_10pct_std", "recall_at_10pct_mean",
+                                  "recall_at_10pct_std", "lift_at_10pct_mean", "lift_at_10pct_std"],
+    "x18_terrain_type_block_permutation.csv": ["observed_chi2", "naive_chi2_p", "block_permutation_p",
+                                               "n_permutations", "block_size_km", "null_q95", "null_max"],
+    "x19_within_unit_auc.csv": ["model", "unit", "n_seeds", "pooled_auc", "within_unit_auc",
+                                "within_unit_auc_sd", "eligible_units", "within_unit_pairs",
+                                "share_case_control_pairs_within_units"],
+    "x20_coordinate_ablation.csv": ["model", "variant", "n_folds", "roc_auc_mean", "delta_roc_auc_mean",
+                                    "delta_roc_auc_sd", "pr_auc_mean", "delta_pr_auc_mean"],
+    "x21_ward_null_calibration.csv": ["spatial_length_m", "ward_effect_sd_logit", "null_family", "n_simulations",
+                                      "n_null_partitions", "rejection_rate", "rejection_ci_low", "rejection_ci_high",
+                                      "median_ward_icc", "mean_null_q95"],
+    "x22_reduced_covariates.csv": ["model", "term", "coef_per_sd", "ci_low", "ci_high", "ci_excludes_zero",
+                                   "vif", "n_covariates", "design_rank"],
+    "x23_feature_family_ablation.csv": ["model", "dropped_family", "n_folds", "delta_roc_auc_mean", "ci95_low",
+                                        "ci95_high", "p_uncorrected", "p_holm_within_model"],
+    "x24_within_ward_auc_block_bootstrap.csv": ["model", "within_ward_auc", "ci_low", "ci_high", "n_blocks",
+                                                "n_bootstrap", "bootstrap_unit"],
+    "x25_ward_reported_year.csv": ["ward", "n_valid_reported_years", "mean_reported_value",
+                                   "median_reported_value", "q25_reported_value", "q75_reported_value",
+                                   "share_coded_2071_or_later", "share_coded_2072"],
+    "x25_recent_year_nulls.csv": ["outcome", "family", "n_sources", "observed_ward_icc", "null_q025",
+                                  "null_q975", "null_max", "p_nominal", "n_null"],
+    "x25_worldcover_by_ward.csv": ["ward", "n_comparable_sources",
+                                   "share_recorded_cover_not_largest_worldcover_class", "recorded_drying_rate"],
+    "x25_spatially_isolated_sources.csv": ["subset", "n_records", "n_non_tied_comparisons",
+                                           "share_matches_recorded_ward_majority",
+                                           "share_matches_10_nearest_source_majority",
+                                           "ward_minus_local_match", "block_boot_ci_low", "block_boot_ci_high",
+                                           "bootstrap_blocks"],
+    "x25_ascertainment_checks.csv": ["check", "n", "estimate", "detail"],
+    "x27_full_rank_residual_icc.csv": ["covariate_set", "n_covariates", "design_rank", "null", "obs", "null_q975",
+                                       "null_max", "n_exceed", "p_one_sided"],
+    "x27_full_rank_earthquake.csv": ["covariate_set", "model", "term", "coef_per_sd", "ci_low", "ci_high",
+                                     "ci_excludes_zero"],
+    "x28_latent_icc.csv": ["block", "subset", "outcome", "unit", "null", "observed_obs", "observed_null_max",
+                           "observed_p_one_sided", "latent_obs", "latent_null_q975", "latent_null_max",
+                           "latent_n_exceed", "latent_p_one_sided"],
+    "x28_latent_icc_contrasts.csv": ["contrast", "scale", "difference", "se", "ci_low", "ci_high", "p_one_sided",
+                                     "n_blocks"],
+    "x26_ward_polygon_icc.csv": ["unit", "sample", "n_sources", "n_units", "outcome", "null", "obs", "null_q975",
+                                 "null_max", "n_exceed", "p_one_sided"],
+    "x13_matched_count_icc.csv": ["unit", "n_units", "obs", "null_mean", "null_q975", "null_max", "z", "n_null",
+                                  "n_exceed", "p_one_sided"],
+    "x14_pair_robustness.csv": ["population", "term", "n_pairs", "log_odds", "boot_ci_low", "boot_ci_high",
+                                "boot_p_one_sided", "boot_skewness", "se_dyadic", "dyadic_ci_low", "dyadic_ci_high",
+                                "dyadic_p_two_sided", "loo_block_min", "loo_block_max"],
+    "pm_drying_rules.csv": ["consequent", "antecedent", "n", "support", "confidence", "lift", "wracc", "q_bh",
+                            "mh_or_ward", "mh_ci_low", "mh_ci_high", "share_wards_lift_gt1", "heldout_replication",
+                            "reverses_within_wards"],
+}
+SI_NUMBERS = {key: k + 1 for k, (key, _) in enumerate(SI_ORDER)}
+
+# Former SI list, kept for reference to the metric files (no longer printed in the supplement)
+_SI_ALL = [
+    # landscape typology
+    ("un_pca_variance.csv", "Principal components of the static landscape covariates", None),
+    ("un_typology_selection.csv", "Gaussian-mixture model selection: BIC and bootstrap stability", None),
+    ("un_typology_drying.csv", "Drying rate by landscape type (95 % Wilson CI)", None),
+    ("un_typology_profiles.csv", "Mean standardised covariates (and survey composition) by landscape type", None),
+    ("un_typology_vs_ward_lrt.csv", "Landscape type vs ward: likelihood-ratio tests", None),
+    ("un_typology_summary.csv", "Association strengths (bias-corrected Cramér's V)", None),
     # spatial structure
-    ("spatial_autocorrelation_distance_decay.csv", "Table S17. Global Moran's I distance decay", None),
-    ("lisa_cluster_summary.csv", "Table S18. LISA clusters (k = 7; BH-FDR)", None),
-    ("sa_variation_partitioning.csv", "Table S19. Environment vs Moran-eigenvector space (adjusted pseudo-R²)", None),
-    ("sa_variation_by_scale.csv", "Table S20. Spatial fraction by MEM scale band", None),
-    ("sa_scan_clusters.csv", "Table S21. Bernoulli spatial scan clusters (999 Monte Carlo replicates)",
-     ["analysis", "rank", "radius_m", "n_sources", "cases", "observed_rate", "rate_outside", "relative_risk", "llr", "p_value",
-      "center_lat", "center_lon"]),
-    ("sa_scan_ward_alignment.csv", "Table S22. Ward concentration of significant scan clusters vs random windows", None),
+    ("spatial_autocorrelation_distance_decay.csv", "Global Moran's I distance decay", None),
     # wards vs watersheds
-    ("ca_unit_icc.csv", "Table S23. ICC of drying: DEM catchments, wards, municipalities vs size-matched grids", None),
-    ("un_regionalisation.csv", "Table S24. Label-free regionalisations vs wards: landscape and drying homogeneity", None),
-    ("sa_ward_concordance.csv", "Table S25. Status concordance of spring pairs by distance band, within vs across wards", None),
-    ("ca_pair_concordance_logit.csv", "Table S26. Pair concordance ~ same catchment + same ward + log distance", None),
-    ("sa_directional_test.csv", "Table S27. Upslope vs downslope neighbour dependence (permutation test)", None),
-    ("ca_flowpath_logit.csv", "Table S28. Flow-path covariates with and without environmental adjustment", None),
-    ("dr_three_way_partition.csv", "Table S29. Three-way variation partitioning: environment, space, ward", None),
-    ("un_ward_funnel_summary.csv", "Table S30. Ward funnel plot against a landscape-only model: overdispersion", None),
-    ("un_ward_funnel.csv", "Table S31. Observed and landscape-expected dried sources per ward", None),
+    ("ca_unit_icc.csv", "ICC of drying: DEM catchments, wards, municipalities vs size-matched grids", None),
+    ("un_regionalisation.csv", "Label-free landscape regions vs wards: landscape and drying homogeneity", None),
+    ("sa_ward_concordance.csv", "Status concordance of spring pairs by distance band, within vs across wards", None),
+    ("ca_pair_concordance_logit.csv", "Pair concordance ~ same catchment + same ward + log distance", None),
+    ("sa_directional_test.csv", "Upslope vs downslope neighbour dependence (permutation test)", None),
+    ("ca_flowpath_logit.csv", "Flow-path covariates with and without environmental adjustment", None),
+    ("dr_three_way_partition.csv", "Three-way variation partitioning: environment, space, ward", None),
+    ("un_ward_funnel_summary.csv", "Ward funnel plot against a landscape-only model: overdispersion", None),
+    ("un_ward_funnel.csv", "Observed and landscape-expected dried sources per ward", None),
     # apriori pattern mining
-    ("pm_drying_rules_summary.csv", "Table S32. Apriori drying rules: counts, ward robustness, replication", None),
-    ("pm_seasonal_flag.csv", "Table S33. The survey seasonal-flow flag (analysed separately)", None),
-    ("pm_drying_rules.csv", "Table S34. Significant productive apriori rules (BH-FDR q < 0.05), ranked by WRAcc",
+    ("pm_drying_rules_summary.csv", "Apriori drying rules: counts, ward robustness, replication", None),
+    ("pm_seasonal_flag.csv", "The survey seasonal-flow flag (analysed separately)", None),
+    ("pm_drying_rules.csv", "Significant productive apriori rules (BH-FDR q < 0.05), ranked by WRAcc",
      ["consequent", "antecedent", "n", "support", "confidence", "lift", "wracc", "q_bh", "mh_or_ward", "mh_ci_low",
       "mh_ci_high", "share_wards_lift_gt1", "heldout_replication", "reverses_within_wards"]),
     # recalled causes and years
-    ("drying_reasons.csv", "Table S35. Reported reason of drying", None),
-    ("drying_timing_summary.csv", "Table S36. Reported timing of drying", None),
-    ("sa_knox_test.csv", "Table S37. Knox space-time test of reported drying year, within vs across wards", None),
-    ("un_dried_icc.csv", "Table S38. Ward and landscape-type structure of reported causes and years among dried sources", None),
-    ("pm_narrative_rules.csv", "Table S39. Apriori narrative rules among dried sources (ward-stratified)",
-     ["consequent", "antecedent", "n", "support", "confidence", "lift", "q_bh", "mh_or_ward", "mh_ci_low", "mh_ci_high",
-      "ward_robust"]),
-    ("un_type_by_reason.csv", "Table S40. Reported cause by landscape type (row shares)", None),
-    ("un_narrative_k_selection.csv", "Table S41. Ward narrative regimes: silhouette by number of clusters", None),
-    ("un_narrative_regimes.csv", "Table S42. Ward narrative regimes: mean profiles", None),
-    ("un_narrative_mantel.csv", "Table S43. Mantel tests: narrative similarity vs geography and landscape", None),
+    ("drying_reasons.csv", "Reported reason of drying", None),
+    ("drying_timing_summary.csv", "Reported timing of drying", None),
+    ("sa_knox_test.csv", "Knox space-time test of reported drying year, within vs across wards", None),
+    ("un_dried_icc.csv", "Ward and landscape-type structure of reported causes and years among dried sources", None),
+    ("un_type_by_reason.csv", "Reported cause by landscape type (row shares)", None),
     # drivers and earthquake
-    ("dr_pooled_vs_within_ward.csv", "Table S44. Drivers of drying: pooled vs ward fixed effects (per SD, 95 % block-bootstrap CI)", None),
-    ("sa_seismic_quintiles.csv", "Table S45. Drying by quintile of 2015 shaking and aftershock exposure", None),
-    ("sa_seismic_logit.csv", "Table S46. Seismic exposure models (per SD, 95 % block-bootstrap CI)", None),
-    ("cause_specific_auc.csv", "Table S47. Pooled out-of-fold ROC-AUC by reported cause (spatial CV, no buffer)", None),
-    # graphs
-    ("gt_topology_graph_stats.csv", "Table S48. Graph topologies: edge length and label assortativity", None),
-    ("gt_topology_summary.csv", "Table S49. GNN performance by graph topology", None),
-    ("gt_topology_paired.csv", "Table S50. GNN topology comparisons (corrected resampled t-test)", None),
-    ("hydroboost_selection_summary.csv", "Table S51. HydroBoost-GAT blend parameters selected on validation folds", None),
-    # robustness (review)
-    ("rb_sensitivity_subsets.csv", "Table S52. Sensitivity of the main results to excluding ponds and seasonal sources", None),
-    ("rb_validation_distances.csv", "Table S53. Distance from test sources to the nearest training source by validation design", None),
-    ("rb_seismic_within_ward_variance.csv", "Table S54. Share of earthquake-exposure variance within wards", None),
-    ("rb_seismic_adjusted.csv", "Table S55. Earthquake exposure with ward fixed effects or Moran-eigenvector adjustment", None),
+    ("dr_pooled_vs_within_ward.csv", "Drivers of drying: pooled vs ward fixed effects (per SD, 95 % block-bootstrap CI)", None),
+    ("sa_seismic_quintiles.csv", "Drying by quintile of 2015 shaking and aftershock exposure", None),
+    ("sa_seismic_logit.csv", "Seismic exposure models, including attribution and dating among dried sources", None),
+    ("cause_specific_auc.csv", "Pooled out-of-fold ROC-AUC by reported cause (spatial CV, no buffer)", None),
+    # robustness
+    ("rb_sensitivity_subsets.csv", "Sensitivity of the ward analyses to the population (ponds, seasonal sources, location)", None),
+    ("rb_validation_distances.csv", "Distance from test sources to the nearest training source by validation design", None),
+    ("rb_seismic_within_ward_variance.csv", "Share of earthquake-exposure variance within wards", None),
+    ("rb_seismic_adjusted.csv", "Earthquake exposure with ward fixed effects or Moran-eigenvector adjustment", None),
+    # data quality
+    ("boundary_agreement.csv", "Recorded palika vs. official palika polygon containing each source", None),
 ]
 
 
@@ -323,87 +382,63 @@ def run_report():
     audit.to_csv(METRICS_DIR / "leakage_audit.csv", index=False)
     rules = single_feature_rule_scores(df)
     rules.to_csv(METRICS_DIR / "single_feature_auc.csv", index=False)
-    rule_auc = float(rules.loc[rules.feature == "earthquake_impact_known", "single_feature_auc"].iloc[0])
 
-    fig_benchmark(summary)
-    fig_leakage(summary, rule_auc)
-    lomo = lomo_table(folds, df)
+    lomo_table(folds, df)   # writes results/tables/lomo_per_municipality_auc.csv
 
-    hb = pd.concat([pd.read_csv(p) for p in METRICS_DIR.glob("hydroboost_selected_params_*.csv")
-                    if "_quick" not in p.name and p.stat().st_size > 10])  # profiles without HydroBoost write an empty file
-    hb = hb[hb.feature_set.isin(["env_hydro", "env_hydro_season", "leaky_reference"])]
-    hb_sel = (hb[hb.variant == "HydroBoost-GAT"].groupby(["profile", "feature_set", "buffer_m"])
-              .agg(folds=("w_catboost", "size"), mean_w_catboost=("w_catboost", "mean"),
-                   share_w0=("w_catboost", lambda v: (v == 0).mean()), share_w1=("w_catboost", lambda v: (v == 1).mean()),
-                   share_no_diffusion=("beta", lambda v: (v == 0).mean())).reset_index())
-    hb_sel.to_csv(METRICS_DIR / "hydroboost_selection_summary.csv", index=False)
-
-    # ---------------- SI tables (markdown for the repository, LaTeX for the paper/arXiv) ----------------
-    n_seeds = folds[folds.profile == "main"].seed.nunique()
-    tabs = []  # (title, note, DataFrame)
-    tabs.append(("Table S2. Survey skip-logic leakage audit",
-                 "Missingness of survey fields among active vs dried sources (fields with |gap| > 0.05).",
-                 audit[audit.skip_logic_leak][["column", "missing_active", "missing_dried", "missingness_gap"]].round(3)))
-    tabs.append(("Table S3. ROC-AUC of single features used alone (no model)", "", rules.round(3)))
-    for buf, tag, label in [(0.0, "a", "no buffer (interpolation)"), (500.0, "b", "500 m buffer (extrapolation)")]:
-        tabs.append((f"Table S4{tag}. Spatial block 5-fold CV, {label}, env_hydro ({n_seeds} seeds x 5 folds)", "",
-                     benchmark_table(summary, "main", buf)))
-        tabs.append((f"Table S4{tag} (continued). Paired comparison against the best tabular model (ROC-AUC)", "",
-                     tests_table(core_tests[core_tests.metric == "roc_auc"], "main", buf, models=CORE_ORDER)))
-    if lomo is not None:
-        tabs.append(("Table S5. Leave-one-municipality-out (500 m buffer), env_hydro", "",
-                     benchmark_table(summary, "lomo", 500.0)))
-        tabs.append(("Table S5 (continued). Paired comparison (LOMO)", "",
-                     tests_table(core_tests[core_tests.metric == "roc_auc"], "lomo", 500.0, models=CORE_ORDER)))
-        tabs.append(("Table S5 (continued). ROC-AUC per held-out municipality (mean over seeds)", "", lomo))
+    # ---------------- supplementary tables for the analysis record ----------------
+    built = {}  # key -> (note, DataFrame) for the tables assembled here rather than read from a metric file
+    built["leakage"] = ("Missingness of survey fields among active vs dried sources (fields with |gap| > 0.05).",
+                        audit[audit.skip_logic_leak][["column", "missing_active", "missing_dried",
+                                                      "missingness_gap"]].round(3))
+    built["single"] = ("", rules.round(3))
     fs_rows = []
-    for fs in ["env", "env_hydro", "env_rich", "env_hydro_season", "env_hydro_seismic", "leaky_reference"]:
+    for fs in ["env", "env_hydro", "env_rich", "env_hydro_season", "leaky_reference"]:
         s = summary[(summary.feature_set == fs) & (summary.buffer_m == 0)]
         for _, r in s.iterrows():
             fs_rows.append({"Feature set": fs, "n features": len(FEATURE_SETS.get(fs, [])), "Model": r.model,
                             "ROC-AUC": fmt(r.roc_auc_mean, r.roc_auc_sd), "PR-AUC": fmt(r.pr_auc_mean, r.pr_auc_sd)})
-    tabs.append(("Table S6. Feature-set sensitivity (spatial CV, no buffer)", "", pd.DataFrame(fs_rows)))
-    # buffer-distance sensitivity (review): env_hydro, spatial CV with 0-2 km buffers, plus LOMO
-    bf = folds[(folds.feature_set == "env_hydro") & folds.profile.isin(["main", "buffers", "lomo"])
-               & folds.model.isin(["Logistic Regression", "Random Forest", "CatBoost"])].copy()
-    if len(bf):
-        bf["design"] = np.where(bf.profile == "lomo", "LOMO (500 m buffer)",
-                                "spatial CV, buffer " + bf.buffer_m.astype(int).astype(str) + " m")
-        bt = (bf.groupby(["design", "model"]).roc_auc.agg(["mean", "std", "size"]).reset_index()
-              .assign(**{"ROC-AUC": lambda d: [fmt(m, s) for m, s in zip(d["mean"], d["std"])]})
-              .pivot(index="design", columns="model", values="ROC-AUC"))
-        order = [d for d in ["spatial CV, buffer 0 m", "spatial CV, buffer 500 m", "spatial CV, buffer 1000 m",
-                             "spatial CV, buffer 2000 m", "LOMO (500 m buffer)"] if d in bt.index]
-        tabs.append(("Table S6 (continued). ROC-AUC by distance between test and training sources, env_hydro",
-                     "Spatial CV 5 seeds x 5 folds; LOMO 3 seeds x 7 municipalities. Distances in Table S53.",
-                     bt.loc[order].reset_index()))
-    pt = paired_tests(folds[folds.profile == "main"], "ResGATv2", [m for m in folds.model.unique() if "placebo" in m], "roc_auc")
-    tabs.append(("Table S7. ResGATv2 placebo graphs (paired vs ResGATv2, ROC-AUC)", "",
-                 pd.DataFrame({"Feature set": pt.feature_set, "Buffer (m)": pt.buffer_m.astype(int), "Model": pt.model,
-                               "dROC-AUC [95% CI]": [f"{r.mean_diff:+.3f} [{r.ci95_low:+.3f}, {r.ci95_high:+.3f}]"
-                                                     for _, r in pt.iterrows()],
-                               "p (Holm)": [f"{r.p_holm:.3g}" for _, r in pt.iterrows()]})))
-    for name, title, cols in SI_TABLES:
-        p = METRICS_DIR / name
-        if p.exists() and p.stat().st_size > 10:
-            t = pd.read_csv(p)
-            if cols:
-                t = t[[c for c in cols if c in t.columns]]
-            if name == "pm_drying_rules.csv":
-                t = pd.concat([t[t.consequent == c].head(40) for c in ["dried", "active"]])
-            tabs.append((title, "", t.round(4)))
-        else:
-            logger.warning(f"SI table source missing: {name}")
+    built["featuresets"] = ("Mean ± SD over 5 seeds x 5 spatial folds.", pd.DataFrame(fs_rows))
+    roc_tests = core_tests[core_tests.metric == "roc_auc"]
+    paired = [tests_table(roc_tests, prof, buf, models=CORE_ORDER).assign(Design=design)
+              for prof, buf, design in [("main", 0.0, "spatial CV, no buffer"), ("main", 500.0, "spatial CV, 500 m buffer"),
+                                        ("lomo", 500.0, "unseen municipality (LOMO)")]
+              if not roc_tests[(roc_tests.profile == prof) & (roc_tests.buffer_m == buf)].empty]
+    if paired:
+        p = pd.concat(paired, ignore_index=True)
+        built["paired"] = ("env_hydro covariates. Positive differences favour the model over the reference.",
+                           p[["Design"] + [c for c in p.columns if c != "Design"]])
+
+    tabs = []  # (title, note, DataFrame)
+    for key, title in SI_ORDER:
+        label = f"Table S{SI_NUMBERS[key]}. {title}"
+        if key in built:
+            tabs.append((label, *built[key]))
+            continue
+        path = METRICS_DIR / key
+        if not (path.exists() and path.stat().st_size > 10):
+            logger.warning(f"SI table source missing: {key}")
+            continue
+        t = pd.read_csv(path)
+        if key in SI_COLUMNS:
+            t = t[[c for c in SI_COLUMNS[key] if c in t.columns]]
+        if key == "pm_drying_rules.csv":
+            t = pd.concat([t[t.consequent == c].head(40) for c in ["dried", "active"]])
+        tabs.append((label, "", t.round(4)))
 
     parts = ["# Auto-generated SI tables", "",
              "_Generated by `python -m src.report` from `results/metrics/`. Do not edit by hand; re-run the pipeline. "
              "Benchmark values are mean ± SD over seeds × folds; tests use the corrected resampled t-test with Holm "
-             "adjustment. Table S1 (covariate definitions) is in the Supplement text._", ""]
+             "adjustment. Every other result table is in `results/metrics/`._", ""]
     for title, note, t in tabs:
         parts += [f"## {title}", ""] + ([note, ""] if note else []) + [md_table(t), ""]
     SI_PATH.write_text("\n".join(parts), encoding="utf-8")
-    (SI_PATH.parent / "si_tables.tex").write_text("\n".join(latex_table(*x) for x in tabs), encoding="utf-8")
-    logger.info(f"Wrote {SI_PATH} and si_tables.tex ({len(tabs)} tables)")
+    logger.info(f"Wrote {SI_PATH} ({len(tabs)} tables)")
+    if SI_TEX.parent.exists():   # LaTeX version for the supplement (paper/ is kept outside version control)
+        tex = ["% Auto-generated by `python -m src.report` from results/metrics/. Do not edit by hand.",
+               r"\section*{Supplementary tables}"]
+        tex += [latex_table(title, note, t) for title, note, t in tabs]
+        SI_TEX.write_text("\n".join(tex), encoding="utf-8")
+        logger.info(f"Wrote {SI_TEX} ({len(tabs)} tables)")
     return summary, core_tests
 
 
@@ -417,24 +452,78 @@ def tex_escape(v) -> str:
     if isinstance(v, float):
         if np.isnan(v):
             return "--"
-        v = f"{v:.4g}" if abs(v) < 1e4 else f"{v:.0f}"
+        if np.isinf(v):
+            return "inf" if v > 0 else "-inf"
+        if v == int(v) or abs(v) >= 100:
+            v = f"{v:.0f}"
+        else:
+            v = f"{v:.3g}"
     s = str(v)
     return "".join(_TEX_ESC.get(ch, ch if ord(ch) < 128 else "?") for ch in s)
 
 
-def latex_table(title, note, t: pd.DataFrame, max_rows=45) -> str:
+def _stack(text: str, width: int) -> str:
+    """Break a header or long text cell into short lines inside a one-column tabular."""
+    words, lines, cur = text.split(), [], ""
+    for w in words:
+        if cur and len(cur) + 1 + len(w) > width:
+            lines.append(cur)
+            cur = w
+        else:
+            cur = f"{cur} {w}".strip()
+    lines.append(cur)
+    if len(lines) == 1:
+        return lines[0]
+    # "{}" after each break stops a following "[" from being read as the break's optional argument
+    return "\\begin{tabular}[t]{@{}l@{}}" + " \\\\{} ".join(lines) + "\\end{tabular}"
+
+
+def _header(c) -> str:
+    return "\\textbf{" + _stack(tex_escape(str(c).replace("_", " ")), 12) + "}"
+
+
+def _cell(v) -> str:
+    s = tex_escape(v)
+    return _stack(s, 22) if isinstance(v, str) and len(s) > 24 else s
+
+
+TRANSPOSE_MIN_COLUMNS = 8   # short tables wider than this are transposed
+TRANSPOSE_MAX_ROWS = 8
+
+
+def latex_table(title, note, t: pd.DataFrame, max_rows=40) -> str:
+    """One supplementary table as a non-floating block, so tables follow each other on the page.
+
+    Short, wide tables (more than TRANSPOSE_MIN_COLUMNS columns and at most TRANSPOSE_MAX_ROWS rows) are transposed
+    so that their many metrics become rows; long tables are split into chunks of max_rows rows."""
     t = t.reset_index(drop=True) if t.index.name is None else t.reset_index()
-    more = len(t) - max_rows
-    t = t.head(max_rows)
-    head = " & ".join(r"\textbf{" + tex_escape(c) + "}" for c in t.columns)
-    body = "\n".join(" & ".join(tex_escape(v) for v in r) + r" \\" for r in t.itertuples(index=False))
-    tail = (f"\n\\par\\footnotesize {more} further rows in \\texttt{{paper/si\\_generated\\_tables.md}} and "
-            f"\\texttt{{results/metrics}}." if more > 0 else "")
-    note_tex = f"\\par\\footnotesize {tex_escape(note)}" if note else ""
-    return (f"\\begin{{table}}[!htbp]\\centering\\scriptsize\n\\caption*{{\\textbf{{{tex_escape(title)}}}}}\n"
-            f"\\begin{{adjustbox}}{{max width=\\linewidth, max totalheight=0.85\\textheight}}\n"
+    if max_rows < 1:
+        raise ValueError("max_rows must be positive")
+    if len(t.columns) > TRANSPOSE_MIN_COLUMNS and 1 <= len(t) <= TRANSPOSE_MAX_ROWS:
+        first = t.columns[0]
+        labels = [str(v) for v in t[first]]
+        if len(set(labels)) < len(labels):          # keep columns distinct when the first column repeats
+            labels = [f"{v} ({i + 1})" for i, v in enumerate(labels)]
+        t = t.drop(columns=first).T
+        t.columns = labels
+        t = t.reset_index().rename(columns={"index": str(first).replace("_", " ")})
+        t.iloc[:, 0] = [str(v).replace("_", " ") for v in t.iloc[:, 0]]
+    head = " & ".join(_header(c) for c in t.columns)
+    parts = []
+    for start in range(0, max(len(t), 1), max_rows):
+        chunk = t.iloc[start:start + max_rows]
+        body = "\n".join(" & ".join(_cell(v) for v in r) + r" \\" for r in chunk.itertuples(index=False))
+        caption = title if start == 0 else f"{title} (continued)"
+        note_tex = (f"\\par\\smallskip{{\\scriptsize {tex_escape(note)}\\par}}"
+                    if note and start + max_rows >= len(t) else "")
+        parts.append(
+            "\\begin{center}\\footnotesize\n"
+            f"\\captionof*{{table}}{{\\textbf{{{tex_escape(caption)}}}}}\n"
+            "\\begin{adjustbox}{max width=\\linewidth, max totalheight=0.9\\textheight}\n"
             f"\\begin{{tabular}}{{{'l' * len(t.columns)}}}\n\\toprule\n{head} \\\\\n\\midrule\n{body}\n\\bottomrule\n"
-            f"\\end{{tabular}}\n\\end{{adjustbox}}{note_tex}{tail}\n\\end{{table}}\n\\clearpage\n")
+            f"\\end{{tabular}}\n\\end{{adjustbox}}{note_tex}\n\\end{{center}}\n\\medskip\n"
+        )
+    return "".join(parts)
 
 
 if __name__ == "__main__":

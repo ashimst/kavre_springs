@@ -2,7 +2,6 @@
 
 import pytest
 import pandas as pd
-import numpy as np
 from pathlib import Path
 
 CLEAN_CSV = Path("data/processed/clean_springs.csv")

@@ -1,15 +1,14 @@
 """
-Drivers of drying that survive survey-team structure.
+Conditional associations of recorded drying status.
 
 D1. Standardised logistic coefficients of env_hydro covariates (without latitude/longitude), pooled vs
-    with ward fixed effects (75 wards = 75 survey teams), with 95 % spatial-block bootstrap CIs.
-    Associations that persist within wards cannot be explained by between-team differences in how
-    "dried" was recorded or by any other ward-level factor.
+    with ridge-penalized ward indicators, with 95 % spatial-block bootstrap CIs. Ward membership is
+    not an observed enumerator identifier, and these conditional associations do not identify their cause.
 D2. Three-way variation partitioning of drying (adjusted McFadden pseudo-R^2) between
     E = environment (env_hydro without lat/lon), S = spatial structure (positive Moran eigenvector
     maps of the k-NN graph) and W = ward membership.
 
-Outputs: results/metrics/dr_*.csv, results/figures/dr_drivers.png
+Outputs: results/metrics/dr_*.csv (figures: src/figures.py)
 Usage:   python -m src.drivers_analysis
 """
 
@@ -30,14 +29,13 @@ os.environ.setdefault("MPLCONFIGDIR", str(PROJECT_ROOT / ".matplotlib"))
 import matplotlib
 
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 
-from src.features import FEATURE_SETS, explanatory_columns
-from src.graph_builder import coords_to_metric, load_master
+from src.features import explanatory_columns
+from src.dataset import coords_to_metric, load_master
 from src.spatial_analysis import _adj_r2, mem_eigenvectors
 from src.spatial_splits import grid_block_ids
 
@@ -76,9 +74,9 @@ def pooled_vs_within(df, blocks, n_boot=300):
     return out
 
 
-def three_way_partition(df, coords):
+def three_way_partition(df, coords, cols=None, write=True):
     y = df.target_dried.to_numpy()
-    cols = explanatory_columns(df)
+    cols = cols or explanatory_columns(df)
     E = StandardScaler().fit_transform(df[cols].fillna(df[cols].median()).to_numpy(float))
     _, S = mem_eigenvectors(coords)
     W = pd.get_dummies(df.municipality.astype(str) + "_" + df.ward.astype(str), drop_first=True, dtype=float).to_numpy()
@@ -96,38 +94,10 @@ def three_way_partition(df, coords):
         "unexplained": 1 - R["ESW"],
     }
     out = pd.DataFrame({"fraction": list(frac), "adj_pseudo_r2": list(frac.values())})
-    out.to_csv(METRICS / "dr_three_way_partition.csv", index=False)
-    pd.DataFrame([R]).to_csv(METRICS / "dr_three_way_r2.csv", index=False)
+    if write:
+        out.to_csv(METRICS / "dr_three_way_partition.csv", index=False)
+        pd.DataFrame([R]).to_csv(METRICS / "dr_three_way_r2.csv", index=False)
     return out, R
-
-
-def figure(coefs, part):
-    fig, axes = plt.subplots(1, 2, figsize=(14, 6.5), gridspec_kw={"width_ratios": [1.4, 1]})
-    ax = axes[0]
-    p = coefs[coefs.model == "pooled"].set_index("term")
-    w = coefs[coefs.model != "pooled"].set_index("term")
-    order = p.coef_per_sd.abs().sort_values().index
-    yy = np.arange(len(order))
-    for off, t, col, lab in [(-0.18, p, "#8C8C8C", "pooled"), (0.18, w, "#C44E52", "within ward")]:
-        t = t.loc[order]
-        ax.errorbar(t.coef_per_sd, yy + off, xerr=[t.coef_per_sd - t.ci_low, t.ci_high - t.coef_per_sd], fmt="o",
-                    ms=3, color=col, capsize=2, label=lab)
-    ax.axvline(0, c="k", lw=0.8)
-    ax.set_yticks(yy)
-    ax.set_yticklabels(order, fontsize=7)
-    ax.set_xlabel("Standardised log-odds (95% spatial-block bootstrap CI)")
-    ax.set_title("(a) Associations with drying: pooled vs within ward", fontsize=10)
-    ax.legend(fontsize=8)
-    ax = axes[1]
-    q = part[part.fraction != "unexplained"]
-    ax.barh(q.fraction, q.adj_pseudo_r2, color="#4C72B0")
-    ax.axvline(0, c="k", lw=0.8)
-    ax.set_xlabel("Adjusted McFadden pseudo-R²")
-    ax.set_title(f"(b) Variation partitioning (unexplained {part.set_index('fraction').adj_pseudo_r2['unexplained']:.2f})",
-                 fontsize=10)
-    fig.tight_layout()
-    fig.savefig(FIGS / "dr_drivers.png", dpi=300)
-    plt.close(fig)
 
 
 def run():
@@ -138,7 +108,6 @@ def run():
     logger.info("\n" + coefs.round(3).to_string())
     part, R = three_way_partition(df, coords)
     logger.info("\n" + part.round(4).to_string() + "\n" + str({k: round(v, 4) for k, v in R.items()}))
-    figure(coefs, part)
 
 
 if __name__ == "__main__":

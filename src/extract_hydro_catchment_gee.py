@@ -20,10 +20,9 @@ Features extracted:
    - pdsi: Palmer Drought Severity Index (2018-2023 mean)
 """
 
-import sys, os, time
+import sys, time
 from pathlib import Path
 import pandas as pd
-import numpy as np
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:

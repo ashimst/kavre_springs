@@ -1,4 +1,4 @@
-"""Unit tests for the statistical building blocks of the spatial, catchment and unsupervised analyses."""
+"""Unit tests for the statistical building blocks of the catchment, unsupervised, rule-mining and robustness analyses."""
 
 from pathlib import Path
 
@@ -8,7 +8,6 @@ import pytest
 
 from src.catchment_analysis import icc1, matched_grid_null
 from src.features import FORBIDDEN_FEATURES
-from src.spatial_analysis import kulldorff_scan
 from src.unsupervised import ENV_COLS, LANDSCAPE_COLS, cramers_v, env_r2, wilson
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -22,23 +21,38 @@ def test_icc_extremes():
     assert abs(icc1(y, g)) < 0.05                               # random labels -> ~0
 
 
+def test_icc1_uses_unequal_group_size_anova_estimator():
+    groups = np.array(["a", "b", "b", "c", "c", "c"])
+    y = np.array([0, 0, 1, 1, 1, 1], dtype=float)
+    assert icc1(y, groups) == pytest.approx(0.45)
+
+
+def test_top_k_metrics_share_cutoff_ties_fractionally():
+    from src.revision_experiments import _expected_top_k_hits
+    y = np.array([1, 0, 1, 0])
+    scores = np.array([0.9, 0.5, 0.5, 0.1])
+    assert _expected_top_k_hits(y, scores, 2) == pytest.approx(1.5)
+
+
+def test_within_unit_auc_weights_only_case_control_pairs_inside_units():
+    from src.revision_experiments import _weighted_within_unit_auc
+    result = _weighted_within_unit_auc(
+        np.array([1, 0, 1, 0, 1]),
+        np.array([0.9, 0.1, 0.1, 0.9, 0.5]),
+        np.array(["a", "a", "b", "b", "c"]),
+    )
+    assert result["within_unit_auc"] == pytest.approx(0.5)
+    assert result["within_unit_pairs"] == 2
+    assert result["share_case_control_pairs_within_units"] == pytest.approx(1 / 3)
+    assert result["eligible_units"] == 2
+
+
 def test_matched_grid_has_requested_number_of_units():
     coords = rng.uniform(0, 20000, (3000, 2))
     y = rng.integers(0, 2, 3000).astype(float)
     cell, null, counts = matched_grid_null(coords, y, 60, n_shift=20, rng=np.random.default_rng(1))
     assert abs(np.mean(counts) - 60) < 15
     assert np.all(np.abs(null) < 0.1)
-
-
-def test_scan_detects_planted_cluster():
-    coords = rng.uniform(0, 10000, (1500, 2))
-    p = np.where(np.hypot(coords[:, 0] - 3000, coords[:, 1] - 3000) < 1200, 0.8, 0.2)
-    cases = (rng.random(1500) < p).astype(int)
-    cl = kulldorff_scan(coords, cases, n_perm=99, rng=np.random.default_rng(2))
-    top = cl[0]
-    centre = coords[top["center_index"]]
-    assert top["p_value"] <= 0.02 and top["relative_risk"] > 2
-    assert np.hypot(*(centre - 3000)) < 1500
 
 
 def test_unsupervised_inputs_are_label_free():
@@ -98,19 +112,11 @@ def test_apriori_recovers_planted_rule_and_prunes_unproductive():
     assert not noise.productive
 
 
-def test_mantel_identity():
-    from src.unsupervised import mantel
-    pts = rng.normal(size=(30, 2))
-    D = np.sqrt(((pts[:, None] - pts[None]) ** 2).sum(-1))
-    r0, p = mantel(D, D, n_perm=99)
-    assert r0 == pytest.approx(1.0) and p <= 0.02
-
-
 def test_random_regions_match_size_distribution_and_cover_all_nodes():
-    from src.robustness import neighbours, random_regions
+    from src.regions import contiguity_graph, grow_partition
     pts = rng.uniform(0, 10000, (1200, 2))
     sizes = np.array([200, 150, 300, 250, 300])
-    lab = random_regions(neighbours(pts), sizes, np.random.default_rng(1), pts)
+    lab = grow_partition(contiguity_graph(pts), pts, sizes, np.random.default_rng(1))
     assert (lab >= 0).all() and len(np.unique(lab)) == len(sizes)
     got = np.sort(np.bincount(lab))
     assert np.abs(got - np.sort(sizes)).max() <= 60

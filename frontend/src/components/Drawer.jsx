@@ -1,19 +1,20 @@
-import React, { useState } from 'react';
-import { 
-  Building2, 
-  Map, 
-  Layers, 
-  Activity, 
-  BarChart2, 
-  BookOpen, 
-  Globe, 
+import React, { useMemo, useState } from 'react';
+import {
+  Building2,
+  Map,
+  ClipboardCheck,
+  Activity,
+  BarChart2,
+  BookOpen,
+  Globe,
   ExternalLink,
   ShieldCheck,
-  TrendingUp,
   Mountain,
   Compass,
   Trees,
-  Truck
+  Truck,
+  CalendarDays,
+  AlertTriangle
 } from 'lucide-react';
 
 const GithubIcon = ({ size = 14 }) => (
@@ -23,342 +24,267 @@ const GithubIcon = ({ size = 14 }) => (
   </svg>
 );
 
-export default function Drawer({
-  isOpen,
-  onClose,
-  data,
-  selectedPalika,
-  onSelectPalika
-}) {
+const rateClass = (rate, hi = 30, mid = 20) => (rate > hi ? 'high' : rate > mid ? 'med' : 'low');
+const fmt = (v, d = 3) => (v === null || v === undefined ? '–' : Number(v).toFixed(d));
+const signed = (v, d = 3) => (v < 0 ? `−${Math.abs(v).toFixed(d)}` : v.toFixed(d));
+
+function RateChart({ rows, scale = 2.2, hi = 30, mid = 20 }) {
+  return (
+    <div className="custom-bar-chart">
+      {rows.map((r) => (
+        <div key={r.label} className="chart-bar-row">
+          <span className="bar-label truncate tabular-nums" title={r.label}>{r.label}</span>
+          <div className="bar-track-simple">
+            <div className={`bar-simple-fill ${rateClass(r.rate, hi, mid)}`} style={{ width: `${Math.min(r.rate * scale, 100)}%` }} />
+          </div>
+          <span className="bar-count-inline tabular-nums" title={`${r.dried.toLocaleString()} of ${r.total.toLocaleString()} sources`}>
+            <strong>{r.rate}%</strong>
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ChartCard({ icon: Icon, title, badge, note, children }) {
+  return (
+    <div className="chart-card">
+      <div className="chart-card-header">
+        <div className="chart-title-group">
+          <Icon size={14} className="chart-icon" />
+          <h5>{title}</h5>
+        </div>
+        {badge && <span className="chart-badge">{badge}</span>}
+      </div>
+      {note && <p className="chart-sub">{note}</p>}
+      {children}
+    </div>
+  );
+}
+
+export default function Drawer({ isOpen, onClose, data, selectedPalika, onSelectPalika }) {
   const [activeTab, setActiveTab] = useState('analytics');
+
+  const palikas = useMemo(() => (data?.palikas?.features || [])
+    .map((f) => f.properties)
+    .filter((p) => p.surveyed)
+    .sort((a, b) => a.drying_rate - b.drying_rate), [data]);
 
   if (!isOpen) return null;
 
-  const palikas = [
-    { name: 'Panauti', rate: 9.4, count: 447, dried: 42, elev: 1747, road: 142 },
-    { name: 'Bethanchowk', rate: 19.2, count: 1029, dried: 198, elev: 1770, road: 185 },
-    { name: 'Namobuddha', rate: 20.1, count: 452, dried: 91, elev: 1475, road: 120 },
-    { name: 'Roshi', rate: 21.8, count: 1708, dried: 373, elev: 1489, road: 168 },
-    { name: 'Dhulikhel', rate: 28.8, count: 368, dried: 106, elev: 1327, road: 84 },
-    { name: 'Temal', rate: 39.8, count: 679, dried: 270, elev: 1332, road: 154 },
-    { name: 'Panchkhal', rate: 39.9, count: 1006, dried: 401, elev: 1074, road: 110 },
+  const charts = data?.charts || {};
+  const f = data?.findings || {};
+  const icc = f.icc || {};
+  const credits = data?.credits || {};
+  const years = charts.years || [];
+  const maxYear = Math.max(1, ...years.map((y) => y.count));
+
+  const tabs = [
+    { id: 'analytics', icon: BarChart2, label: 'Descriptive charts' },
+    { id: 'units', icon: Building2, label: 'Wards & catchments' },
+    { id: 'palikas', icon: Map, label: 'Palikas' },
+    { id: 'audit', icon: ClipboardCheck, label: 'Survey audit' },
+    { id: 'credits', icon: BookOpen, label: 'Data & credits' }
   ];
 
-  const charts = data?.charts || {};
-
   return (
-    <aside className="insights-drawer glass-panel" aria-label="Scientific Insights Panel">
-      {/* Drawer Header & Tabs */}
+    <aside className="insights-drawer glass-panel" aria-label="Findings panel">
       <div className="drawer-header">
         <div className="drawer-nav">
-          <button
-            type="button"
-            className={`tab-btn ${activeTab === 'analytics' ? 'active' : ''}`}
-            onClick={() => setActiveTab('analytics')}
-          >
-            <BarChart2 size={14} />
-            <span>Charts &amp; Analytics</span>
-          </button>
-          <button
-            type="button"
-            className={`tab-btn ${activeTab === 'governance' ? 'active' : ''}`}
-            onClick={() => setActiveTab('governance')}
-          >
-            <Building2 size={14} />
-            <span>Governance (2.5&times;)</span>
-          </button>
-          <button
-            type="button"
-            className={`tab-btn ${activeTab === 'palikas' ? 'active' : ''}`}
-            onClick={() => setActiveTab('palikas')}
-          >
-            <Map size={14} />
-            <span>Palikas</span>
-          </button>
-          <button
-            type="button"
-            className={`tab-btn ${activeTab === 'typology' ? 'active' : ''}`}
-            onClick={() => setActiveTab('typology')}
-          >
-            <Layers size={14} />
-            <span>Typology (T1–T8)</span>
-          </button>
-          <button
-            type="button"
-            className={`tab-btn ${activeTab === 'credits' ? 'active' : ''}`}
-            onClick={() => setActiveTab('credits')}
-          >
-            <BookOpen size={14} />
-            <span>ICIMOD &amp; Credits</span>
-          </button>
+          {tabs.map(({ id, icon: Icon, label }) => (
+            <button key={id} type="button" className={`tab-btn ${activeTab === id ? 'active' : ''}`} onClick={() => setActiveTab(id)}>
+              <Icon size={14} />
+              <span>{label}</span>
+            </button>
+          ))}
         </div>
-        <button 
-          type="button" 
-          onClick={onClose} 
-          className="drawer-close-btn"
-          title="Minimize drawer"
-        >
-          &times;
-        </button>
+        <button type="button" onClick={onClose} className="drawer-close-btn" title="Minimize drawer">&times;</button>
       </div>
 
-      {/* Drawer Body Content */}
       <div className="drawer-content">
 
-        {/* TAB 1: CHARTS & ANALYTICS */}
+        {/* TAB 1: DESCRIPTIVE CHARTS */}
         {activeTab === 'analytics' && (
           <div className="tab-pane">
             <div className="tab-intro">
-              <h4>Spatial Hydro-Geological Analytics</h4>
-              <p>Key empirical distributions mined across 5,689 surveyed springs in Kavrepalanchok.</p>
-            </div>
-
-            {/* CHART 1: Elevation Gradient */}
-            <div className="chart-card">
-              <div className="chart-card-header">
-                <div className="chart-title-group">
-                  <Mountain size={14} className="chart-icon" />
-                  <h5>Elevation Gradient &amp; Desiccation Rate</h5>
-                </div>
-                <span className="chart-badge">Orography</span>
-              </div>
-              <p className="chart-sub">
-                Higher mountain zones (&gt;1,600m) maintain higher resilience (17% dried) compared to low-elevation valley fringes (&gt;34% dried).
+              <h4>Share of mapped sources recorded as dried</h4>
+              <p>
+                {data.totalSources.toLocaleString()} springs and ponds ({data.springs.toLocaleString()} springs, {data.ponds.toLocaleString()} ponds);
+                {' '}{data.dryingRate}% are recorded as dried. These are raw shares of mapped records, not adjusted for other
+                variables and not estimates of district prevalence.
               </p>
-              <div className="custom-bar-chart">
-                {(charts.elevation || []).map((b) => (
-                  <div key={b.range} className="chart-bar-row">
-                    <span className="bar-label tabular-nums">{b.range}</span>
-                    <div className="bar-track-stacked">
-                      <div 
-                        className="bar-seg-active" 
-                        style={{ width: `${(b.active / 2300) * 100}%` }} 
-                        title={`Active: ${b.active}`}
-                      />
-                      <div 
-                        className="bar-seg-dried" 
-                        style={{ width: `${(b.dried / 2300) * 100}%` }} 
-                        title={`Dried: ${b.dried}`}
-                      />
-                    </div>
-                    <span className={`bar-rate-pill ${b.rate > 30 ? 'high' : b.rate > 20 ? 'med' : 'low'} tabular-nums`}>
-                      {b.rate}%
-                    </span>
-                  </div>
-                ))}
-              </div>
-              <div className="chart-legend-inline">
-                <span className="legend-item"><span className="legend-chip active-chip"></span> Active Springs</span>
-                <span className="legend-item"><span className="legend-chip dried-chip"></span> Dried Springs</span>
-              </div>
             </div>
 
-            {/* CHART 2: Road Distance Hazard Curve */}
-            <div className="chart-card">
-              <div className="chart-card-header">
-                <div className="chart-title-group">
-                  <Truck size={14} className="chart-icon" />
-                  <h5>Distance to Motorable Road Hazard Gradient</h5>
-                </div>
-                <span className="chart-badge warning">Infrastructure</span>
-              </div>
-              <p className="chart-sub">
-                Desiccation hazards drop sharply from <strong>30.1%</strong> within 50m of unpaved rural roads to <strong>18.3%</strong> at distances &gt;250m.
-              </p>
-              <div className="custom-bar-chart">
-                {(charts.road || []).map((r) => (
-                  <div key={r.distance} className="chart-bar-row">
-                    <span className="bar-label tabular-nums">{r.distance}</span>
-                    <div className="bar-track-simple">
-                      <div 
-                        className={`bar-simple-fill ${r.rate > 28 ? 'high' : r.rate > 22 ? 'med' : 'low'}`}
-                        style={{ width: `${r.rate * 2.8}%` }}
-                      />
-                    </div>
-                    <span className="bar-count-inline tabular-nums">
-                      <strong>{r.rate}%</strong> <small>({r.total} springs)</small>
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <ChartCard icon={Mountain} title="By elevation" badge="Terrain">
+              <RateChart rows={charts.elevation || []} />
+            </ChartCard>
 
-            {/* CHART 3: Land Use Resilience */}
-            <div className="chart-card">
-              <div className="chart-card-header">
-                <div className="chart-title-group">
-                  <Trees size={14} className="chart-icon" />
-                  <h5>Land Cover Hydrological Resilience</h5>
-                </div>
-                <span className="chart-badge success">Ecology</span>
-              </div>
-              <p className="chart-sub">
-                Dense forest canopy provides strong groundwater buffer (17.3% dried), while settlement fringes exceed 45% desiccation.
-              </p>
-              <div className="custom-bar-chart">
-                {(charts.landuse || []).map((lu) => (
-                  <div key={lu.landuse} className="chart-bar-row">
-                    <span className="bar-label truncate" title={lu.landuse}>{lu.landuse}</span>
-                    <div className="bar-track-simple">
-                      <div 
-                        className={`bar-simple-fill ${lu.rate > 35 ? 'high' : lu.rate > 25 ? 'med' : 'low'}`}
-                        style={{ width: `${lu.rate * 2.1}%` }}
-                      />
-                    </div>
-                    <span className="bar-count-inline tabular-nums">
-                      <strong>{lu.rate}%</strong>
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <ChartCard icon={Truck} title="By distance to the nearest road" badge="Infrastructure"
+              note="An association in the raw data; roads also follow settlements, valleys and lower ground.">
+              <RateChart rows={charts.road || []} />
+            </ChartCard>
 
-            {/* CHART 4: Aspect Solar Deficit */}
-            <div className="chart-card">
-              <div className="chart-card-header">
-                <div className="chart-title-group">
-                  <Compass size={14} className="chart-icon" />
-                  <h5>Slope Aspect &amp; Solar Insolation Polarity</h5>
-                </div>
-                <span className="chart-badge">Microclimate</span>
-              </div>
-              <p className="chart-sub">
-                South and West facing slopes experience severe afternoon vapor pressure deficit and evapotranspiration stress.
-              </p>
-              <div className="custom-bar-chart">
-                {(charts.aspect || []).map((asp) => (
-                  <div key={asp.quadrant} className="chart-bar-row">
-                    <span className="bar-label truncate" title={asp.quadrant}>{asp.quadrant}</span>
-                    <div className="bar-track-simple">
-                      <div 
-                        className={`bar-simple-fill ${asp.rate > 28 ? 'high' : 'med'}`}
-                        style={{ width: `${asp.rate * 2.8}%` }}
-                      />
-                    </div>
-                    <span className="bar-count-inline tabular-nums">
-                      <strong>{asp.rate}%</strong>
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <ChartCard icon={Trees} title="By land use recorded in the survey" badge="Survey field"
+              note="Land use was recorded by the survey teams and may partly reflect drying rather than precede it.">
+              <RateChart rows={charts.landuse || []} scale={1.8} hi={35} mid={25} />
+            </ChartCard>
 
-            {/* CHART 5: Recalled Community Causes */}
-            <div className="chart-card">
-              <div className="chart-card-header">
-                <div className="chart-title-group">
-                  <Activity size={14} className="chart-icon" />
-                  <h5>Community Recalled Desiccation Drivers</h5>
-                </div>
-                <span className="chart-badge">Oral History</span>
-              </div>
+            <ChartCard icon={Compass} title="By slope aspect" badge="Terrain">
+              <RateChart rows={charts.aspect || []} />
+            </ChartCard>
+
+            <ChartCard icon={Activity} title="Recalled cause of drying" badge="Community recall"
+              note={`Among the ${data.totalDried.toLocaleString()} dried sources. Causes are recalled by communities, often years later, and are not verified.`}>
               <div className="causes-list">
                 {(charts.causes || []).map((c) => (
-                  <div key={c.cause} className="cause-item">
+                  <div key={c.label} className="cause-item">
                     <div className="cause-header">
-                      <span className="cause-name">{c.cause}</span>
+                      <span className="cause-name">{c.label}</span>
                       <span className="cause-pct tabular-nums">{c.pct}% ({c.count})</span>
                     </div>
                     <div className="cause-bar-track">
-                      <div className="cause-bar-fill" style={{ width: `${c.pct * 2.5}%` }} />
+                      <div className="cause-bar-fill" style={{ width: `${Math.min(c.pct * 2.5, 100)}%` }} />
                     </div>
-                    <div className="cause-desc">{c.desc}</div>
                   </div>
                 ))}
               </div>
-            </div>
+            </ChartCard>
+
+            <ChartCard icon={CalendarDays} title="Reported year of drying (treated as Bikram Sambat)" badge="Community recall"
+              note="2072 BS spans April 2015 to April 2016. The field wording is ambiguous and visit dates are unavailable, so the year coding is a working interpretation.">
+              <div className="year-chart" role="img" aria-label="Dried sources by reported year">
+                {years.map((y) => (
+                  <div key={y.year} className={`year-col ${y.year === 2072 ? 'quake' : ''}`} title={`${y.year} BS: ${y.count}`}>
+                    <div className="year-bar" style={{ height: `${(y.count / maxYear) * 100}%` }} />
+                  </div>
+                ))}
+              </div>
+              <div className="year-axis tabular-nums"><span>{years[0]?.year} BS</span><span>red: 2072 BS</span><span>{years[years.length - 1]?.year} BS</span></div>
+            </ChartCard>
           </div>
         )}
 
-        {/* TAB 2: GOVERNANCE VS CATCHMENT */}
-        {activeTab === 'governance' && (
+        {/* TAB 2: WARDS AND CATCHMENTS */}
+        {activeTab === 'units' && (
           <div className="tab-pane">
-            <div className="insight-hero-card">
-              <div className="hero-kpi-row">
-                <div className="hero-kpi-box highlight">
-                  <div className="hero-label">Ward Boundary ICC</div>
-                  <div className="hero-val tabular-nums">0.358</div>
-                  <div className="hero-sub">Administrative Units</div>
-                </div>
-                <div className="hero-vs">vs</div>
-                <div className="hero-kpi-box">
-                  <div className="hero-label">Catchment ICC</div>
-                  <div className="hero-val tabular-nums">0.141</div>
-                  <div className="hero-sub">Hydrological Basins</div>
-                </div>
-                <div className="hero-kpi-box badge-box">
-                  <div className="hero-label">Governance Ratio</div>
-                  <div className="hero-val tabular-nums">2.54&times;</div>
-                  <div className="hero-sub">Ward Dominance</div>
-                </div>
-              </div>
-
-              <h4 className="insight-heading">The Hydro-Governance Discovery</h4>
-              <p className="insight-p">
-                In classical hydrology, natural watersheds and ridge boundaries are assumed to govern spring discharge.
-                Our spatial mixed-effects analysis demonstrates that <strong>local municipal wards explain 2.54 times more variance</strong> in spring drying than topographic drainage basins.
+            <div className="tab-intro">
+              <h4>Does drying cluster within wards or within catchments?</h4>
+              <p>
+                Clustering is measured by the intraclass correlation (ICC): the share of variation in recorded drying that
+                lies between units. It is shown on two scales. The observed (ANOVA) scale is the paper's main measure; the
+                latent (logit) scale does not depend on how common drying is.
               </p>
-
-              <div className="insight-grid">
-                <div className="insight-card">
-                  <div className="card-badge danger">Primary Hazard Mechanism</div>
-                  <h5>Unpaved Rural Road Excavation</h5>
-                  <p>
-                    Local ward infrastructure budgets construct low-cost farm tracks without engineered culverts or hydrogeological surveys, shearing shallow fractured aquifers and diverting recharge away from downslope communities.
-                  </p>
-                </div>
-
-                <div className="insight-card">
-                  <div className="card-badge info">Decentralized Management</div>
-                  <h5>Local Water Diversion Schemes</h5>
-                  <p>
-                    Upstream ward user committees frequently install concrete intake tanks that tap source heads directly, depriving downstream traditional <em>dhunge dharas</em> and community springs of baseflow.
-                  </p>
-                </div>
-              </div>
             </div>
+
+            <div className="chart-card">
+              <h5 className="table-title">ICC of recorded drying by unit</h5>
+              <table className="data-table tabular-nums">
+                <thead><tr><th>Unit</th><th>Observed</th><th>Latent</th></tr></thead>
+                <tbody>
+                  {(icc.units || []).map((u) => (
+                    <tr key={u.unit}>
+                      <td>{u.unit}</td>
+                      <td>{fmt(u.observed)}{u.observed_beats_grids && <span className="mark" title="Above all matched rotated grids"> ▲</span>}</td>
+                      <td>{fmt(u.latent)}{u.latent_beats_grids && <span className="mark" title="Above all matched rotated grids"> ▲</span>}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <p className="table-note">▲ above all 1,000 rotated grids with the same number of cells. Smaller units have higher raw ICCs, so values are compared with their own grids, not with each other.</p>
+            </div>
+
+            <div className="chart-card">
+              <h5 className="table-title">Wards against random reference partitions</h5>
+              <table className="data-table tabular-nums">
+                <thead><tr><th>Outcome</th><th>Reference (1,000 draws)</th><th>Reached by: observed</th><th>latent</th></tr></thead>
+                <tbody>
+                  {(icc.references || []).map((r) => (
+                    <tr key={`${r.outcome}-${r.reference}`}>
+                      <td>{r.outcome}</td>
+                      <td>{r.reference}</td>
+                      <td>{r.observed_exceed}</td>
+                      <td className={r.latent_exceed > 0 ? 'warn-cell' : ''}>{r.latent_exceed}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <p className="table-note">
+                Number of random partitions whose ICC reached the ward ICC. Wards exceed contiguous random regions on both
+                scales, and exceed every reference after covariate adjustment. Unadjusted wards do not exceed rotated grids on
+                the latent scale.
+              </p>
+            </div>
+
+            <div className="chart-card">
+              <h5 className="table-title">Direct ward–catchment differences (ICC)</h5>
+              <table className="data-table tabular-nums">
+                <thead><tr><th>Contrast</th><th>Scale</th><th>Difference (95% interval)</th></tr></thead>
+                <tbody>
+                  {(icc.contrasts || []).map((c) => (
+                    <tr key={`${c.contrast}-${c.scale}`}>
+                      <td>{c.contrast}</td>
+                      <td>{c.scale}</td>
+                      <td>{signed(c.difference)} ({signed(c.low)} to {signed(c.high)})</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <p className="table-note">The data do not rank wards above catchments: the one observed-scale difference that excludes zero disappears on the latent scale.</p>
+            </div>
+
+            <div className="insight-card caution-card">
+              <div className="card-badge info"><AlertTriangle size={11} /> How to read this</div>
+              <p>
+                Ward clustering is descriptive. Simulations show these reference comparisons can over-reject under spatial
+                autocorrelation alone, and the ward signal cannot be separated from survey team, visit timing or ward-level
+                water and road schemes. It is not evidence that ward governance causes drying.
+              </p>
+            </div>
+
+            {(f.withinWardDrivers || []).length > 0 && (
+              <div className="chart-card">
+                <h5 className="table-title">Terrain associations that remain within wards</h5>
+                <table className="data-table tabular-nums">
+                  <thead><tr><th>Covariate</th><th>Log-odds per SD (95% interval)</th></tr></thead>
+                  <tbody>
+                    {f.withinWardDrivers.map((d) => (
+                      <tr key={d.term}><td>{d.term}</td><td>{d.beta.toFixed(2)} ({d.low.toFixed(2)} to {d.high.toFixed(2)})</td></tr>
+                    ))}
+                  </tbody>
+                </table>
+                <p className="table-note">From a ten-covariate model with ward fixed effects; exploratory and not adjusted for multiple comparisons.</p>
+              </div>
+            )}
           </div>
         )}
 
-        {/* TAB 3: PALIKA BENCHMARKS */}
+        {/* TAB 3: PALIKAS */}
         {activeTab === 'palikas' && (
           <div className="tab-pane">
             <div className="tab-intro">
-              <h4>Palika Desiccation Rates (7 Surveyed Municipalities)</h4>
-              <p>Click any municipality to highlight and center the map on its boundary and spring clusters.</p>
+              <h4>Seven surveyed palikas</h4>
+              <p>Share of mapped sources recorded as dried. Click a palika to centre the map on it.</p>
             </div>
-
             <div className="palika-list">
               {palikas.map((p) => {
-                const isSelected = selectedPalika && p.name.toLowerCase().startsWith(selectedPalika.slice(0, 4).toLowerCase());
+                const isSelected = selectedPalika === p.name;
                 return (
-                  <div 
-                    key={p.name}
-                    className={`palika-item ${isSelected ? 'selected' : ''}`}
-                    onClick={() => onSelectPalika(p.name)}
-                  >
+                  <div key={p.name} className={`palika-item ${isSelected ? 'selected' : ''}`} onClick={() => onSelectPalika(p.name)}>
                     <div className="palika-row-top">
                       <div className="palika-name-group">
                         <span className="palika-name">{p.name}</span>
-                        <span className="palika-elev tabular-nums">{p.elev}m mean elev</span>
+                        <span className="palika-elev tabular-nums">{p.mean_elev.toLocaleString()} m mean elevation</span>
                       </div>
                       <div className="palika-rate-group">
-                        <span className={`rate-pill ${p.rate > 30 ? 'high' : p.rate > 20 ? 'med' : 'low'} tabular-nums`}>
-                          {p.rate}% Dried
-                        </span>
+                        <span className={`rate-pill ${rateClass(p.drying_rate)} tabular-nums`}>{p.drying_rate}% dried</span>
                       </div>
                     </div>
-
                     <div className="palika-bar-track">
-                      <div 
-                        className={`palika-bar-fill ${p.rate > 30 ? 'high' : p.rate > 20 ? 'med' : 'low'}`} 
-                        style={{ width: `${p.rate * 2.2}%` }}
-                      />
+                      <div className={`palika-bar-fill ${rateClass(p.drying_rate)}`} style={{ width: `${Math.min(p.drying_rate * 2.2, 100)}%` }} />
                     </div>
-
                     <div className="palika-row-bottom">
-                      <span><strong>{p.count.toLocaleString()}</strong> springs ({p.dried} dried)</span>
-                      <span>Avg {p.road}m to motorable road</span>
+                      <span><strong>{p.total_sources.toLocaleString()}</strong> sources ({p.dried_sources} dried)</span>
+                      <span>Mean {p.mean_road} m to a road</span>
                     </div>
                   </div>
                 );
@@ -367,110 +293,104 @@ export default function Drawer({
           </div>
         )}
 
-        {/* TAB 4: LANDSCAPE TYPOLOGY */}
-        {activeTab === 'typology' && (
+        {/* TAB 4: SURVEY AUDIT */}
+        {activeTab === 'audit' && (
           <div className="tab-pane">
             <div className="tab-intro">
-              <h4>8 Discovered Micro-Catchment Typologies</h4>
-              <p>Derived via hierarchical spatial clustering over elevation, slope aspect, topographic wetness, and road proximity.</p>
+              <h4>What the survey design does to the data</h4>
+              <p>Recorded condition can reflect how the inventory was collected as well as the landscape.</p>
             </div>
 
-            <div className="typology-grid">
-              {(data?.typology || []).map((t) => (
-                <div key={t.id} className="typology-card">
-                  <div className="typology-card-header">
-                    <span className="typology-tag tabular-nums">{t.id}</span>
-                    <span className={`typology-risk ${t.risk.toLowerCase()}`}>{t.risk} Risk</span>
-                  </div>
-                  <h5 className="typology-title">{t.name}</h5>
-                  <div className="typology-stats">
-                    <div>Rate: <strong className="tabular-nums">{t.rate}%</strong></div>
-                    <div>Elev: <strong className="tabular-nums">{t.elev}</strong></div>
-                  </div>
-                  <div className="typology-desc">{t.hazard}</div>
-                </div>
-              ))}
+            <div className="insight-card">
+              <div className="card-badge danger">Questionnaire skip logic</div>
+              <p>
+                {f.skipLogic?.outcomeDependent} of {f.skipLogic?.fields} raw survey fields have missingness that depends on
+                whether the source was recorded as dried. Whether the earthquake question was answered alone predicts the label
+                with ROC-AUC {fmt(f.skipLogic?.completionIndicatorAuc)}. These fields are excluded from every model.
+              </p>
+            </div>
+
+            <div className="insight-card">
+              <div className="card-badge info">Leak-free prediction</div>
+              <p>
+                With terrain, climate, hydrology and road covariates only, spatially blocked ROC-AUC is
+                {' '}{fmt(f.prediction?.aucLow, 2)}–{fmt(f.prediction?.aucHigh, 2)}; ranking within a ward reaches about
+                {' '}{fmt(f.prediction?.withinWardHigh, 2)}. Model scores may help design a validation sample, not select sites.
+              </p>
+            </div>
+
+            <div className="insight-card">
+              <div className="card-badge info">Recorded location vs boundaries</div>
+              <p>
+                {f.location?.insidePalika}% of sources lie inside their recorded palika. Against OpenStreetMap ward polygons,
+                {' '}{f.location?.insideWard}% lie inside their recorded ward and {f.location?.within100m}% within 100 m of it;
+                {' '}{f.location?.adjacentWard}% of the rest fall in a neighbouring ward. In {f.location?.wardsUnderHalf} wards fewer
+                than half of the sources fall inside the polygon of the same name, a pattern more consistent with ward numbering
+                that differs between the survey and the map than with GPS error. Turn on <em>Ward boundaries</em> on the map to see them.
+              </p>
+            </div>
+
+            <div className="insight-card">
+              <div className="card-badge info">Missing information</div>
+              <p>
+                The inventory has no independent frame of all local water sources, no enumerator identifiers and no visit dates,
+                and the drying year and cause rest on recall. The share recorded as dried describes mapped records, not true
+                vulnerability.
+              </p>
             </div>
           </div>
         )}
 
-        {/* TAB 5: ICIMOD & CREDITS */}
+        {/* TAB 5: DATA & CREDITS */}
         {activeTab === 'credits' && (
           <div className="tab-pane">
-            {/* ICIMOD Attribution Card */}
             <div className="credits-card primary">
               <div className="credits-header">
                 <ShieldCheck size={18} className="credits-icon icimod" />
                 <div>
-                  <h4>Data Collection &amp; Field Survey</h4>
-                  <h5>International Centre for Integrated Mountain Development (ICIMOD)</h5>
+                  <h4>Data</h4>
+                  <h5>{credits.dataProvider}</h5>
                 </div>
               </div>
               <p className="credits-body">
-                The baseline dataset of <strong>5,689 springs</strong> across Kavrepalanchok District was surveyed and published by <strong>ICIMOD</strong> in direct partnership with local municipal governments and the <em>Ministry of Energy, Water Resources and Irrigation, Government of Nepal</em> under Open Data principles.
+                <em>{credits.dataTitle}</em>. The inventory of {data.totalSources.toLocaleString()} springs and ponds was collected
+                and published by ICIMOD; the authors of this analysis were not involved in its collection. Licence: {credits.dataLicence}.
               </p>
+              <div className="links-group">
+                <a href={credits.dataDoi} target="_blank" rel="noopener noreferrer" className="credit-link-btn">
+                  <BookOpen size={14} /><span>Dataset DOI</span><ExternalLink size={12} />
+                </a>
+              </div>
               <div className="credits-meta">
-                <span>Coverage: 13 Municipalities (7 completely surveyed)</span>
-                <span>Coordinates: WGS84 GPS Field Verification</span>
+                <span>Palika boundaries: MoFAGA via geoBoundaries (CC BY-SA 4.0)</span>
+                <span>Ward boundaries: OpenStreetMap contributors (ODbL)</span>
               </div>
             </div>
 
-            {/* Author & Organization Attribution */}
             <div className="credits-card secondary">
               <div className="credits-header">
                 <Globe size={18} className="credits-icon noesis" />
                 <div>
-                  <h4>Research &amp; Spatial Data Mining</h4>
-                  <h5>Ashim Shrestha &bull; Noesis Frameworks</h5>
+                  <h4>Analysis</h4>
+                  <h5>{(credits.authors || []).join(' & ')} &bull; {credits.organization}</h5>
                 </div>
               </div>
               <p className="credits-body">
-                Spatial data mining, graph-based hydrological modeling, causal inference, and interactive GIS engineering developed at <strong>Noesis Frameworks</strong>.
+                A spatial audit of the inventory: survey-field leakage checks, spatially blocked prediction, and comparisons of
+                wards and catchments against random reference partitions. Every number on this site is exported from the
+                analysis pipeline in the repository.
               </p>
-              
               <div className="links-group">
-                <a 
-                  href="https://noesisframeworks.com" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="credit-link-btn"
-                >
-                  <Globe size={14} />
-                  <span>noesisframeworks.com</span>
-                  <ExternalLink size={12} />
+                <a href={credits.orgUrl} target="_blank" rel="noopener noreferrer" className="credit-link-btn">
+                  <Globe size={14} /><span>noesisframeworks.com</span><ExternalLink size={12} />
                 </a>
-
-                <a 
-                  href="https://github.com/ashimst/kavre_springs" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="credit-link-btn"
-                >
-                  <GithubIcon size={14} />
-                  <span>GitHub Repository</span>
-                  <ExternalLink size={12} />
-                </a>
-
-                <a 
-                  href="https://github.com/ashimst" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="credit-link-btn"
-                >
-                  <GithubIcon size={14} />
-                  <span>Author GitHub Profile (@ashimst)</span>
-                  <ExternalLink size={12} />
+                <a href={credits.githubUrl} target="_blank" rel="noopener noreferrer" className="credit-link-btn">
+                  <GithubIcon size={14} /><span>Code and data (GitHub)</span><ExternalLink size={12} />
                 </a>
               </div>
             </div>
-
-            {/* Open Source / Cloudflare Edge Notice */}
-            <div className="credits-footer-note">
-              Designed for static edge deployment on <strong>Cloudflare Pages</strong> using React 19, Vite, and Leaflet hardware-accelerated Canvas.
-            </div>
           </div>
         )}
-
       </div>
     </aside>
   );

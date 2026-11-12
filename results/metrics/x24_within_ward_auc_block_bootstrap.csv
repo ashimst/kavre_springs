@@ -1,0 +1,4 @@
+model,within_ward_auc,ci_low,ci_high,n_blocks,n_bootstrap,bootstrap_unit,prediction_summary
+CatBoost,0.660360509539073,0.6060028218832159,0.7140338640309223,44,1000,8-km spatial blocks,OOF probabilities averaged over 5 seeds
+Logistic Regression,0.6506735898376051,0.5871210295220398,0.7029875894907149,44,1000,8-km spatial blocks,OOF probabilities averaged over 5 seeds
+kNN label interpolation,0.5150389724058807,0.47610039490942363,0.5423686484354925,44,1000,8-km spatial blocks,OOF probabilities averaged over 5 seeds

@@ -47,3 +47,16 @@ data/external/
 # Removed experiments and superseded files, kept locally for reference only
 deleted/
 .ruff_cache/
+
+# Overleaf bundle of the manuscript (paper/ is not published with the code)
+*_overleaf.zip
+
+# Agent working notes and scratch files
+.agents/
+
+# Outputs of the removed lifecycle notebooks (see deleted/), not used by the pipeline
+data/processed/lifecycle/
+
+# Third-party Claude Code skill used for editing (installed locally)
+.claude/skills/
+skills-lock.json

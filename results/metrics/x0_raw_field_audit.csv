@@ -1,0 +1,57 @@
+field,missing_active,missing_dried,gap,outcome_dependent,direction,missingness_only_auc,gap_gt_1pp,gap_gt_5pp,gap_gt_10pp
+Reason of drying,1.0,0.0,-1.0,True,dried only,1.0,True,True,True
+Perception on source water quality change,0.0,1.0,1.0,True,skipped for dried,1.0,True,True,True
+Is this source in use?,0.0,1.0,1.0,True,skipped for dried,1.0,True,True,True
+Dried since how many years?,0.9997600767754319,0.0,-0.9997600767754319,True,dried only,0.999880038387716,True,True,True
+Is water source significant for cultural/religious purpose?,0.0004798464491362764,1.0,0.9995201535508638,True,skipped for dried,0.9997600767754319,True,True,True
+Are there water user groups for management?,0.0,0.9993425378040762,0.9993425378040762,True,skipped for dried,0.9996712689020382,True,True,True
+"After this source dried up , was there any activity for revival done in this source?",1.0,0.0006574621959237344,-0.9993425378040762,True,dried only,0.9996712689020382,True,True,True
+Is this source tapped?,0.0009596928982725527,0.9993425378040762,0.9983828449058036,True,skipped for dried,0.9991914224529019,True,True,True
+Perception on source water quality,0.0,0.9980276134122288,0.9980276134122288,True,skipped for dried,0.9990138067061144,True,True,True
+Is this source accessible to everyone in community? (in term of use access),0.0009596928982725527,0.9986850756081526,0.99772538270988,True,skipped for dried,0.9988626913549401,True,True,True
+Any spring revival / pond protection measures taken?,0.0009596928982725527,0.9986850756081526,0.99772538270988,True,skipped for dried,0.9988626913549401,True,True,True
+What was done after source was dried up?,0.994721689059501,0.005917159763313609,-0.9888045292961873,True,dried only,0.9944022646480937,True,True,True
+Trend of spring discharge,0.06261996161228407,1.0,0.9373800383877159,True,skipped for dried,0.9686900191938579,True,True,True
+Source Condition.1,0.0628598848368522,1.0,0.9371401151631478,True,skipped for dried,0.9685700575815739,True,True,True
+How much time did it take to fill the Jar of 20 liter before 10 yr? (minutes),0.0628598848368522,1.0,0.9371401151631478,True,skipped for dried,0.9685700575815739,True,True,True
+"Volume of bucket /bottle (1, 2, 5, 10 or 20 litre)",0.0628598848368522,1.0,0.9371401151631478,True,skipped for dried,0.9685700575815739,True,True,True
+Nature of discharge,0.06309980806142035,1.0,0.9369001919385797,True,skipped for dried,0.9684500959692899,True,True,True
+Approx. distance from the nearest dependent household (metre),0.0628598848368522,0.9993425378040762,0.936482652967224,True,skipped for dried,0.968241326483612,True,True,True
+One-way water fetching time (minutes),0.0628598848368522,0.9993425378040762,0.936482652967224,True,skipped for dried,0.968241326483612,True,True,True
+Time to fill (seconds),0.0628598848368522,0.9993425378040762,0.936482652967224,True,skipped for dried,0.968241326483612,True,True,True
+Water emergence point,0.06309980806142035,0.9993425378040762,0.9362427297426559,True,skipped for dried,0.9681213648713279,True,True,True
+Any impact due to 2015 earthquake?,0.06070057581573896,0.9953977646285339,0.934697188812795,True,skipped for dried,0.9673485944063974,True,True,True
+Current time to fill 20 liter jar (minutes),0.0628598848368522,0.9967126890203813,0.9338528041835291,True,skipped for dried,0.9669264020917645,True,True,True
+Ethnicity of users,0.23032629558541268,1.0,0.7696737044145874,True,skipped for dried,0.8848368522072937,True,True,True
+Purpose of use,0.23032629558541268,1.0,0.7696737044145874,True,skipped for dried,0.8848368522072937,True,True,True
+No. of households dependent on this source,0.23080614203454894,1.0,0.769193857965451,True,skipped for dried,0.8845969289827255,True,True,True
+No. of households dependent on this source only,0.354126679462572,0.9980276134122288,0.6439009339496569,True,skipped for dried,0.8219504669748284,True,True,True
+Ethnicity of users dependent on this source only,0.3814779270633397,0.9993425378040762,0.6178646107407365,True,skipped for dried,0.8089323053703683,True,True,True
+Remarks (source specific comment),0.4846449136276392,0.9914529914529915,0.5068080778253523,True,skipped for dried,0.7534040389126762,True,True,True
+Supplied to same Municipality or different?,0.5019193857965452,1.0,0.49808061420345484,True,skipped for dried,0.7490403071017274,True,True,True
+Supplied to same ward or different wards?,0.5019193857965452,1.0,0.49808061420345484,True,skipped for dried,0.7490403071017274,True,True,True
+What measures have been taken?,0.7658349328214972,0.9986850756081526,0.2328501427866554,True,skipped for dried,0.6164250713933277,True,True,True
+Who is the chairperson?,0.8795585412667947,1.0,0.12044145873320533,True,skipped for dried,0.5602207293666026,True,True,True
+User group type,0.8795585412667947,1.0,0.12044145873320533,True,skipped for dried,0.5602207293666026,True,True,True
+Women in leadership position,0.8826775431861804,0.9993425378040762,0.11666499461789581,True,skipped for dried,0.558332497308948,True,True,True
+List the events associated with sources,0.8910748560460653,0.9986850756081526,0.10761021956208727,True,skipped for dried,0.5538051097810437,True,True,True
+List the activities done for source revival,1.0,0.9191321499013807,-0.0808678500986193,True,dried only,0.5404339250493096,True,True,False
+Pond depth10 years earlier (metre),0.9347408829174664,1.0,0.06525911708253362,True,skipped for dried,0.5326295585412668,True,True,False
+Pond depth (metre),0.9349808061420346,1.0,0.0650191938579654,True,skipped for dried,0.5325095969289827,True,True,False
+Pond area (square metre),0.9349808061420346,1.0,0.0650191938579654,True,skipped for dried,0.5325095969289827,True,True,False
+Pond area 10 years earlier (square metre),0.9349808061420346,1.0,0.0650191938579654,True,skipped for dried,0.5325095969289827,True,True,False
+If not who are restricted?,0.974088291746641,1.0,0.025911708253358978,False,,0.5129558541266794,True,False,False
+Source Name,0.0014395393474088292,0.0006574621959237344,-0.0007820771514850948,False,,0.5003910385757426,False,False,False
+Surrounding Environment (Landuse),0.0,0.0006574621959237344,0.0006574621959237344,False,,0.5003287310979618,False,False,False
+Tole,0.0002399232245681382,0.0,-0.0002399232245681382,False,,0.500119961612284,False,False,False
+Plant Species around Water Source,0.0007197696737044146,0.0006574621959237344,-6.23074777806802e-05,False,,0.5000311537388904,False,False,False
+Ownership,0.0,0.0,0.0,False,,,False,False,False
+Source Type,0.0,0.0,0.0,False,,,False,False,False
+Municipality,0.0,0.0,0.0,False,,,False,False,False
+SN,0.0,0.0,0.0,False,,,False,False,False
+Perennial / Seasonal,0.0,0.0,0.0,False,,,False,False,False
+District,0.0,0.0,0.0,False,,,False,False,False
+Ward Number,0.0,0.0,0.0,False,,,False,False,False
+Town/Village Name,0.0,0.0,0.0,False,,,False,False,False
+Latitude,0.0,0.0,0.0,False,,,False,False,False
+Longitude,0.0,0.0,0.0,False,,,False,False,False

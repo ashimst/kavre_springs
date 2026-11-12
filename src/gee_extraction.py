@@ -9,11 +9,8 @@ Extracts topographic, hydro-climatic, and ecological covariates for all 5,689 po
 Clipped directly to the official OpenStreetMap Kavrepalanchok boundary polygon.
 """
 
-import sys
 import json
-import argparse
 import pandas as pd
-import numpy as np
 from pathlib import Path
 import logging
 
@@ -21,7 +18,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 logger = logging.getLogger(__name__)
 
 INPUT_CSV = Path("data/processed/clean_springs.csv")
-BOUNDARY_GEOJSON = Path("data/processed/kavre_district_boundary.geojson")
+BOUNDARY_GEOJSON = Path("data/processed/boundaries/kavre_district.geojson")  # src/boundaries.py
 OUTPUT_CSV = Path("data/processed/gee_features.csv")
 MASTER_PARQUET = Path("data/processed/master_dataset.parquet")
 

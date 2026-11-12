@@ -1,0 +1,3 @@
+subset,n_records,n_non_tied_comparisons,share_matches_recorded_ward_majority,share_matches_10_nearest_source_majority,ward_minus_local_match,block_boot_ci_low,block_boot_ci_high,bootstrap_blocks
+outside recorded palika,383,341,0.7771260997067448,0.750733137829912,0.026392961876832845,-0.025397497982243746,0.08200136612021854,30
+outside largest within-ward 10-NN component,385,356,0.7443820224719101,0.699438202247191,0.0449438202247191,0.0,0.10844466575981344,32

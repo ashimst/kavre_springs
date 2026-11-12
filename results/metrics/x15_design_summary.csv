@@ -1,0 +1,2 @@
+n_covariates,rank_of_covariate_matrix,constant_covariates,n_exactly_collinear,n_vif_above_10,median_vif
+65,62,wc_shrub,9,31,5.758122060812325

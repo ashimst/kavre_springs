@@ -1,0 +1,5 @@
+unit,sample,n_units,units_not_connected_on_source_graph,median_polygon_neighbours
+polygon ward,sources inside a surveyed ward polygon,75,38,
+recorded ward,sources inside a surveyed ward polygon,75,44,
+recorded ward,sources inside their recorded ward polygon,74,16,
+polygon ward,ward polygons (all contiguous),75,0,5.0

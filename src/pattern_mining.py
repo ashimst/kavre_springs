@@ -16,11 +16,8 @@ P1  Drying rules. Every source becomes a transaction of items: tertiles (low / m
         evaluated on the held-out block (five folds); we report the share of folds in which held-out lift > 1.
     Rules are ranked by weighted relative accuracy, WRAcc = support(A) x (confidence - base rate), the standard
     quality measure of subgroup discovery.
-P2  Narrative rules among dried sources: items are reported cause, period of drying (before / in / after
-    2072 BS / unknown), landscape type, source type, land use and municipality; consequents are reported causes.
-    Mined and tested as in P1 (ward-stratified MH OR included).
 
-Outputs: results/metrics/pm_*.csv, results/figures/pm_rules.png
+Outputs: results/metrics/pm_*.csv (figure: src/figures.py)
 Usage:   python -m src.pattern_mining
 """
 
@@ -42,13 +39,12 @@ os.environ.setdefault("MPLCONFIGDIR", str(PROJECT_ROOT / ".matplotlib"))
 import matplotlib
 
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from mlxtend.frequent_patterns import apriori
 from scipy import stats
 
-from src.graph_builder import coords_to_metric, load_master
+from src.dataset import coords_to_metric, load_master
 from src.spatial_mining import bh_fdr
 from src.spatial_splits import spatial_block_kfold
 
@@ -115,8 +111,10 @@ def mantel_haenszel(a_mask, y, strata):
     R = S = PR = PS_QR = QS = 0.0
     for s in np.unique(strata):
         m = strata == s
-        a = np.sum(a_mask[m] & (y[m] == 1)); b = np.sum(a_mask[m] & (y[m] == 0))
-        c = np.sum(~a_mask[m] & (y[m] == 1)); d = np.sum(~a_mask[m] & (y[m] == 0))
+        a = np.sum(a_mask[m] & (y[m] == 1))
+        b = np.sum(a_mask[m] & (y[m] == 0))
+        c = np.sum(~a_mask[m] & (y[m] == 1))
+        d = np.sum(~a_mask[m] & (y[m] == 0))
         n = a + b + c + d
         if (a + b) == 0 or (c + d) == 0 or n < 2:
             continue
@@ -241,70 +239,7 @@ def drying_rules(df, coords, ward):
     return rules, summary, item_support, seas
 
 
-def narrative_rules(df, ward):
-    d = df[df.target_dried == 1].reset_index(drop=True)
-    w = ward[(df.target_dried == 1).to_numpy()]
-    yr = pd.to_numeric(d["years_since_dried"], errors="coerce").where(lambda v: (v >= 2000) & (v <= 2085))
-    period = np.select([yr < 2072, yr == 2072, yr > 2072], ["before 2072 BS", "2072 BS", "after 2072 BS"], "unknown")
-    items = {f"period={p}": period == p for p in ["before 2072 BS", "2072 BS", "after 2072 BS", "unknown"]}
-    items.update(categorical_items(d))
-    items.pop("flow=seasonal (survey)", None)
-    for mname in sorted(d.municipality.unique()):
-        items[f"municipality={mname}"] = (d.municipality == mname).to_numpy()
-    I = pd.DataFrame(items).astype(bool)
-    res = []
-    for cause in ["earthquake", "drought", "infrastructure_development"]:
-        y = d.reason_of_drying.eq(cause).to_numpy().astype(int)
-        r, base = mine_rules(I, y, 1, min_support=0.02, max_len=2)
-        sel = r[(r.q_bh < 0.05) & r.productive & (r.lift > 1.2)].sort_values("wracc", ascending=False)
-        e = evaluate_rules(sel, I, y, 1, w, folds=[])
-        e["consequent"] = f"reason={cause}"
-        e["base_rate"] = base
-        res.append(e)
-    rules = pd.concat(res, ignore_index=True)
-    rules["antecedent"] = [" & ".join(sorted(a)) for a in rules.antecedent]
-    return rules.drop(columns=["heldout_replication", "n_heldout_folds"])
-
-
 # ----------------------------------------------------------------------------- figure
-def figure(rules, narr):
-    """(a) all dried rules as a hexbin (support x lift, colour = share ward-robust); (b, c) top 8 ward-robust rules."""
-
-    from matplotlib.ticker import FuncFormatter, NullFormatter
-    fig = plt.figure(figsize=(13, 8.5), layout="constrained")
-    gs = fig.add_gridspec(2, 2, width_ratios=[1, 1.35])
-    ax = fig.add_subplot(gs[:, 0])
-    r = rules[rules.consequent == "dried"]
-    hb = ax.hexbin(np.log10(r.support), r.lift, C=r.ward_robust.astype(float), reduce_C_function=np.mean,
-                   gridsize=16, cmap="RdGy_r", vmin=0, vmax=1, mincnt=3, linewidths=0.2)
-    fig.colorbar(hb, ax=ax, location="bottom", shrink=0.8,
-                 label="share of rules in cell that hold within wards (MH, BH q < 0.05)")
-    ax.set_xlabel("log10 support (share of sources)")
-    ax.set_ylabel("Lift")
-    ax.set_title(f"(a) {len(r):,} significant productive rules → dried\n"
-                 f"{r.ward_robust.mean():.0%} hold within wards", fontsize=10, loc="left")
-    fmt = FuncFormatter(lambda v, _: f"{v:g}")
-    for k, (cons, title) in enumerate([("dried", "(b) Top ward-robust rules → dried"),
-                                       ("active", "(c) Top ward-robust rules → active")]):
-        ax = fig.add_subplot(gs[k, 1])
-        r = rules[(rules.consequent == cons) & rules.ward_robust].sort_values("wracc", ascending=False).head(8)[::-1]
-        yy = np.arange(len(r))
-        ax.errorbar(r.mh_or_ward, yy, xerr=[r.mh_or_ward - r.mh_ci_low, r.mh_ci_high - r.mh_or_ward], fmt="o",
-                    capsize=2, c="k", ms=4)
-        ax.axvline(1, c="grey", lw=0.8, ls=":")
-        ax.set_yticks(yy)
-        ax.set_yticklabels([a.replace(" & ", " &\n") + f"\n(conf {c:.2f}, n={n:,})"
-                            for a, c, n in zip(r.antecedent, r.confidence, r.n)], fontsize=7.5)
-        ax.set_xscale("log")
-        ax.xaxis.set_major_formatter(fmt); ax.xaxis.set_minor_formatter(NullFormatter())
-        ax.set_xticks([1, 1.5, 2, 3, 4, 6])
-        ax.grid(axis="x", lw=0.3, alpha=0.5)
-        ax.set_xlabel("ward-stratified Mantel–Haenszel odds ratio (95% CI)")
-        ax.set_title(title, fontsize=10, loc="left")
-    fig.savefig(FIGS / "pm_rules.png", dpi=300)
-    plt.close(fig)
-
-
 def run():
     METRICS.mkdir(parents=True, exist_ok=True)
     df = load_master()
@@ -321,11 +256,6 @@ def run():
     logger.info("\n" + rules.sort_values("wracc", ascending=False).head(30)[
         ["consequent", "antecedent", "support", "confidence", "lift", "q_bh", "mh_or_ward", "mh_ci_low", "mh_ci_high",
          "share_wards_lift_gt1", "heldout_replication"]].round(3).to_string())
-    narr = narrative_rules(df, ward)
-    narr.to_csv(METRICS / "pm_narrative_rules.csv", index=False)
-    logger.info("\n" + narr.head(30)[["consequent", "antecedent", "support", "confidence", "lift", "mh_or_ward",
-                                      "mh_ci_low", "ward_robust"]].round(3).to_string())
-    figure(rules, narr)
 
 
 if __name__ == "__main__":

@@ -11,7 +11,10 @@ DEM-based hydrological GIS for the Kavre springs (label-free).
    the link id, the flow-path length to the stream, the Strahler order of the receiving link and
    the contributing area at the spring's own cell.
 
-Output: data/processed/hydro_gis_features.csv and results/figures/hydro_gis_network.png.
+Output: data/processed/hydro_gis_features.csv.
+
+`build_matched_count_catchments` adds a catchment system with as many occupied units as there are wards
+(data/processed/hydro_gis_matched_catchments.csv), used for the count-matched ward-catchment contrast.
 Usage:  python -m src.hydro_gis
 """
 
@@ -25,15 +28,8 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 import logging
-import os
 import urllib.request
 
-os.environ.setdefault("MPLCONFIGDIR", str(PROJECT_ROOT / ".matplotlib"))
-
-import matplotlib
-
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import rasterio
@@ -44,6 +40,7 @@ DEM_URL = ("https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N2
            "Copernicus_DSM_COG_10_N27_00_E085_00_DEM.tif")
 DEM_DIR = PROJECT_ROOT / "data/external/dem"
 OUT = PROJECT_ROOT / "data/processed/hydro_gis_features.csv"
+MATCHED = PROJECT_ROOT / "data/processed/hydro_gis_matched_catchments.csv"
 MASTER = PROJECT_ROOT / "data/processed/master_dataset.parquet"
 THRESHOLDS_KM2 = [0.5, 2.0, 10.0]
 # pysheds default D8 encoding: N, NE, E, SE, S, SW, W, NW
@@ -166,7 +163,11 @@ def trace_to_stream(r, c, fdir, link, cell_m, max_steps=20000):
     return -1, length
 
 
-def build_hydro_gis_features():
+def route_sources():
+    """Condition the DEM, route flow, and locate every source on the grid.
+
+    Returns the source ids, the conditioned DEM, D8 flow direction, flow accumulation, the cell area (km^2),
+    the cell side (m) and the row/column of each source."""
     df = pd.read_parquet(MASTER)[["id", "latitude", "longitude"]]
     dem_path = get_dem(df.latitude.min(), df.latitude.max(), df.longitude.min(), df.longitude.max())
     logger.info("Conditioning DEM and routing flow (pysheds) ...")
@@ -176,43 +177,59 @@ def build_hydro_gis_features():
     a_km2 = cell_area_km2(transform, df.latitude.mean())
     cell_m = np.sqrt(a_km2) * 1000
     rows, cols = rasterio.transform.rowcol(transform, df.longitude.to_numpy(), df.latitude.to_numpy())
-    rows, cols = np.asarray(rows), np.asarray(cols)
-    out = df[["id"]].copy()
+    return df[["id"]].copy(), dem, fdir, acc, a_km2, cell_m, np.asarray(rows), np.asarray(cols)
+
+
+def link_catchments(fdir, acc, a_km2, cell_m, rows, cols, threshold_km2):
+    """Receiving stream link, flow-path length and Strahler order of each source at one area threshold."""
+    stream = (acc + 1) * a_km2 >= threshold_km2
+    link, order, _ = stream_links(fdir, stream)
+    lids, lens = zip(*[trace_to_stream(r, c, fdir, link, cell_m) for r, c in zip(rows, cols)])
+    strahler = [order.get(l, np.nan) if l >= 0 else np.nan for l in lids]
+    return np.array(lids), np.array(lens), strahler, int(stream.sum()), len(order)
+
+
+def build_hydro_gis_features():
+    out, dem, fdir, acc, a_km2, cell_m, rows, cols = route_sources()
     out["dem_elev_m"] = dem[rows, cols]
     out["contrib_area_km2"] = (acc[rows, cols] + 1) * a_km2
-    nets = {}
     for T in THRESHOLDS_KM2:
-        stream = (acc + 1) * a_km2 >= T
-        link, order, ds = stream_links(fdir, stream)
-        nets[T] = (stream, link, order)
-        lids, lens = zip(*[trace_to_stream(r, c, fdir, link, cell_m) for r, c in zip(rows, cols)])
+        lids, lens, strahler, n_stream, n_links = link_catchments(fdir, acc, a_km2, cell_m, rows, cols, T)
         tag = str(T).replace(".", "p")
         out[f"catch_T{tag}"] = lids
         out[f"flowlen_to_stream_T{tag}_m"] = lens
-        out[f"strahler_T{tag}"] = [order.get(l, np.nan) if l >= 0 else np.nan for l in lids]
-        logger.info(f"T={T} km2: {stream.sum()} stream cells, {len(order)} links, "
-                    f"{pd.Series(lids).nunique()} catchments occupied by springs, unresolved={int((np.array(lids) < 0).sum())}")
+        out[f"strahler_T{tag}"] = strahler
+        logger.info(f"T={T} km2: {n_stream} stream cells, {n_links} links, "
+                    f"{pd.Series(lids).nunique()} catchments occupied by springs, unresolved={int((lids < 0).sum())}")
     OUT.parent.mkdir(parents=True, exist_ok=True)
     out.to_csv(OUT, index=False)
-
-    fig, ax = plt.subplots(figsize=(8, 7.5))
-    ext = [transform.c, transform.c + transform.a * dem.shape[1], transform.f + transform.e * dem.shape[0], transform.f]
-    ax.imshow(np.where(dem > 0, dem, np.nan), extent=ext, cmap="terrain", alpha=0.75)
-    s2 = nets[2.0][0]
-    rr, cc = np.where(s2)
-    xs, ys = rasterio.transform.xy(transform, rr, cc)
-    ax.scatter(xs, ys, s=0.15, c="#1f4e9c", linewidths=0, label="streams (T = 2 km²)")
-    ax.scatter(df.longitude, df.latitude, s=1.5, c="k", linewidths=0, label="water sources")
-    ax.set_xlim(df.longitude.min() - 0.02, df.longitude.max() + 0.02)
-    ax.set_ylim(df.latitude.min() - 0.02, df.latitude.max() + 0.02)
-    ax.set_aspect(1 / np.cos(np.radians(27.57)))
-    ax.set_title("Copernicus 30 m DEM, D8 stream network (2 km²) and mapped sources", fontsize=10)
-    ax.legend(fontsize=8, loc="lower left", markerscale=6)
-    fig.tight_layout()
-    fig.savefig(PROJECT_ROOT / "results/figures/hydro_gis_network.png", dpi=250)
-    plt.close(fig)
     logger.info("\n" + out.describe().T.round(2).to_string())
     return out
+
+
+def build_matched_count_catchments(target_units=75, thresholds_km2=None):
+    """Link catchments at the area threshold whose number of occupied catchments is closest to target_units.
+
+    The 2 km^2 catchments give 176 occupied units against 75 wards. This scans thresholds between 2 and 10 km^2
+    and keeps the one with the closest count (the smaller threshold on ties), so that wards and catchments can be
+    compared at the same number of units. Writes the chosen labels and the full scan."""
+    if thresholds_km2 is None:
+        thresholds_km2 = np.round(np.arange(2.0, 10.01, 0.25), 2)
+    out, _, fdir, acc, a_km2, cell_m, rows, cols = route_sources()
+    scan, labels = [], {}
+    for T in thresholds_km2:
+        lids = link_catchments(fdir, acc, a_km2, cell_m, rows, cols, T)[0]
+        labels[T] = lids
+        scan.append({"threshold_km2": T, "occupied_catchments": len(np.unique(lids)),
+                     "unresolved_sources": int((lids < 0).sum())})
+    scan = pd.DataFrame(scan)
+    best = scan.loc[(scan.occupied_catchments - target_units).abs().idxmin()]
+    scan["chosen"] = scan.threshold_km2 == best.threshold_km2
+    out["catch_matched"] = labels[best.threshold_km2]
+    out["matched_threshold_km2"] = best.threshold_km2
+    out.to_csv(MATCHED, index=False)
+    logger.info(f"count-matched catchments: T={best.threshold_km2} km2, {int(best.occupied_catchments)} occupied")
+    return out, scan
 
 
 if __name__ == "__main__":

@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+message: "If you use this code or the enriched dataset, please cite the paper and the original inventory."
+title: "Kavre springs: code and enriched data for a statistical audit of recorded spring drying"
+authors:
+  - family-names: Shrestha
+    given-names: Ashim
+repository-code: "https://github.com/ashimst/kavre_springs"
+license: MIT
+preferred-citation:
+  type: article
+  title: "Landscape covariates versus administrative survey structure in recorded spring drying: A statistical audit of 5,689 water sources in Kavrepalanchok, Nepal"
+  authors:
+    - family-names: Shrestha
+      given-names: Ashim
+  year: 2026
+  notes: "Manuscript in preparation for Environmental Challenges; DOI to be added after deposition."
+references:
+  - type: dataset
+    title: "Status of Springs in Seven Municipalities of Kavre, Nepal"
+    authors:
+      - name: ICIMOD
+    year: 2025
+    doi: "10.26066/RDS.1974131"
+    license: CC-BY-4.0
+  - type: article
+    title: "Citizen science data on springs in seven municipalities of Kavrepalanchok, Nepal"
+    authors:
+      - family-names: Thapa
+    journal: "Data in Brief"
+    volume: 60
+    start: 111466
+    year: 2025
+    doi: "10.1016/j.dib.2025.111466"

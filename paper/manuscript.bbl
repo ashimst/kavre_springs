@@ -1,514 +1,749 @@
-\begin{thebibliography}{88}
-\providecommand{\natexlab}[1]{#1}
+\begin{thebibliography}{69}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 \providecommand{\url}[1]{\texttt{#1}}
-\expandafter\ifx\csname urlstyle\endcsname\relax
-  \providecommand{\doi}[1]{doi: #1}\else
-  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
-
-\bibitem[Abatzoglou et~al.(2018)Abatzoglou, Dobrowski, Parks, and Hegewisch]{abatzoglou2018terraclimate}
-John T. Abatzoglou, Solomon Z. Dobrowski, Sean A. Parks, and Katherine C. Hegewisch.
-\newblock {TerraClimate}, a high-resolution global dataset of monthly climate and climatic water balance from 1958--2015.
-\newblock \emph{Scientific Data}, 5:\penalty0 170191, 2018.
-\newblock \doi{10.1038/sdata.2017.191}.
-
-\bibitem[Adhikari et~al.(2021)Adhikari, Gurung, Chauhan, Rijal, Dongol, Aryal, and Talchabhadel]{adhikari2021status}
-Sanot Adhikari, Anup Gurung, Raju Chauhan, Deepak Rijal, Bhawani S. Dongol, Dibit Aryal, and Rocky Talchabhadel.
-\newblock {Status of springs in mountain watershed of western Nepal}.
-\newblock \emph{Water Policy}, 23\penalty0 (1):\penalty0 142--156, 2021.
-\newblock \doi{10.2166/wp.2020.187}.
-
-\bibitem[Agrawal and Srikant(1994)Agrawal and Srikant]{agrawal1994fast}
-Rakesh Agrawal and Ramakrishnan Srikant.
-\newblock Fast algorithms for mining association rules.
-\newblock In \emph{Proceedings of the 20th International Conference on Very Large Data Bases (VLDB)}, pages 487--499, 1994.
-
-\bibitem[Anselin(1995)Anselin]{anselin1995local}
-Luc Anselin.
-\newblock Local indicators of spatial association---{LISA}.
-\newblock \emph{Geographical Analysis}, 27\penalty0 (2):\penalty0 93--115, 1995.
-
-\bibitem[Avouac et~al.(2015)Avouac, Meng, Wei, Wang, and Ampuero]{avouac2015lower}
-Jean-Philippe Avouac, Lingsen Meng, Shengji Wei, Teng Wang, and Jean-Paul Ampuero.
-\newblock Lower edge of locked {Main Himalayan Thrust} unzipped by the 2015 {Gorkha} earthquake.
-\newblock \emph{Nature Geoscience}, 8\penalty0 (9):\penalty0 708--711, 2015.
-\newblock \doi{10.1038/ngeo2518}.
-
-\bibitem[Bai and Tahmasebi(2023)Bai and Tahmasebi]{bai2023graph}
-Tao Bai and Pejman Tahmasebi.
-\newblock {Graph neural network for groundwater level forecasting}.
-\newblock \emph{Journal of Hydrology}, 616:\penalty0 128792, 2023.
-\newblock \doi{10.1016/j.jhydrol.2022.128792}.
-
-\bibitem[Benjamini and Hochberg(1995)Benjamini and Hochberg]{benjamini1995controlling}
-Yoav Benjamini and Yosef Hochberg.
-\newblock Controlling the false discovery rate: A practical and powerful approach to multiple testing.
-\newblock \emph{Journal of the Royal Statistical Society: Series B (Methodological)}, 57\penalty0 (1):\penalty0 289--300, 1995.
-
-\bibitem[Bergsma(2013)Bergsma]{bergsma2013bias}
-Wicher Bergsma.
-\newblock A bias-correction for {Cram{\'e}r's} $V$ and {Tschuprow's} $T$.
-\newblock \emph{Journal of the Korean Statistical Society}, 42\penalty0 (3):\penalty0 323--328, 2013.
-\newblock \doi{10.1016/j.jkss.2012.10.002}.
-
-\bibitem[Beven and Kirkby(1979)Beven and Kirkby]{beven1979physically}
-K. J. Beven and M. J. Kirkby.
-\newblock A physically based, variable contributing area model of basin hydrology.
-\newblock \emph{Hydrological Sciences Bulletin}, 24\penalty0 (1):\penalty0 43--69, 1979.
-\newblock \doi{10.1080/02626667909491834}.
-
-\bibitem[Blondel et~al.(2008)Blondel, Guillaume, Lambiotte, and Lefebvre]{blondel2008fast}
-Vincent D. Blondel, Jean-Loup Guillaume, Renaud Lambiotte, and Etienne Lefebvre.
-\newblock Fast unfolding of communities in large networks.
-\newblock \emph{Journal of Statistical Mechanics: Theory and Experiment}, 2008\penalty0 (10):\penalty0 P10008, 2008.
-\newblock \doi{10.1088/1742-5468/2008/10/P10008}.
-
-\bibitem[Borcard and Legendre(2002)Borcard and Legendre]{borcard2002allscale}
-Daniel Borcard and Pierre Legendre.
-\newblock All-scale spatial analysis of ecological data by means of principal coordinates of neighbour matrices.
-\newblock \emph{Ecological Modelling}, 153\penalty0 (1--2):\penalty0 51--68, 2002.
-\newblock \doi{10.1016/S0304-3800(01)00501-4}.
-
-\bibitem[Bouckaert and Frank(2004)Bouckaert and Frank]{bouckaert2004evaluating}
-Remco R. Bouckaert and Eibe Frank.
-\newblock Evaluating the replicability of significance tests for comparing learning algorithms.
-\newblock In \emph{Advances in Knowledge Discovery and Data Mining (PAKDD 2004)}, pages 3--12, 2004.
-
-\bibitem[Brody et~al.(2022)Brody, Alon, and Yahav]{brody2022attentive}
-Shaked Brody, Uri Alon, and Eran Yahav.
-\newblock How attentive are graph attention networks?.
-\newblock \emph{International Conference on Learning Representations (ICLR)}, , 2022.
-
-\bibitem[Buytaert et~al.(2014)Buytaert, Zulkafli, Grainger, Acosta, Alemie, Bastiaensen, De Bi{\`e}vre, Bhusal, Clark, Dewulf, Foggin, Hannah, Hergarten, Isaeva, Karpouzoglou, Pandeya, Paudel, Sharma, Steenhuis, Tilahun, Van Hecken, and Zhumanova]{buytaert2014citizen}
-Wouter Buytaert, Zed Zulkafli, Sam Grainger, Luis Acosta, Tilashwork C. Alemie, Johan Bastiaensen, Bert De Bi{\`e}vre, Jagat Bhusal, Julian Clark, Art Dewulf, Marc Foggin, David M. Hannah, Christian Hergarten, Aiganysh Isaeva, Timothy Karpouzoglou, Bhopal Pandeya, Deepak Paudel, Keshav Sharma, Tammo Steenhuis, Seifu Tilahun, Gert Van Hecken, and Munavar Zhumanova.
-\newblock {Citizen science in hydrology and water resources: opportunities for knowledge generation, ecosystem service management, and sustainable development}.
-\newblock \emph{Frontiers in Earth Science}, 2, 2014.
-\newblock \doi{10.3389/feart.2014.00026}.
-
-\bibitem[Campello et~al.(2013)Campello, Moulavi, and Sander]{campello2013density}
-Ricardo J. G. B. Campello, Davoud Moulavi, and Joerg Sander.
-\newblock Density-based clustering based on hierarchical density estimates.
-\newblock In \emph{Advances in Knowledge Discovery and Data Mining (PAKDD 2013), Lecture Notes in Computer Science 7819}, pages 160--172, 2013.
-\newblock \doi{10.1007/978-3-642-37456-2_14}.
-
-\bibitem[Chapagain et~al.(2019)Chapagain, Ghimire, and Shrestha]{chapagain2019status}
-Prem Sagar Chapagain, Motilal Ghimire, and Shova Shrestha.
-\newblock {Status of natural springs in the Melamchi region of the Nepal Himalayas in the context of climate change}.
-\newblock \emph{Environment, Development and Sustainability}, 21\penalty0 (1):\penalty0 263--280, 2019.
-\newblock \doi{10.1007/s10668-017-0036-4}.
-
-\bibitem[Chauhan et~al.(2023)Chauhan, Shrestha, Oh, and Gurung]{chauhan2023degradation}
-Raju Chauhan, Archana Shrestha, Sang Eun Oh, and Anup Gurung.
-\newblock {The degradation of spring water resources in Nepal: some policy gaps}.
-\newblock \emph{Water Policy}, 25\penalty0 (4):\penalty0 338--358, 2023.
-\newblock \doi{10.2166/wp.2023.159}.
-
-\bibitem[Chen and Guestrin(2016)Chen and Guestrin]{chen2016xgboost}
-Tianqi Chen and Carlos Guestrin.
-\newblock XGBoost: A scalable tree boosting system.
-\newblock \emph{}, :\penalty0 785--794, 2016.
-
-\bibitem[Didan(2021)Didan]{didan2021mod13q1}
-Kamel Didan.
-\newblock {MODIS/Terra} Vegetation Indices 16-Day {L3} Global 250m {SIN} Grid {V061}.
-\newblock NASA Land Processes Distributed Active Archive Center, 2021.
-\newblock \doi{10.5067/MODIS/MOD13Q1.061}.
-
-\bibitem[Dray et~al.(2006)Dray, Legendre, and Peres-Neto]{dray2006spatial}
-St{\'e}phane Dray, Pierre Legendre, and Pedro R. Peres-Neto.
-\newblock Spatial modelling: a comprehensive framework for principal coordinate analysis of neighbour matrices ({PCNM}).
-\newblock \emph{Ecological Modelling}, 196\penalty0 (3--4):\penalty0 483--493, 2006.
-\newblock \doi{10.1016/j.ecolmodel.2006.02.015}.
-
-\bibitem[Drusch et~al.(2012)Drusch, Del Bello, Carlier, Colin, Fernandez, Gascon, Hoersch, Isola, Laberinti, and Martimort]{drusch2012sentinel}
-Matthias Drusch, Umberto Del Bello, S{\'e}bastien Carlier, Olivier Colin, Veronica Fernandez, Ferran Gascon, Bianca Hoersch, Claudia Isola, Paolo Laberinti, and Philippe Martimort et~al..
-\newblock Sentinel-2: {ESA}'s optical high-resolution mission for {GMES} operational services.
-\newblock \emph{Remote Sensing of Environment}, 120:\penalty0 25--36, 2012.
-
-\bibitem[Elvidge et~al.(2021)Elvidge, Zhizhin, Ghosh, Hsu, and Taneja]{elvidge2021annual}
-Christopher D. Elvidge, Mikhail Zhizhin, Tilottama Ghosh, Feng-Chi Hsu, and Jay Taneja.
-\newblock Annual time series of global {VIIRS} nighttime lights derived from monthly averages: 2012 to 2019.
-\newblock \emph{Remote Sensing}, 13\penalty0 (5):\penalty0 922, 2021.
-\newblock \doi{10.3390/rs13050922}.
-
-\bibitem[{European Space Agency}(2021){European Space Agency}]{esa2021copernicusdem}
-{European Space Agency}.
-\newblock Copernicus Global Digital Elevation Model ({GLO-30}).
-\newblock Distributed by OpenTopography / Copernicus DEM AWS open data, 2021.
-\newblock \doi{10.5270/ESA-c5d3d65}.
-
-\bibitem[Farr et~al.(2007)Farr, Rosen, Caro, Crippen, Duren, Hensley, Kobrick, Paller, Rodriguez, and Roth]{farr2007shuttle}
-Tom G. Farr, Paul A. Rosen, Edward Caro, Robert Crippen, Riley Duren, Scott Hensley, Michael Kobrick, Miriam Paller, Ernesto Rodriguez, and Ladislav Roth et~al..
-\newblock The {Shuttle Radar Topography Mission}.
-\newblock \emph{Reviews of Geophysics}, 45\penalty0 (2), 2007.
-
-\bibitem[Fraley and Raftery(2002)Fraley and Raftery]{fraley2002model}
-Chris Fraley and Adrian E. Raftery.
-\newblock Model-based clustering, discriminant analysis, and density estimation.
-\newblock \emph{Journal of the American Statistical Association}, 97\penalty0 (458):\penalty0 611--631, 2002.
-\newblock \doi{10.1198/016214502760047131}.
-
-\bibitem[Funk et~al.(2015)Funk, Peterson, Landsfeld, Pedreros, Verdin, Shukla, Husak, Rowland, Harrison, and Hoell]{funk2015climate}
-Chris Funk, Pete Peterson, Martin Landsfeld, Diego Pedreros, James Verdin, Shraddhanand Shukla, Gregory Husak, James Rowland, Laura Harrison, and Andrew Hoell et~al..
-\newblock The climate hazards group infrared precipitation with stations---a new environmental record for monitoring extremes.
-\newblock \emph{Scientific Data}, 2\penalty0 (1):\penalty0 1--21, 2015.
-
-\bibitem[Galetzka et~al.(2015)Galetzka, Melgar, Genrich, Geng, Owen, Lindsey, Xu, and Bock]{galetzka2015slip}
-J. Galetzka, D. Melgar, J. F. Genrich, J. Geng, S. Owen, E. O. Lindsey, X. Xu, and Y. Bock et~al..
-\newblock Slip pulse and resonance of the {Kathmandu} basin during the 2015 {Gorkha} earthquake, {Nepal}.
-\newblock \emph{Science}, 349\penalty0 (6252):\penalty0 1091--1095, 2015.
-\newblock \doi{10.1126/science.aac6383}.
-
-\bibitem[Grinsztajn et~al.(2022)Grinsztajn, Oyallon, and Varoquaux]{grinsztajn2022tree}
-L{'e}o Grinsztajn, Edouard Oyallon, and Ga{\"e}l Varoquaux.
-\newblock Why do tree-based models still outperform deep learning on typical tabular data?.
-\newblock In \emph{Advances in Neural Information Processing Systems 35, Datasets and Benchmarks Track}, 2022.
-
-\bibitem[Hamilton et~al.(2017)Hamilton, Ying, and Leskovec]{hamilton2017inductive}
-Will Hamilton, Zhitao Ying, and Jure Leskovec.
-\newblock Inductive representation learning on large graphs.
-\newblock \emph{Advances in Neural Information Processing Systems (NeurIPS)}, 30, 2017.
-
-\bibitem[Hansen et~al.(2013)Hansen, Potapov, Moore, Hancher, Turubanova, Tyukavina, Thau, and Stehman]{hansen2013high}
-M. C. Hansen, P. V. Potapov, R. Moore, M. Hancher, S. A. Turubanova, A. Tyukavina, D. Thau, and S. V. Stehman et~al..
-\newblock High-resolution global maps of 21st-century forest cover change.
-\newblock \emph{Science}, 342\penalty0 (6160):\penalty0 850--853, 2013.
-\newblock \doi{10.1126/science.1244693}.
-
-\bibitem[Hennig(2007)Hennig]{hennig2007cluster}
-Christian Hennig.
-\newblock Cluster-wise assessment of cluster stability.
-\newblock \emph{Computational Statistics \& Data Analysis}, 52\penalty0 (1):\penalty0 258--271, 2007.
-\newblock \doi{10.1016/j.csda.2006.11.025}.
-
-\bibitem[Hubert and Arabie(1985)Hubert and Arabie]{hubert1985comparing}
-Lawrence Hubert and Phipps Arabie.
-\newblock Comparing partitions.
-\newblock \emph{Journal of Classification}, 2\penalty0 (1):\penalty0 193--218, 1985.
-\newblock \doi{10.1007/BF01908075}.
-
-\bibitem[{ICIMOD}(2021){ICIMOD}]{icimod2021springs}
-{ICIMOD}.
-\newblock Protocol for Reviving Springs in the {Hindu Kush Himalaya}: A Practitioner's Manual for a Six-Step Springshed Management Approach.
-\newblock Technical report, International Centre for Integrated Mountain Development (ICIMOD), 2021.
-
-\bibitem[{ICIMOD}(2025){ICIMOD}]{icimod2025kavredata}
-{ICIMOD}.
-\newblock Status of Springs in Seven Municipalities of {Kavre}, {Nepal} [Data set].
-\newblock Regional Database System, International Centre for Integrated Mountain Development, Licensed under CC BY 4.0, 2025.
-\newblock \doi{10.26066/RDS.1974131}.
-
-\bibitem[Ishikawa et~al.(2025)Ishikawa, Okazaki, Dashtseren, Temuujin, and Hiyama]{ishikawa2025spring}
-Mamoru Ishikawa, Azumi Okazaki, Avirmed Dashtseren, Khurelbaatar Temuujin, and Tetsuya Hiyama.
-\newblock {Machine-learning-based spatial analysis of the spring states in the southernmost Eurasian permafrost, Hangai Mountains, central Mongolia}.
-\newblock \emph{Progress in Earth and Planetary Science}, 12\penalty0 (1):\penalty0 48, 2025.
-\newblock \doi{10.1186/s40645-025-00720-8}.
-
-\bibitem[Kadaverugu et~al.(2026)Kadaverugu, Dhole, and Nidheesh]{kadaverugu2026springshed}
-Rakesh Kadaverugu, Asha Dhole, and P. V. Nidheesh.
-\newblock {Integrating machine learning models to map springshed potential zones using key environmental variables in high-altitude Himalayan terrain}.
-\newblock \emph{Environmental Monitoring and Assessment}, 198\penalty0 (6):\penalty0 615, 2026.
-\newblock \doi{10.1007/s10661-026-15465-0}.
-
-\bibitem[Kapoor and Narayanan(2023)Kapoor and Narayanan]{kapoor2023leakage}
-Sayash Kapoor and Arvind Narayanan.
-\newblock {Leakage and the reproducibility crisis in machine-learning-based science}.
-\newblock \emph{Patterns}, 4\penalty0 (9):\penalty0 100804, 2023.
-\newblock \doi{10.1016/j.patter.2023.100804}.
-
-\bibitem[Kaufman et~al.(2012)Kaufman, Rosset, Perlich, and Stitelman]{kaufman2012leakage}
-Shachar Kaufman, Saharon Rosset, Claudia Perlich, and Ori Stitelman.
-\newblock Leakage in data mining: Formulation, detection, and avoidance.
-\newblock \emph{ACM Transactions on Knowledge Discovery from Data}, 6\penalty0 (4):\penalty0 15, 2012.
-\newblock \doi{10.1145/2382577.2382579}.
-
-\bibitem[Kipf and Welling(2017)Kipf and Welling]{kipf2017semi}
-Thomas N. Kipf and Max Welling.
-\newblock Semi-supervised classification with graph convolutional networks.
-\newblock \emph{International Conference on Learning Representations (ICLR)}, , 2017.
-
-\bibitem[Knox(1964)Knox]{knox1964detection}
-E. G. Knox.
-\newblock The detection of space-time interactions.
-\newblock \emph{Journal of the Royal Statistical Society. Series C (Applied Statistics)}, 13\penalty0 (1):\penalty0 25--30, 1964.
-\newblock \doi{10.2307/2985220}.
-
-\bibitem[Kosmala et~al.(2016)Kosmala, Wiggins, Swanson, and Simmons]{kosmala2016assessing}
-Margaret Kosmala, Andrea Wiggins, Alexandra Swanson, and Brooke Simmons.
-\newblock Assessing data quality in citizen science.
-\newblock \emph{Frontiers in Ecology and the Environment}, 14\penalty0 (10):\penalty0 551--560, 2016.
-\newblock \doi{10.1002/fee.1436}.
-
-\bibitem[Kulldorff(1997)Kulldorff]{kulldorff1997spatial}
-Martin Kulldorff.
-\newblock A spatial scan statistic.
-\newblock \emph{Communications in Statistics -- Theory and Methods}, 26\penalty0 (6):\penalty0 1481--1496, 1997.
-\newblock \doi{10.1080/03610929708831995}.
-
-\bibitem[Lavra{\v{c}} et~al.(2004)Lavra{\v{c}}, Kav{\v{s}}ek, Flach, and Todorovski]{lavrac2004subgroup}
-Nada Lavra{\v{c}}, Branko Kav{\v{s}}ek, Peter Flach, and Ljup{\v{c}}o Todorovski.
-\newblock Subgroup discovery with {CN2-SD}.
-\newblock \emph{Journal of Machine Learning Research}, 5:\penalty0 153--188, 2004.
-
-\bibitem[Liu et~al.(2008)Liu, Ting, and Zhou]{liu2008isolation}
-Fei Tony Liu, Kai Ming Ting, and Zhi-Hua Zhou.
-\newblock Isolation forest.
-\newblock In \emph{2008 Eighth IEEE International Conference on Data Mining}, pages 413--422, 2008.
-\newblock \doi{10.1109/ICDM.2008.17}.
-
-\bibitem[Manga et~al.(2012)Manga, Beresnev, Brodsky, Elkhoury, Elsworth, Ingebritsen, Mays, and Wang]{manga2012changes}
-Michael Manga, Igor Beresnev, Emily E. Brodsky, Jean E. Elkhoury, Derek Elsworth, S. E. Ingebritsen, David C. Mays, and Chi-Yuen Wang.
-\newblock {Changes in permeability caused by transient stresses: Field observations, experiments, and mechanisms}.
-\newblock \emph{Reviews of Geophysics}, 50\penalty0 (2):\penalty0 2011RG000382, 2012.
-\newblock \doi{10.1029/2011rg000382}.
-
-\bibitem[Mantel(1967)Mantel]{mantel1967detection}
-Nathan Mantel.
-\newblock The detection of disease clustering and a generalized regression approach.
-\newblock \emph{Cancer Research}, 27\penalty0 (2):\penalty0 209--220, 1967.
-
-\bibitem[Meyer and Pebesma(2022)Meyer and Pebesma]{meyer2022machine}
-Hanna Meyer and Edzer Pebesma.
-\newblock {Machine learning-based global maps of ecological variables and the challenge of assessing them}.
-\newblock \emph{Nature Communications}, 13\penalty0 (1):\penalty0 2208, 2022.
-\newblock \doi{10.1038/s41467-022-29838-9}.
-
-\bibitem[Moghaddam et~al.(2020)Moghaddam, Rahmati, Panahi, Tiefenbacher, Darabi, Haghizadeh, Haghighi, Nalivan, and Tien Bui]{moghaddam2020sample}
-Davoud Davoudi Moghaddam, Omid Rahmati, Mahdi Panahi, John Tiefenbacher, Hamid Darabi, Ali Haghizadeh, Ali Torabi Haghighi, Omid Asadi Nalivan, and Dieu Tien Bui.
-\newblock {The effect of sample size on different machine learning models for groundwater potential mapping in mountain bedrock aquifers}.
-\newblock \emph{CATENA}, 187:\penalty0 104421, 2020.
-\newblock \doi{10.1016/j.catena.2019.104421}.
-
-\bibitem[Moran(1950)Moran]{moran1950notes}
-Patrick A. P. Moran.
-\newblock Notes on continuous stochastic phenomena.
-\newblock \emph{Biometrika}, 37\penalty0 (1/2):\penalty0 17--23, 1950.
-
-\bibitem[Nadeau and Bengio(2003)Nadeau and Bengio]{nadeau2003inference}
-Claude Nadeau and Yoshua Bengio.
-\newblock Inference for the generalization error.
-\newblock \emph{Machine Learning}, 52\penalty0 (3):\penalty0 239--281, 2003.
-\newblock \doi{10.1023/A:1024068626366}.
-
-\bibitem[Naghibi et~al.(2016)Naghibi, Pourghasemi, and Dixon]{naghibi2016gis}
-Seyed Amir Naghibi, Hamid Reza Pourghasemi, and Barnali Dixon.
-\newblock {GIS-based groundwater potential mapping using boosted regression tree, classification and regression tree, and random forest machine learning models in Iran}.
-\newblock \emph{Environmental Monitoring and Assessment}, 188\penalty0 (1):\penalty0 44, 2016.
-\newblock \doi{10.1007/s10661-015-5049-6}.
-
-\bibitem[{NITI Aayog}(2017){NITI Aayog}]{nitiaayog2017springs}
-{NITI Aayog}.
-\newblock Inventory and Revival of Springs in the {Himalayas} for Water Security.
-\newblock Technical report, NITI Aayog, Government of India, 2017.
-
-\bibitem[O'Callaghan and Mark(1984)O'Callaghan and Mark]{ocallaghan1984extraction}
-John F. O'Callaghan and David M. Mark.
-\newblock The extraction of drainage networks from digital elevation data.
-\newblock \emph{Computer Vision, Graphics, and Image Processing}, 28\penalty0 (3):\penalty0 323--344, 1984.
-\newblock \doi{10.1016/S0734-189X(84)80011-0}.
-
-\bibitem[{OpenStreetMap contributors}(2024){OpenStreetMap contributors}]{osm2024}
-{OpenStreetMap contributors}.
-\newblock {OpenStreetMap}.
-\newblock \url{https://www.openstreetmap.org}, Road network and administrative boundaries, ODbL licence, 2024.
-
-\bibitem[Pandit et~al.(2024)Pandit, Batelaan, Pandey, and Adhikari]{pandit2024depleting}
-Anju Pandit, Okke Batelaan, Vishnu Prasad Pandey, and Sanot Adhikari.
-\newblock {Depleting spring sources in the Himalayas: Environmental drivers or just perception?}.
-\newblock \emph{Journal of Hydrology: Regional Studies}, 53:\penalty0 101752, 2024.
-\newblock \doi{10.1016/j.ejrh.2024.101752}.
-
-\bibitem[Peres-Neto et~al.(2006)Peres-Neto, Legendre, Dray, and Borcard]{peresneto2006variation}
-Pedro R. Peres-Neto, Pierre Legendre, St{\'e}phane Dray, and Daniel Borcard.
-\newblock Variation partitioning of species data matrices: estimation and comparison of fractions.
-\newblock \emph{Ecology}, 87\penalty0 (10):\penalty0 2614--2625, 2006.
-\newblock \doi{10.1890/0012-9658(2006)87[2614:VPOSDM]2.0.CO;2}.
-
-\bibitem[Pesaresi(2023)Pesaresi]{pesaresi2023ghsl}
-Martino Pesaresi.
-\newblock {GHS-BUILT-S R2023A} -- {GHS} built-up surface grid, derived from {Sentinel-2} composite and {Landsat}, multitemporal (1975--2030).
-\newblock European Commission, Joint Research Centre (JRC), 2023.
-\newblock \doi{10.2905/9F06F36F-4B11-47EC-ABB0-4F8B7B1D72EA}.
-
-\bibitem[Ploton et~al.(2020)Ploton, Mortier, R{\'e}jou-M{\'e}chain, Barbier, Picard, Rossi, Dormann, Cornu, Viennois, Bayol, Lyapustin, Gourlet-Fleury, and P{\'e}lissier]{ploton2020spatial}
-Pierre Ploton, Fr{\'e}d{\'e}ric Mortier, Maxime R{\'e}jou-M{\'e}chain, Nicolas Barbier, Nicolas Picard, Vivien Rossi, Carsten Dormann, Guillaume Cornu, Ga{\"e}lle Viennois, Nicolas Bayol, Alexei Lyapustin, Sylvie Gourlet-Fleury, and Rapha{\"e}l P{\'e}lissier.
-\newblock {Spatial validation reveals poor predictive performance of large-scale ecological mapping models}.
-\newblock \emph{Nature Communications}, 11\penalty0 (1):\penalty0 4540, 2020.
-\newblock \doi{10.1038/s41467-020-18321-y}.
-
-\bibitem[Poggio et~al.(2021)Poggio, de Sousa, Batjes, Heuvelink, Kempen, Ribeiro, and Rossiter]{poggio2021soilgrids}
-Laura Poggio, Luis M. de Sousa, Niels H. Batjes, Gerard B. M. Heuvelink, Bas Kempen, Eloi Ribeiro, and David Rossiter.
-\newblock {SoilGrids} 2.0: producing soil information for the globe with quantified spatial uncertainty.
-\newblock \emph{SOIL}, 7\penalty0 (1):\penalty0 217--240, 2021.
-\newblock \doi{10.5194/soil-7-217-2021}.
-
-\bibitem[Poudel and Duex(2017)Poudel and Duex]{poudel2017vanishing}
-Durga D. Poudel and Timothy W. Duex.
-\newblock {Vanishing Springs in Nepalese Mountains: Assessment of Water Sources, Farmers' Perceptions, and Climate Change Adaptation}.
-\newblock \emph{Mountain Research and Development}, 37\penalty0 (1):\penalty0 35, 2017.
-\newblock \doi{10.1659/mrd-journal-d-16-00039.1}.
-
-\bibitem[Prokhorenkova et~al.(2018)Prokhorenkova, Gusev, Vorobev, Dorogush, and Gulin]{prokhorenkova2018catboost}
-Liudmila Prokhorenkova, Gleb Gusev, Aleksandr Vorobev, Anna Veronika Dorogush, and Andrey Gulin.
-\newblock CatBoost: unbiased boosting with categorical features.
-\newblock \emph{Advances in Neural Information Processing Systems (NeurIPS)}, 31, 2018.
-
-\bibitem[Raschka(2018)Raschka]{raschka2018mlxtend}
-Sebastian Raschka.
-\newblock {MLxtend}: Providing machine learning and data science utilities and extensions to {Python}'s scientific computing stack.
-\newblock \emph{Journal of Open Source Software}, 3\penalty0 (24):\penalty0 638, 2018.
-\newblock \doi{10.21105/joss.00638}.
-
-\bibitem[Roberts et~al.(2017)Roberts, Bahn, Ciuti, Boyce, Elith, Guillera-Arroita, Hauenstein, Lahoz-Monfort, Schr{\"o}der, Thuiller, Warton, Wintle, Hartig, and Dormann]{roberts2017cross}
-David R. Roberts, Volker Bahn, Simone Ciuti, Mark S. Boyce, Jane Elith, Gurutzeta Guillera-Arroita, Severin Hauenstein, Jos{'e} J. Lahoz-Monfort, Boris Schr{\"o}der, Wilfried Thuiller, David I. Warton, Brendan A. Wintle, Florian Hartig, and Carsten F. Dormann.
-\newblock {Cross-validation strategies for data with temporal, spatial, hierarchical, or phylogenetic structure}.
-\newblock \emph{Ecography}, 40\penalty0 (8):\penalty0 913--929, 2017.
-\newblock \doi{10.1111/ecog.02881}.
-
-\bibitem[Robins et~al.(1986)Robins, Breslow, and Greenland]{robins1986general}
-James Robins, Norman Breslow, and Sander Greenland.
-\newblock Estimators of the {Mantel-Haenszel} variance consistent in both sparse data and large-strata limiting models.
-\newblock \emph{Biometrics}, 42\penalty0 (2):\penalty0 311--323, 1986.
-\newblock \doi{10.2307/2531052}.
-
-\bibitem[Running et~al.(2021)Running, Mu, Zhao, and Moreno]{running2021mod16}
-Steve Running, Qiaozhen Mu, Maosheng Zhao, and Alvaro Moreno.
-\newblock {MODIS/Terra} Net Evapotranspiration Gap-Filled 8-Day {L4} Global 500m {SIN} Grid {V061}.
-\newblock NASA Land Processes Distributed Active Archive Center, 2021.
-\newblock \doi{10.5067/MODIS/MOD16A2GF.061}.
-
-\bibitem[Schwarz(1978)Schwarz]{schwarz1978estimating}
-Gideon Schwarz.
-\newblock Estimating the dimension of a model.
-\newblock \emph{The Annals of Statistics}, 6\penalty0 (2):\penalty0 461--464, 1978.
-\newblock \doi{10.1214/aos/1176344136}.
-
-\bibitem[Shchur et~al.(2018)Shchur, Mumme, Bojchevski, and G{\"u}nnemann]{shchur2018pitfalls}
-Oleksandr Shchur, Maximilian Mumme, Aleksandar Bojchevski, and Stephan G{\"u}nnemann.
-\newblock {Pitfalls of Graph Neural Network Evaluation}.
-\newblock arXiv:1811.05868, 2018.
-
-\bibitem[Spiegelhalter(2005)Spiegelhalter]{spiegelhalter2005funnel}
-David J. Spiegelhalter.
-\newblock Funnel plots for comparing institutional performance.
-\newblock \emph{Statistics in Medicine}, 24\penalty0 (8):\penalty0 1185--1202, 2005.
-\newblock \doi{10.1002/sim.1970}.
-
-\bibitem[Strahler(1957)Strahler]{strahler1957quantitative}
-Arthur N. Strahler.
-\newblock Quantitative analysis of watershed geomorphology.
-\newblock \emph{Eos, Transactions American Geophysical Union}, 38\penalty0 (6):\penalty0 913--920, 1957.
-\newblock \doi{10.1029/TR038i006p00913}.
-
-\bibitem[St{\"o}cklin(1980)St{\"o}cklin]{stocklin1980geology}
-J. St{\"o}cklin.
-\newblock {Geology of Nepal and its regional frame}.
-\newblock \emph{Journal of the Geological Society}, 137\penalty0 (1):\penalty0 1--34, 1980.
-\newblock \doi{10.1144/gsjgs.137.1.0001}.
-
-\bibitem[Sun et~al.(2021)Sun, Jiang, Mudunuru, and Chen]{sun2021explore}
-Alexander Y. Sun, Peishi Jiang, Maruti K. Mudunuru, and Xingyuan Chen.
-\newblock {Explore Spatio-Temporal Learning of Large Sample Hydrology Using Graph Neural Networks}.
-\newblock \emph{Water Resources Research}, 57\penalty0 (12):\penalty0 e2021WR030394, 2021.
-\newblock \doi{10.1029/2021wr030394}.
-
-\bibitem[Taccari et~al.(2024)Taccari, Wang, Nuttall, Chen, and Jimack]{taccari2024spatial}
-Maria Luisa Taccari, He Wang, Jonathan Nuttall, Xiaohui Chen, and Peter K. Jimack.
-\newblock {Spatial-temporal graph neural networks for groundwater data}.
-\newblock \emph{Scientific Reports}, 14\penalty0 (1):\penalty0 24564, 2024.
-\newblock \doi{10.1038/s41598-024-75385-2}.
-
-\bibitem[Tambe et~al.(2012)Tambe, Kharel, Arrawatia, Kulkarni, Mahamuni, and Ganeriwala]{tambe2012reviving}
-Sandeep Tambe, Ghanashyam Kharel, M. L. Arrawatia, Himanshu Kulkarni, Kaustubh Mahamuni, and Anil K. Ganeriwala.
-\newblock {Reviving Dying Springs: Climate Change Adaptation Experiments From the Sikkim Himalaya}.
-\newblock \emph{Mountain Research and Development}, 32\penalty0 (1):\penalty0 62--72, 2012.
-\newblock \doi{10.1659/mrd-journal-d-11-00079.1}.
-
-\bibitem[Thapa et~al.(2023\natexlab{a})Thapa, Bhattarai, Dahal, Tiwari, and Jacobsen]{thapa2023drying}
-Bhumika Thapa, Chiranjibi Bhattarai, Ngamindra Dahal, Sushma Tiwari, and Dean Jacobsen.
-\newblock {Drying of Springs in the Himalayan Region of Nepal: Perspectives of Local Government Leaders on Causes, Consequences, and Conservation Efforts}.
-\newblock \emph{Mountain Research and Development}, 43\penalty0 (4):\penalty0 R9--R15, 2023.
-\newblock \doi{10.1659/mrd.2023.00007}.
-
-\bibitem[Thapa et~al.(2023\natexlab{b})Thapa, Subedi, Desai, Rijal, Tiwari, and Kandel]{thapa2023recharge}
-Ram Singh Thapa, Rajan Subedi, Jayesh Desai, Moti Lal Rijal, Krishna Raj Tiwari, and Pem Narayan Kandel.
-\newblock {Identifying potential recharge areas of mountain springs through hydrogeological mapping}.
-\newblock \emph{Banko Janakari}, 33\penalty0 (1):\penalty0 3--15, 2023.
-\newblock \doi{10.3126/banko.v33i1.55463}.
-
-\bibitem[Thapa et~al.(2025)Thapa, Pandit, Bhuchar, and Dhakal]{thapa2025citizen}
-Srijan Thapa, Anju Pandit, Sanjeev Bhuchar, and Madhav Dhakal.
-\newblock Citizen science approach for springshed management: A comprehensive community-driven mapping and dataset of spring sources in {Kavre}, {Nepal}.
-\newblock \emph{Data in Brief}, 60:\penalty0 111466, 2025.
-\newblock \doi{10.1016/j.dib.2025.111466}.
-
-\bibitem[Theobald et~al.(2015)Theobald, Harrison-Atlas, Monahan, and Albano]{theobald2015ecologically}
-David M. Theobald, Dylan Harrison-Atlas, William B. Monahan, and Christine M. Albano.
-\newblock Ecologically-relevant maps of landforms and physiographic diversity for climate adaptation planning.
-\newblock \emph{PLOS ONE}, 10\penalty0 (12):\penalty0 e0143619, 2015.
-\newblock \doi{10.1371/journal.pone.0143619}.
-
-\bibitem[{U.S. Geological Survey}(2015){U.S. Geological Survey}]{usgs2015shakemap}
-{U.S. Geological Survey}.
-\newblock {ShakeMap} and {ComCat} products for the 25 April 2015 {M}7.8 {Gorkha} (us20002926) and 12 May 2015 {M}7.3 {Dolakha} (us20002ejl) earthquakes.
-\newblock \url{https://earthquake.usgs.gov/earthquakes/eventpage/us20002926}, Accessed November 2026, 2015.
-
-\bibitem[Valavi et~al.(2019)Valavi, Elith, Lahoz-Monfort, and Guillera-Arroita]{valavi2019blockcv}
-Roozbeh Valavi, Jane Elith, Jos{'e} J. Lahoz-Monfort, and Gurutzeta Guillera-Arroita.
-\newblock {block CV : An r package for generating spatially or environmentally separated folds for k -fold cross-validation of species distribution models}.
-\newblock \emph{Methods in Ecology and Evolution}, 10\penalty0 (2):\penalty0 225--232, 2019.
-\newblock \doi{10.1111/2041-210x.13107}.
-
-\bibitem[van der Maaten and Hinton(2008)van der Maaten and Hinton]{vandermaaten2008visualizing}
-Laurens van der Maaten and Geoffrey Hinton.
-\newblock Visualizing data using t-{SNE}.
-\newblock \emph{Journal of Machine Learning Research}, 9:\penalty0 2579--2605, 2008.
-
-\bibitem[Wadoux et~al.(2021)Wadoux, Heuvelink, de Bruin, and Brus]{wadoux2021spatial}
-Alexandre M.J.-C. Wadoux, Gerard B.M. Heuvelink, Sytze de Bruin, and Dick J. Brus.
-\newblock {Spatial cross-validation is not the right way to evaluate map accuracy}.
-\newblock \emph{Ecological Modelling}, 457:\penalty0 109692, 2021.
-\newblock \doi{10.1016/j.ecolmodel.2021.109692}.
-
-\bibitem[Wald et~al.(1999)Wald, Quitoriano, Heaton, Kanamori, Scrivner, and Worden]{wald1999trinet}
-David J. Wald, Vincent Quitoriano, Thomas H. Heaton, Hiroo Kanamori, Craig W. Scrivner, and C. Bruce Worden.
-\newblock {TriNet} ``{ShakeMaps}'': Rapid generation of peak ground motion and intensity maps for earthquakes in southern {California}.
-\newblock \emph{Earthquake Spectra}, 15\penalty0 (3):\penalty0 537--555, 1999.
-\newblock \doi{10.1193/1.1586057}.
-
-\bibitem[Wang and Manga(2010)Wang and Manga]{wang2010earthquakes}
-Chi-yuen Wang and Michael Manga.
-\newblock \emph{Earthquakes and Water}.
-\newblock volume 114 of \emph{Lecture Notes in Earth Sciences}. Springer, Berlin, Heidelberg, 2010.
-\newblock \doi{10.1007/978-3-642-00810-8}.
-
-\bibitem[Webb(2007)Webb]{webb2007discovering}
-Geoffrey I. Webb.
-\newblock Discovering significant patterns.
-\newblock \emph{Machine Learning}, 68\penalty0 (1):\penalty0 1--33, 2007.
-\newblock \doi{10.1007/s10994-007-5006-x}.
-
-\bibitem[Worden et~al.(2012)Worden, Gerstenberger, Rhoades, and Wald]{worden2012probabilistic}
-C. B. Worden, M. C. Gerstenberger, D. A. Rhoades, and D. J. Wald.
-\newblock Probabilistic relationships between ground-motion parameters and {Modified Mercalli Intensity} in {California}.
-\newblock \emph{Bulletin of the Seismological Society of America}, 102\penalty0 (1):\penalty0 204--221, 2012.
-\newblock \doi{10.1785/0120110156}.
-
-\bibitem[{WorldPop}(2018){WorldPop}]{worldpop2018}
-{WorldPop}.
-\newblock Global 100m Population.
-\newblock University of Southampton, 2018.
-\newblock \doi{10.5258/SOTON/WP00645}.
-
-\bibitem[Yamazaki et~al.(2019)Yamazaki, Ikeshima, Sosa, Bates, Allen, and Pavelsky]{yamazaki2019merit}
-Dai Yamazaki, Daiki Ikeshima, Jeison Sosa, Paul D. Bates, George H. Allen, and Tamlin M. Pavelsky.
-\newblock {MERIT Hydro}: A high-resolution global hydrography map based on latest topography dataset.
-\newblock \emph{Water Resources Research}, 55\penalty0 (6):\penalty0 5053--5073, 2019.
-\newblock \doi{10.1029/2019WR024873}.
-
-\bibitem[Zanaga et~al.(2022)Zanaga, Van De Kerchove, Daems, De Keersmaecker, Brockmann, and Kirches]{zanaga2022worldcover}
-Daniele Zanaga, Ruben Van De Kerchove, Dirk Daems, Wanda De Keersmaecker, Carsten Brockmann, and Grit Kirches et~al..
-\newblock {ESA WorldCover} 10 m 2021 v200.
-\newblock Zenodo, 2022.
-\newblock \doi{10.5281/zenodo.7254221}.
+\providecommand{\href}[2]{#2}
+\providecommand{\path}[1]{#1}
+\providecommand{\DOIprefix}{doi:}
+\providecommand{\ArXivprefix}{arXiv:}
+\providecommand{\URLprefix}{URL: }
+\providecommand{\Pubmedprefix}{pmid:}
+\providecommand{\doi}[1]{\href{http://dx.doi.org/#1}{\path{#1}}}
+\providecommand{\Pubmed}[1]{\href{pmid:#1}{\path{#1}}}
+\providecommand{\bibinfo}[2]{#2}
+\ifx\xfnm\relax \def\xfnm[#1]{\unskip,\space#1}\fi
+%Type = Article
+\bibitem[{Abatzoglou et~al.(2018)Abatzoglou, Dobrowski, Parks and
+  Hegewisch}]{abatzoglou2018terraclimate}
+\bibinfo{author}{Abatzoglou, J.T.}, \bibinfo{author}{Dobrowski, S.Z.},
+  \bibinfo{author}{Parks, S.A.}, \bibinfo{author}{Hegewisch, K.C.},
+  \bibinfo{year}{2018}.
+\newblock \bibinfo{title}{{TerraClimate}, a high-resolution global dataset of
+  monthly climate and climatic water balance from 1958--2015}.
+\newblock \bibinfo{journal}{Scientific Data} \bibinfo{volume}{5},
+  \bibinfo{pages}{170191}.
+\newblock \DOIprefix\doi{10.1038/sdata.2017.191}.
+%Type = Article
+\bibitem[{Aronow et~al.(2015)Aronow, Samii and Assenova}]{aronow2015cluster}
+\bibinfo{author}{Aronow, P.M.}, \bibinfo{author}{Samii, C.},
+  \bibinfo{author}{Assenova, V.A.}, \bibinfo{year}{2015}.
+\newblock \bibinfo{title}{Cluster-robust variance estimation for dyadic data}.
+\newblock \bibinfo{journal}{Political Analysis} \bibinfo{volume}{23},
+  \bibinfo{pages}{564--577}.
+\newblock \DOIprefix\doi{10.1093/pan/mpv018}.
+%Type = Article
+\bibitem[{Avouac et~al.(2015)Avouac, Meng, Wei, Wang and
+  Ampuero}]{avouac2015lower}
+\bibinfo{author}{Avouac, J.P.}, \bibinfo{author}{Meng, L.},
+  \bibinfo{author}{Wei, S.}, \bibinfo{author}{Wang, T.},
+  \bibinfo{author}{Ampuero, J.P.}, \bibinfo{year}{2015}.
+\newblock \bibinfo{title}{Lower edge of locked {Main Himalayan Thrust} unzipped
+  by the 2015 {Gorkha} earthquake}.
+\newblock \bibinfo{journal}{Nature Geoscience} \bibinfo{volume}{8},
+  \bibinfo{pages}{708--711}.
+\newblock \DOIprefix\doi{10.1038/ngeo2518}.
+%Type = Article
+\bibitem[{Beven and Kirkby(1979)}]{beven1979physically}
+\bibinfo{author}{Beven, K.J.}, \bibinfo{author}{Kirkby, M.J.},
+  \bibinfo{year}{1979}.
+\newblock \bibinfo{title}{A physically based, variable contributing area model
+  of basin hydrology}.
+\newblock \bibinfo{journal}{Hydrological Sciences Bulletin}
+  \bibinfo{volume}{24}, \bibinfo{pages}{43--69}.
+\newblock \DOIprefix\doi{10.1080/02626667909491834}.
+%Type = Article
+\bibitem[{Bird et~al.(2014)Bird, Bates, Lefcheck, Hill, Thomson, Edgar,
+  Stuart-Smith, Wotherspoon, Krkosek, Stuart-Smith, Pecl, Barrett
+  et~al.}]{bird2014statistical}
+\bibinfo{author}{Bird, T.J.}, \bibinfo{author}{Bates, A.E.},
+  \bibinfo{author}{Lefcheck, J.S.}, \bibinfo{author}{Hill, N.A.},
+  \bibinfo{author}{Thomson, R.J.}, \bibinfo{author}{Edgar, G.J.},
+  \bibinfo{author}{Stuart-Smith, R.D.}, \bibinfo{author}{Wotherspoon, S.},
+  \bibinfo{author}{Krkosek, M.}, \bibinfo{author}{Stuart-Smith, J.F.},
+  \bibinfo{author}{Pecl, G.T.}, \bibinfo{author}{Barrett, N.}, et~al.,
+  \bibinfo{year}{2014}.
+\newblock \bibinfo{title}{Statistical solutions for error and bias in global
+  citizen science datasets}.
+\newblock \bibinfo{journal}{Biological Conservation} \bibinfo{volume}{173},
+  \bibinfo{pages}{144--154}.
+\newblock \DOIprefix\doi{10.1016/j.biocon.2013.07.037}.
+%Type = Article
+\bibitem[{Borcard and Legendre(2002)}]{borcard2002allscale}
+\bibinfo{author}{Borcard, D.}, \bibinfo{author}{Legendre, P.},
+  \bibinfo{year}{2002}.
+\newblock \bibinfo{title}{All-scale spatial analysis of ecological data by
+  means of principal coordinates of neighbour matrices}.
+\newblock \bibinfo{journal}{Ecological Modelling} \bibinfo{volume}{153},
+  \bibinfo{pages}{51--68}.
+\newblock \DOIprefix\doi{10.1016/S0304-3800(01)00501-4}.
+%Type = Inproceedings
+\bibitem[{Bouckaert and Frank(2004)}]{bouckaert2004evaluating}
+\bibinfo{author}{Bouckaert, R.R.}, \bibinfo{author}{Frank, E.},
+  \bibinfo{year}{2004}.
+\newblock \bibinfo{title}{Evaluating the replicability of significance tests
+  for comparing learning algorithms}, in: \bibinfo{booktitle}{Advances in
+  Knowledge Discovery and Data Mining (PAKDD 2004)},
+  \bibinfo{publisher}{Springer}. pp. \bibinfo{pages}{3--12}.
+%Type = Article
+\bibitem[{Breiman(2001)}]{breiman2001random}
+\bibinfo{author}{Breiman, L.}, \bibinfo{year}{2001}.
+\newblock \bibinfo{title}{Random forests}.
+\newblock \bibinfo{journal}{Machine Learning} \bibinfo{volume}{45},
+  \bibinfo{pages}{5--32}.
+\newblock \DOIprefix\doi{10.1023/A:1010933404324}.
+%Type = Article
+\bibitem[{Buytaert et~al.(2014)Buytaert, Zulkafli, Grainger, Acosta, Alemie,
+  Bastiaensen, De~Bi{\`e}vre, Bhusal, Clark, Dewulf, Foggin, Hannah, Hergarten,
+  Isaeva, Karpouzoglou, Pandeya, Paudel, Sharma, Steenhuis, Tilahun, Van~Hecken
+  and Zhumanova}]{buytaert2014citizen}
+\bibinfo{author}{Buytaert, W.}, \bibinfo{author}{Zulkafli, Z.},
+  \bibinfo{author}{Grainger, S.}, \bibinfo{author}{Acosta, L.},
+  \bibinfo{author}{Alemie, T.C.}, \bibinfo{author}{Bastiaensen, J.},
+  \bibinfo{author}{De~Bi{\`e}vre, B.}, \bibinfo{author}{Bhusal, J.},
+  \bibinfo{author}{Clark, J.}, \bibinfo{author}{Dewulf, A.},
+  \bibinfo{author}{Foggin, M.}, \bibinfo{author}{Hannah, D.M.},
+  \bibinfo{author}{Hergarten, C.}, \bibinfo{author}{Isaeva, A.},
+  \bibinfo{author}{Karpouzoglou, T.}, \bibinfo{author}{Pandeya, B.},
+  \bibinfo{author}{Paudel, D.}, \bibinfo{author}{Sharma, K.},
+  \bibinfo{author}{Steenhuis, T.}, \bibinfo{author}{Tilahun, S.},
+  \bibinfo{author}{Van~Hecken, G.}, \bibinfo{author}{Zhumanova, M.},
+  \bibinfo{year}{2014}.
+\newblock \bibinfo{title}{{Citizen science in hydrology and water resources:
+  opportunities for knowledge generation, ecosystem service management, and
+  sustainable development}}.
+\newblock \bibinfo{journal}{Frontiers in Earth Science} \bibinfo{volume}{2}.
+\newblock \DOIprefix\doi{10.3389/feart.2014.00026}.
+%Type = Article
+\bibitem[{Chapagain et~al.(2019)Chapagain, Ghimire and
+  Shrestha}]{chapagain2019status}
+\bibinfo{author}{Chapagain, P.S.}, \bibinfo{author}{Ghimire, M.},
+  \bibinfo{author}{Shrestha, S.}, \bibinfo{year}{2019}.
+\newblock \bibinfo{title}{{Status of natural springs in the Melamchi region of
+  the Nepal Himalayas in the context of climate change}}.
+\newblock \bibinfo{journal}{Environment, Development and Sustainability}
+  \bibinfo{volume}{21}, \bibinfo{pages}{263--280}.
+\newblock \DOIprefix\doi{10.1007/s10668-017-0036-4}.
+%Type = Article
+\bibitem[{Chauhan et~al.(2023)Chauhan, Shrestha, Oh and
+  Gurung}]{chauhan2023degradation}
+\bibinfo{author}{Chauhan, R.}, \bibinfo{author}{Shrestha, A.},
+  \bibinfo{author}{Oh, S.E.}, \bibinfo{author}{Gurung, A.},
+  \bibinfo{year}{2023}.
+\newblock \bibinfo{title}{{The degradation of spring water resources in Nepal:
+  some policy gaps}}.
+\newblock \bibinfo{journal}{Water Policy} \bibinfo{volume}{25},
+  \bibinfo{pages}{338--358}.
+\newblock \DOIprefix\doi{10.2166/wp.2023.159}.
+%Type = Article
+\bibitem[{De~Reu et~al.(2013)De~Reu, Bourgeois, Bats, Zwertvaegher, Gelorini,
+  De~Smedt, Chu, Antrop, De~Maeyer, Finke, Van~Meirvenne, Verniers
+  et~al.}]{dereu2013application}
+\bibinfo{author}{De~Reu, J.}, \bibinfo{author}{Bourgeois, J.},
+  \bibinfo{author}{Bats, M.}, \bibinfo{author}{Zwertvaegher, A.},
+  \bibinfo{author}{Gelorini, V.}, \bibinfo{author}{De~Smedt, P.},
+  \bibinfo{author}{Chu, W.}, \bibinfo{author}{Antrop, M.},
+  \bibinfo{author}{De~Maeyer, P.}, \bibinfo{author}{Finke, P.},
+  \bibinfo{author}{Van~Meirvenne, M.}, \bibinfo{author}{Verniers, J.}, et~al.,
+  \bibinfo{year}{2013}.
+\newblock \bibinfo{title}{Application of the topographic position index to
+  heterogeneous landscapes}.
+\newblock \bibinfo{journal}{Geomorphology} \bibinfo{volume}{186},
+  \bibinfo{pages}{39--49}.
+\newblock \DOIprefix\doi{10.1016/j.geomorph.2012.12.015}.
+%Type = Article
+\bibitem[{Di~Maio and Fiala(2020)}]{dimaio2020enumerator}
+\bibinfo{author}{Di~Maio, M.}, \bibinfo{author}{Fiala, N.},
+  \bibinfo{year}{2020}.
+\newblock \bibinfo{title}{Be wary of those who ask: A randomized experiment on
+  the size and determinants of the enumerator effect}.
+\newblock \bibinfo{journal}{The World Bank Economic Review}
+  \bibinfo{volume}{34}, \bibinfo{pages}{654--669}.
+\newblock \DOIprefix\doi{10.1093/wber/lhy024}.
+%Type = Misc
+\bibitem[{Didan(2021)}]{didan2021mod13q1}
+\bibinfo{author}{Didan, K.}, \bibinfo{year}{2021}.
+\newblock \bibinfo{title}{{MODIS/Terra} vegetation indices 16-day {L3} global
+  250m {SIN} grid {V061}}.
+\newblock \bibinfo{howpublished}{NASA Land Processes Distributed Active Archive
+  Center}.
+\newblock \DOIprefix\doi{10.5067/MODIS/MOD13Q1.061}.
+%Type = Article
+\bibitem[{Dormann et~al.(2007)Dormann, McPherson, Ara{\'u}jo, Bivand, Bolliger,
+  Carl, Davies, Hirzel, Jetz, Kissling, K{\"u}hn, Ohlem{\"u}ller
+  et~al.}]{dormann2007methods}
+\bibinfo{author}{Dormann, C.F.}, \bibinfo{author}{McPherson, J.M.},
+  \bibinfo{author}{Ara{\'u}jo, M.B.}, \bibinfo{author}{Bivand, R.},
+  \bibinfo{author}{Bolliger, J.}, \bibinfo{author}{Carl, G.},
+  \bibinfo{author}{Davies, R.G.}, \bibinfo{author}{Hirzel, A.},
+  \bibinfo{author}{Jetz, W.}, \bibinfo{author}{Kissling, W.D.},
+  \bibinfo{author}{K{\"u}hn, I.}, \bibinfo{author}{Ohlem{\"u}ller, R.}, et~al.,
+  \bibinfo{year}{2007}.
+\newblock \bibinfo{title}{Methods to account for spatial autocorrelation in the
+  analysis of species distributional data: A review}.
+\newblock \bibinfo{journal}{Ecography} \bibinfo{volume}{30},
+  \bibinfo{pages}{609--628}.
+\newblock \DOIprefix\doi{10.1111/j.2007.0906-7590.05171.x}.
+%Type = Article
+\bibitem[{Dray et~al.(2006)Dray, Legendre and Peres-Neto}]{dray2006spatial}
+\bibinfo{author}{Dray, S.}, \bibinfo{author}{Legendre, P.},
+  \bibinfo{author}{Peres-Neto, P.R.}, \bibinfo{year}{2006}.
+\newblock \bibinfo{title}{Spatial modelling: a comprehensive framework for
+  principal coordinate analysis of neighbour matrices ({PCNM})}.
+\newblock \bibinfo{journal}{Ecological Modelling} \bibinfo{volume}{196},
+  \bibinfo{pages}{483--493}.
+\newblock \DOIprefix\doi{10.1016/j.ecolmodel.2006.02.015}.
+%Type = Article
+\bibitem[{Drusch et~al.(2012)Drusch, Del~Bello, Carlier, Colin, Fernandez,
+  Gascon, Hoersch, Isola, Laberinti, Martimort et~al.}]{drusch2012sentinel}
+\bibinfo{author}{Drusch, M.}, \bibinfo{author}{Del~Bello, U.},
+  \bibinfo{author}{Carlier, S.}, \bibinfo{author}{Colin, O.},
+  \bibinfo{author}{Fernandez, V.}, \bibinfo{author}{Gascon, F.},
+  \bibinfo{author}{Hoersch, B.}, \bibinfo{author}{Isola, C.},
+  \bibinfo{author}{Laberinti, P.}, \bibinfo{author}{Martimort, P.}, et~al.,
+  \bibinfo{year}{2012}.
+\newblock \bibinfo{title}{Sentinel-2: {ESA}'s optical high-resolution mission
+  for {GMES} operational services}.
+\newblock \bibinfo{journal}{Remote Sensing of Environment}
+  \bibinfo{volume}{120}, \bibinfo{pages}{25--36}.
+%Type = Article
+\bibitem[{Elvidge et~al.(2021)Elvidge, Zhizhin, Ghosh, Hsu and
+  Taneja}]{elvidge2021annual}
+\bibinfo{author}{Elvidge, C.D.}, \bibinfo{author}{Zhizhin, M.},
+  \bibinfo{author}{Ghosh, T.}, \bibinfo{author}{Hsu, F.C.},
+  \bibinfo{author}{Taneja, J.}, \bibinfo{year}{2021}.
+\newblock \bibinfo{title}{Annual time series of global {VIIRS} nighttime lights
+  derived from monthly averages: 2012 to 2019}.
+\newblock \bibinfo{journal}{Remote Sensing} \bibinfo{volume}{13},
+  \bibinfo{pages}{922}.
+\newblock \DOIprefix\doi{10.3390/rs13050922}.
+%Type = Misc
+\bibitem[{{European Space Agency}(2021)}]{esa2021copernicusdem}
+\bibinfo{author}{{European Space Agency}}, \bibinfo{year}{2021}.
+\newblock \bibinfo{title}{Copernicus global digital elevation model
+  ({GLO-30})}.
+\newblock \bibinfo{howpublished}{Distributed by OpenTopography / Copernicus DEM
+  AWS open data}.
+\newblock \DOIprefix\doi{10.5270/ESA-c5d3d65}.
+%Type = Article
+\bibitem[{Farr et~al.(2007)Farr, Rosen, Caro, Crippen, Duren, Hensley, Kobrick,
+  Paller, Rodriguez, Roth et~al.}]{farr2007shuttle}
+\bibinfo{author}{Farr, T.G.}, \bibinfo{author}{Rosen, P.A.},
+  \bibinfo{author}{Caro, E.}, \bibinfo{author}{Crippen, R.},
+  \bibinfo{author}{Duren, R.}, \bibinfo{author}{Hensley, S.},
+  \bibinfo{author}{Kobrick, M.}, \bibinfo{author}{Paller, M.},
+  \bibinfo{author}{Rodriguez, E.}, \bibinfo{author}{Roth, L.}, et~al.,
+  \bibinfo{year}{2007}.
+\newblock \bibinfo{title}{The {Shuttle Radar Topography Mission}}.
+\newblock \bibinfo{journal}{Reviews of Geophysics} \bibinfo{volume}{45}.
+%Type = Article
+\bibitem[{Fotheringham and Wong(1991)}]{fotheringham1991modifiable}
+\bibinfo{author}{Fotheringham, A.S.}, \bibinfo{author}{Wong, D.W.S.},
+  \bibinfo{year}{1991}.
+\newblock \bibinfo{title}{The modifiable areal unit problem in multivariate
+  statistical analysis}.
+\newblock \bibinfo{journal}{Environment and Planning A: Economy and Space}
+  \bibinfo{volume}{23}, \bibinfo{pages}{1025--1044}.
+\newblock \DOIprefix\doi{10.1068/a231025}.
+%Type = Article
+\bibitem[{Funk et~al.(2015)Funk, Peterson, Landsfeld, Pedreros, Verdin, Shukla,
+  Husak, Rowland, Harrison, Hoell et~al.}]{funk2015climate}
+\bibinfo{author}{Funk, C.}, \bibinfo{author}{Peterson, P.},
+  \bibinfo{author}{Landsfeld, M.}, \bibinfo{author}{Pedreros, D.},
+  \bibinfo{author}{Verdin, J.}, \bibinfo{author}{Shukla, S.},
+  \bibinfo{author}{Husak, G.}, \bibinfo{author}{Rowland, J.},
+  \bibinfo{author}{Harrison, L.}, \bibinfo{author}{Hoell, A.}, et~al.,
+  \bibinfo{year}{2015}.
+\newblock \bibinfo{title}{The climate hazards group infrared precipitation with
+  stations---a new environmental record for monitoring extremes}.
+\newblock \bibinfo{journal}{Scientific Data} \bibinfo{volume}{2},
+  \bibinfo{pages}{1--21}.
+%Type = Article
+\bibitem[{Galetzka et~al.(2015)Galetzka, Melgar, Genrich, Geng, Owen, Lindsey,
+  Xu, Bock et~al.}]{galetzka2015slip}
+\bibinfo{author}{Galetzka, J.}, \bibinfo{author}{Melgar, D.},
+  \bibinfo{author}{Genrich, J.F.}, \bibinfo{author}{Geng, J.},
+  \bibinfo{author}{Owen, S.}, \bibinfo{author}{Lindsey, E.O.},
+  \bibinfo{author}{Xu, X.}, \bibinfo{author}{Bock, Y.}, et~al.,
+  \bibinfo{year}{2015}.
+\newblock \bibinfo{title}{Slip pulse and resonance of the {Kathmandu} basin
+  during the 2015 {Gorkha} earthquake, {Nepal}}.
+\newblock \bibinfo{journal}{Science} \bibinfo{volume}{349},
+  \bibinfo{pages}{1091--1095}.
+\newblock \DOIprefix\doi{10.1126/science.aac6383}.
+%Type = Article
+\bibitem[{Gorelick et~al.(2017)Gorelick, Hancher, Dixon, Ilyushchenko, Thau and
+  Moore}]{gorelick2017google}
+\bibinfo{author}{Gorelick, N.}, \bibinfo{author}{Hancher, M.},
+  \bibinfo{author}{Dixon, M.}, \bibinfo{author}{Ilyushchenko, S.},
+  \bibinfo{author}{Thau, D.}, \bibinfo{author}{Moore, R.},
+  \bibinfo{year}{2017}.
+\newblock \bibinfo{title}{{Google Earth Engine}: Planetary-scale geospatial
+  analysis for everyone}.
+\newblock \bibinfo{journal}{Remote Sensing of Environment}
+  \bibinfo{volume}{202}, \bibinfo{pages}{18--27}.
+\newblock \DOIprefix\doi{10.1016/j.rse.2017.06.031}.
+%Type = Article
+\bibitem[{Groves and Lyberg(2010)}]{groves2010total}
+\bibinfo{author}{Groves, R.M.}, \bibinfo{author}{Lyberg, L.},
+  \bibinfo{year}{2010}.
+\newblock \bibinfo{title}{Total survey error: Past, present, and future}.
+\newblock \bibinfo{journal}{Public Opinion Quarterly} \bibinfo{volume}{74},
+  \bibinfo{pages}{849--879}.
+\newblock \DOIprefix\doi{10.1093/poq/nfq065}.
+%Type = Article
+\bibitem[{Hansen et~al.(2013)Hansen, Potapov, Moore, Hancher, Turubanova,
+  Tyukavina, Thau, Stehman et~al.}]{hansen2013high}
+\bibinfo{author}{Hansen, M.C.}, \bibinfo{author}{Potapov, P.V.},
+  \bibinfo{author}{Moore, R.}, \bibinfo{author}{Hancher, M.},
+  \bibinfo{author}{Turubanova, S.A.}, \bibinfo{author}{Tyukavina, A.},
+  \bibinfo{author}{Thau, D.}, \bibinfo{author}{Stehman, S.V.}, et~al.,
+  \bibinfo{year}{2013}.
+\newblock \bibinfo{title}{High-resolution global maps of 21st-century forest
+  cover change}.
+\newblock \bibinfo{journal}{Science} \bibinfo{volume}{342},
+  \bibinfo{pages}{850--853}.
+\newblock \DOIprefix\doi{10.1126/science.1244693}.
+%Type = Techreport
+\bibitem[{{ICIMOD}(2021)}]{icimod2021springs}
+\bibinfo{author}{{ICIMOD}}, \bibinfo{year}{2021}.
+\newblock \bibinfo{title}{Protocol for Reviving Springs in the {Hindu Kush
+  Himalaya}: A Practitioner's Manual for a Six-Step Springshed Management
+  Approach}.
+\newblock \bibinfo{type}{Technical Report}. International Centre for Integrated
+  Mountain Development (ICIMOD). \bibinfo{address}{Kathmandu, Nepal}.
+%Type = Misc
+\bibitem[{{ICIMOD}(2025)}]{icimod2025kavredata}
+\bibinfo{author}{{ICIMOD}}, \bibinfo{year}{2025}.
+\newblock \bibinfo{title}{Status of springs in seven municipalities of {Kavre},
+  {Nepal} [data set]}.
+\newblock \bibinfo{howpublished}{Regional Database System, International Centre
+  for Integrated Mountain Development}.
+\newblock \DOIprefix\doi{10.26066/RDS.1974131}. \bibinfo{note}{licensed under
+  CC BY 4.0}.
+%Type = Article
+\bibitem[{Isaac et~al.(2014)Isaac, van Strien, August, de~Zeeuw and
+  Roy}]{isaac2014statistics}
+\bibinfo{author}{Isaac, N.J.B.}, \bibinfo{author}{van Strien, A.J.},
+  \bibinfo{author}{August, T.A.}, \bibinfo{author}{de~Zeeuw, M.P.},
+  \bibinfo{author}{Roy, D.B.}, \bibinfo{year}{2014}.
+\newblock \bibinfo{title}{Statistics for citizen science: Extracting signals of
+  change from noisy ecological data}.
+\newblock \bibinfo{journal}{Methods in Ecology and Evolution}
+  \bibinfo{volume}{5}, \bibinfo{pages}{1052--1060}.
+\newblock \DOIprefix\doi{10.1111/2041-210X.12254}.
+%Type = Article
+\bibitem[{Johnston et~al.(2021)Johnston, Hochachka, Strimas-Mackey,
+  Ruiz~Gutierrez, Robinson, Miller, Auer, Kelling and
+  Fink}]{johnston2021analytical}
+\bibinfo{author}{Johnston, A.}, \bibinfo{author}{Hochachka, W.M.},
+  \bibinfo{author}{Strimas-Mackey, M.E.}, \bibinfo{author}{Ruiz~Gutierrez, V.},
+  \bibinfo{author}{Robinson, O.J.}, \bibinfo{author}{Miller, E.T.},
+  \bibinfo{author}{Auer, T.}, \bibinfo{author}{Kelling, S.T.},
+  \bibinfo{author}{Fink, D.}, \bibinfo{year}{2021}.
+\newblock \bibinfo{title}{Analytical guidelines to increase the value of
+  community science data: An example using {eBird} data to estimate species
+  distributions}.
+\newblock \bibinfo{journal}{Diversity and Distributions} \bibinfo{volume}{27},
+  \bibinfo{pages}{1265--1277}.
+\newblock \DOIprefix\doi{10.1111/ddi.13271}.
+%Type = Article
+\bibitem[{Kapoor and Narayanan(2023)}]{kapoor2023leakage}
+\bibinfo{author}{Kapoor, S.}, \bibinfo{author}{Narayanan, A.},
+  \bibinfo{year}{2023}.
+\newblock \bibinfo{title}{{Leakage and the reproducibility crisis in
+  machine-learning-based science}}.
+\newblock \bibinfo{journal}{Patterns} \bibinfo{volume}{4},
+  \bibinfo{pages}{100804}.
+\newblock \DOIprefix\doi{10.1016/j.patter.2023.100804}.
+%Type = Article
+\bibitem[{Kaufman et~al.(2012)Kaufman, Rosset, Perlich and
+  Stitelman}]{kaufman2012leakage}
+\bibinfo{author}{Kaufman, S.}, \bibinfo{author}{Rosset, S.},
+  \bibinfo{author}{Perlich, C.}, \bibinfo{author}{Stitelman, O.},
+  \bibinfo{year}{2012}.
+\newblock \bibinfo{title}{Leakage in data mining: Formulation, detection, and
+  avoidance}.
+\newblock \bibinfo{journal}{ACM Transactions on Knowledge Discovery from Data}
+  \bibinfo{volume}{6}, \bibinfo{pages}{15}.
+\newblock \DOIprefix\doi{10.1145/2382577.2382579}.
+%Type = Article
+\bibitem[{Knox(1964)}]{knox1964detection}
+\bibinfo{author}{Knox, E.G.}, \bibinfo{year}{1964}.
+\newblock \bibinfo{title}{The detection of space-time interactions}.
+\newblock \bibinfo{journal}{Journal of the Royal Statistical Society. Series C
+  (Applied Statistics)} \bibinfo{volume}{13}, \bibinfo{pages}{25--30}.
+\newblock \DOIprefix\doi{10.2307/2985220}.
+%Type = Article
+\bibitem[{Kosmala et~al.(2016)Kosmala, Wiggins, Swanson and
+  Simmons}]{kosmala2016assessing}
+\bibinfo{author}{Kosmala, M.}, \bibinfo{author}{Wiggins, A.},
+  \bibinfo{author}{Swanson, A.}, \bibinfo{author}{Simmons, B.},
+  \bibinfo{year}{2016}.
+\newblock \bibinfo{title}{Assessing data quality in citizen science}.
+\newblock \bibinfo{journal}{Frontiers in Ecology and the Environment}
+  \bibinfo{volume}{14}, \bibinfo{pages}{551--560}.
+\newblock \DOIprefix\doi{10.1002/fee.1436}.
+%Type = Article
+\bibitem[{Legendre(1993)}]{legendre1993spatial}
+\bibinfo{author}{Legendre, P.}, \bibinfo{year}{1993}.
+\newblock \bibinfo{title}{Spatial autocorrelation: Trouble or new paradigm?}
+\newblock \bibinfo{journal}{Ecology} \bibinfo{volume}{74},
+  \bibinfo{pages}{1659--1673}.
+\newblock \DOIprefix\doi{10.2307/1939924}.
+%Type = Article
+\bibitem[{Meyer and Pebesma(2022)}]{meyer2022machine}
+\bibinfo{author}{Meyer, H.}, \bibinfo{author}{Pebesma, E.},
+  \bibinfo{year}{2022}.
+\newblock \bibinfo{title}{{Machine learning-based global maps of ecological
+  variables and the challenge of assessing them}}.
+\newblock \bibinfo{journal}{Nature Communications} \bibinfo{volume}{13},
+  \bibinfo{pages}{2208}.
+\newblock \DOIprefix\doi{10.1038/s41467-022-29838-9}.
+%Type = Article
+\bibitem[{Nadeau and Bengio(2003)}]{nadeau2003inference}
+\bibinfo{author}{Nadeau, C.}, \bibinfo{author}{Bengio, Y.},
+  \bibinfo{year}{2003}.
+\newblock \bibinfo{title}{Inference for the generalization error}.
+\newblock \bibinfo{journal}{Machine Learning} \bibinfo{volume}{52},
+  \bibinfo{pages}{239--281}.
+\newblock \DOIprefix\doi{10.1023/A:1024068626366}.
+%Type = Article
+\bibitem[{O'Callaghan and Mark(1984)}]{ocallaghan1984extraction}
+\bibinfo{author}{O'Callaghan, J.F.}, \bibinfo{author}{Mark, D.M.},
+  \bibinfo{year}{1984}.
+\newblock \bibinfo{title}{The extraction of drainage networks from digital
+  elevation data}.
+\newblock \bibinfo{journal}{Computer Vision, Graphics, and Image Processing}
+  \bibinfo{volume}{28}, \bibinfo{pages}{323--344}.
+\newblock \DOIprefix\doi{10.1016/S0734-189X(84)80011-0}.
+%Type = Misc
+\bibitem[{{OpenStreetMap contributors}(2024)}]{osm2024}
+\bibinfo{author}{{OpenStreetMap contributors}}, \bibinfo{year}{2024}.
+\newblock \bibinfo{title}{{OpenStreetMap}}.
+\newblock \bibinfo{howpublished}{\url{https://www.openstreetmap.org}}.
+\newblock \bibinfo{note}{Road network and administrative boundaries, ODbL
+  licence}.
+%Type = Misc
+\bibitem[{{OpenStreetMap contributors}(2026)}]{osm2026wards}
+\bibinfo{author}{{OpenStreetMap contributors}}, \bibinfo{year}{2026}.
+\newblock \bibinfo{title}{Ward boundary relations (admin\_level=9) for
+  {Bethanchok}, {Dhulikhel}, {Namobuddha}, {Panauti}, {Panchkhal}, {Roshi} and
+  {Temal}, {Kavrepalanchok}, {Nepal}}.
+\newblock \bibinfo{howpublished}{Retrieved 11 November 2026 via the Overpass
+  API, \url{https://www.openstreetmap.org}}.
+\newblock \bibinfo{note}{Open Database License (ODbL) 1.0}.
+%Type = Article
+\bibitem[{Pandit et~al.(2024)Pandit, Batelaan, Pandey and
+  Adhikari}]{pandit2024depleting}
+\bibinfo{author}{Pandit, A.}, \bibinfo{author}{Batelaan, O.},
+  \bibinfo{author}{Pandey, V.P.}, \bibinfo{author}{Adhikari, S.},
+  \bibinfo{year}{2024}.
+\newblock \bibinfo{title}{{Depleting spring sources in the Himalayas:
+  Environmental drivers or just perception?}}
+\newblock \bibinfo{journal}{Journal of Hydrology: Regional Studies}
+  \bibinfo{volume}{53}, \bibinfo{pages}{101752}.
+\newblock \DOIprefix\doi{10.1016/j.ejrh.2024.101752}.
+%Type = Article
+\bibitem[{Pandit et~al.(2026)Pandit, Thapa, Bhuchar, Dhakal and
+  Kafle}]{pandit2026community}
+\bibinfo{author}{Pandit, A.}, \bibinfo{author}{Thapa, S.},
+  \bibinfo{author}{Bhuchar, S.}, \bibinfo{author}{Dhakal, M.},
+  \bibinfo{author}{Kafle, S.}, \bibinfo{year}{2026}.
+\newblock \bibinfo{title}{Community-driven assessment of springs and ponds:
+  Status, dependency, and utilization in {Kavre} district, central {Nepal}}.
+\newblock \bibinfo{journal}{Environmental Challenges} \bibinfo{volume}{22},
+  \bibinfo{pages}{101394}.
+\newblock \DOIprefix\doi{10.1016/j.envc.2025.101394}.
+%Type = Article
+\bibitem[{Peres-Neto et~al.(2006)Peres-Neto, Legendre, Dray and
+  Borcard}]{peresneto2006variation}
+\bibinfo{author}{Peres-Neto, P.R.}, \bibinfo{author}{Legendre, P.},
+  \bibinfo{author}{Dray, S.}, \bibinfo{author}{Borcard, D.},
+  \bibinfo{year}{2006}.
+\newblock \bibinfo{title}{Variation partitioning of species data matrices:
+  estimation and comparison of fractions}.
+\newblock \bibinfo{journal}{Ecology} \bibinfo{volume}{87},
+  \bibinfo{pages}{2614--2625}.
+\newblock \DOIprefix\doi{10.1890/0012-9658(2006)87[2614:VPOSDM]2.0.CO;2}.
+%Type = Misc
+\bibitem[{Pesaresi(2023)}]{pesaresi2023ghsl}
+\bibinfo{author}{Pesaresi, M.}, \bibinfo{year}{2023}.
+\newblock \bibinfo{title}{{GHS-BUILT-S R2023A} -- {GHS} built-up surface grid,
+  derived from {Sentinel-2} composite and {Landsat}, multitemporal
+  (1975--2030)}.
+\newblock \bibinfo{howpublished}{European Commission, Joint Research Centre
+  (JRC)}.
+\newblock \DOIprefix\doi{10.2905/9F06F36F-4B11-47EC-ABB0-4F8B7B1D72EA}.
+%Type = Article
+\bibitem[{Ploton et~al.(2020)Ploton, Mortier, R{\'e}jou-M{\'e}chain, Barbier,
+  Picard, Rossi, Dormann, Cornu, Viennois, Bayol, Lyapustin, Gourlet-Fleury and
+  P{\'e}lissier}]{ploton2020spatial}
+\bibinfo{author}{Ploton, P.}, \bibinfo{author}{Mortier, F.},
+  \bibinfo{author}{R{\'e}jou-M{\'e}chain, M.}, \bibinfo{author}{Barbier, N.},
+  \bibinfo{author}{Picard, N.}, \bibinfo{author}{Rossi, V.},
+  \bibinfo{author}{Dormann, C.}, \bibinfo{author}{Cornu, G.},
+  \bibinfo{author}{Viennois, G.}, \bibinfo{author}{Bayol, N.},
+  \bibinfo{author}{Lyapustin, A.}, \bibinfo{author}{Gourlet-Fleury, S.},
+  \bibinfo{author}{P{\'e}lissier, R.}, \bibinfo{year}{2020}.
+\newblock \bibinfo{title}{{Spatial validation reveals poor predictive
+  performance of large-scale ecological mapping models}}.
+\newblock \bibinfo{journal}{Nature Communications} \bibinfo{volume}{11},
+  \bibinfo{pages}{4540}.
+\newblock \DOIprefix\doi{10.1038/s41467-020-18321-y}.
+%Type = Article
+\bibitem[{Poggio et~al.(2021)Poggio, de~Sousa, Batjes, Heuvelink, Kempen,
+  Ribeiro and Rossiter}]{poggio2021soilgrids}
+\bibinfo{author}{Poggio, L.}, \bibinfo{author}{de~Sousa, L.M.},
+  \bibinfo{author}{Batjes, N.H.}, \bibinfo{author}{Heuvelink, G.B.M.},
+  \bibinfo{author}{Kempen, B.}, \bibinfo{author}{Ribeiro, E.},
+  \bibinfo{author}{Rossiter, D.}, \bibinfo{year}{2021}.
+\newblock \bibinfo{title}{{SoilGrids} 2.0: producing soil information for the
+  globe with quantified spatial uncertainty}.
+\newblock \bibinfo{journal}{SOIL} \bibinfo{volume}{7},
+  \bibinfo{pages}{217--240}.
+\newblock \DOIprefix\doi{10.5194/soil-7-217-2021}.
+%Type = Article
+\bibitem[{Poudel and Duex(2017)}]{poudel2017vanishing}
+\bibinfo{author}{Poudel, D.D.}, \bibinfo{author}{Duex, T.W.},
+  \bibinfo{year}{2017}.
+\newblock \bibinfo{title}{{Vanishing Springs in Nepalese Mountains: Assessment
+  of Water Sources, Farmers' Perceptions, and Climate Change Adaptation}}.
+\newblock \bibinfo{journal}{Mountain Research and Development}
+  \bibinfo{volume}{37}, \bibinfo{pages}{35}.
+\newblock \DOIprefix\doi{10.1659/mrd-journal-d-16-00039.1}.
+%Type = Article
+\bibitem[{Prokhorenkova et~al.(2018)Prokhorenkova, Gusev, Vorobev, Dorogush and
+  Gulin}]{prokhorenkova2018catboost}
+\bibinfo{author}{Prokhorenkova, L.}, \bibinfo{author}{Gusev, G.},
+  \bibinfo{author}{Vorobev, A.}, \bibinfo{author}{Dorogush, A.V.},
+  \bibinfo{author}{Gulin, A.}, \bibinfo{year}{2018}.
+\newblock \bibinfo{title}{Catboost: unbiased boosting with categorical
+  features}.
+\newblock \bibinfo{journal}{Advances in Neural Information Processing Systems
+  (NeurIPS)} \bibinfo{volume}{31}.
+%Type = Article
+\bibitem[{Ridout et~al.(1999)Ridout, Dem{\'e}trio and
+  Firth}]{ridout1999estimating}
+\bibinfo{author}{Ridout, M.S.}, \bibinfo{author}{Dem{\'e}trio, C.G.B.},
+  \bibinfo{author}{Firth, D.}, \bibinfo{year}{1999}.
+\newblock \bibinfo{title}{Estimating intraclass correlation for binary data}.
+\newblock \bibinfo{journal}{Biometrics} \bibinfo{volume}{55},
+  \bibinfo{pages}{137--148}.
+\newblock \DOIprefix\doi{10.1111/j.0006-341X.1999.00137.x}.
+%Type = Article
+\bibitem[{Roberts et~al.(2017)Roberts, Bahn, Ciuti, Boyce, Elith,
+  Guillera-Arroita, Hauenstein, Lahoz-Monfort, Schr{\"o}der, Thuiller, Warton,
+  Wintle, Hartig and Dormann}]{roberts2017cross}
+\bibinfo{author}{Roberts, D.R.}, \bibinfo{author}{Bahn, V.},
+  \bibinfo{author}{Ciuti, S.}, \bibinfo{author}{Boyce, M.S.},
+  \bibinfo{author}{Elith, J.}, \bibinfo{author}{Guillera-Arroita, G.},
+  \bibinfo{author}{Hauenstein, S.}, \bibinfo{author}{Lahoz-Monfort, J.J.},
+  \bibinfo{author}{Schr{\"o}der, B.}, \bibinfo{author}{Thuiller, W.},
+  \bibinfo{author}{Warton, D.I.}, \bibinfo{author}{Wintle, B.A.},
+  \bibinfo{author}{Hartig, F.}, \bibinfo{author}{Dormann, C.F.},
+  \bibinfo{year}{2017}.
+\newblock \bibinfo{title}{{Cross-validation strategies for data with temporal,
+  spatial, hierarchical, or phylogenetic structure}}.
+\newblock \bibinfo{journal}{Ecography} \bibinfo{volume}{40},
+  \bibinfo{pages}{913--929}.
+\newblock \DOIprefix\doi{10.1111/ecog.02881}.
+%Type = Article
+\bibitem[{Runfola et~al.(2020)Runfola, Anderson, Baier, Crittenden, Dowker,
+  Fuhrig, Goodman, Grimsley, Layko, Melville, Mulder, Oberman, Panganiban,
+  Peck, Seitz, Shea, Slevin, Youngerman and Hobbs}]{runfola2020geoboundaries}
+\bibinfo{author}{Runfola, D.}, \bibinfo{author}{Anderson, A.},
+  \bibinfo{author}{Baier, H.}, \bibinfo{author}{Crittenden, M.},
+  \bibinfo{author}{Dowker, E.}, \bibinfo{author}{Fuhrig, S.},
+  \bibinfo{author}{Goodman, S.}, \bibinfo{author}{Grimsley, G.},
+  \bibinfo{author}{Layko, R.}, \bibinfo{author}{Melville, G.},
+  \bibinfo{author}{Mulder, M.}, \bibinfo{author}{Oberman, R.},
+  \bibinfo{author}{Panganiban, J.}, \bibinfo{author}{Peck, A.},
+  \bibinfo{author}{Seitz, L.}, \bibinfo{author}{Shea, S.},
+  \bibinfo{author}{Slevin, H.}, \bibinfo{author}{Youngerman, R.},
+  \bibinfo{author}{Hobbs, L.}, \bibinfo{year}{2020}.
+\newblock \bibinfo{title}{{geoBoundaries}: A global database of political
+  administrative boundaries}.
+\newblock \bibinfo{journal}{PLoS ONE} \bibinfo{volume}{15},
+  \bibinfo{pages}{e0231866}.
+\newblock \DOIprefix\doi{10.1371/journal.pone.0231866}.
+%Type = Misc
+\bibitem[{Running et~al.(2021)Running, Mu, Zhao and Moreno}]{running2021mod16}
+\bibinfo{author}{Running, S.}, \bibinfo{author}{Mu, Q.}, \bibinfo{author}{Zhao,
+  M.}, \bibinfo{author}{Moreno, A.}, \bibinfo{year}{2021}.
+\newblock \bibinfo{title}{{MODIS/Terra} net evapotranspiration gap-filled 8-day
+  {L4} global 500m {SIN} grid {V061}}.
+\newblock \bibinfo{howpublished}{NASA Land Processes Distributed Active Archive
+  Center}.
+\newblock \DOIprefix\doi{10.5067/MODIS/MOD16A2GF.061}.
+%Type = Article
+\bibitem[{Spiegelhalter(2005)}]{spiegelhalter2005funnel}
+\bibinfo{author}{Spiegelhalter, D.J.}, \bibinfo{year}{2005}.
+\newblock \bibinfo{title}{Funnel plots for comparing institutional
+  performance}.
+\newblock \bibinfo{journal}{Statistics in Medicine} \bibinfo{volume}{24},
+  \bibinfo{pages}{1185--1202}.
+\newblock \DOIprefix\doi{10.1002/sim.1970}.
+%Type = Article
+\bibitem[{Strahler(1957)}]{strahler1957quantitative}
+\bibinfo{author}{Strahler, A.N.}, \bibinfo{year}{1957}.
+\newblock \bibinfo{title}{Quantitative analysis of watershed geomorphology}.
+\newblock \bibinfo{journal}{Eos, Transactions American Geophysical Union}
+  \bibinfo{volume}{38}, \bibinfo{pages}{913--920}.
+\newblock \DOIprefix\doi{10.1029/TR038i006p00913}.
+%Type = Article
+\bibitem[{Tambe et~al.(2012)Tambe, Kharel, Arrawatia, Kulkarni, Mahamuni and
+  Ganeriwala}]{tambe2012reviving}
+\bibinfo{author}{Tambe, S.}, \bibinfo{author}{Kharel, G.},
+  \bibinfo{author}{Arrawatia, M.L.}, \bibinfo{author}{Kulkarni, H.},
+  \bibinfo{author}{Mahamuni, K.}, \bibinfo{author}{Ganeriwala, A.K.},
+  \bibinfo{year}{2012}.
+\newblock \bibinfo{title}{{Reviving Dying Springs: Climate Change Adaptation
+  Experiments From the Sikkim Himalaya}}.
+\newblock \bibinfo{journal}{Mountain Research and Development}
+  \bibinfo{volume}{32}, \bibinfo{pages}{62--72}.
+\newblock \DOIprefix\doi{10.1659/mrd-journal-d-11-00079.1}.
+%Type = Article
+\bibitem[{Thapa et~al.(2023a)Thapa, Bhattarai, Dahal, Tiwari and
+  Jacobsen}]{thapa2023drying}
+\bibinfo{author}{Thapa, B.}, \bibinfo{author}{Bhattarai, C.},
+  \bibinfo{author}{Dahal, N.}, \bibinfo{author}{Tiwari, S.},
+  \bibinfo{author}{Jacobsen, D.}, \bibinfo{year}{2023}a.
+\newblock \bibinfo{title}{{Drying of Springs in the Himalayan Region of Nepal:
+  Perspectives of Local Government Leaders on Causes, Consequences, and
+  Conservation Efforts}}.
+\newblock \bibinfo{journal}{Mountain Research and Development}
+  \bibinfo{volume}{43}, \bibinfo{pages}{R9--R15}.
+\newblock \DOIprefix\doi{10.1659/mrd.2023.00007}.
+%Type = Article
+\bibitem[{Thapa et~al.(2023b)Thapa, Subedi, Desai, Rijal, Tiwari and
+  Kandel}]{thapa2023recharge}
+\bibinfo{author}{Thapa, R.S.}, \bibinfo{author}{Subedi, R.},
+  \bibinfo{author}{Desai, J.}, \bibinfo{author}{Rijal, M.L.},
+  \bibinfo{author}{Tiwari, K.R.}, \bibinfo{author}{Kandel, P.N.},
+  \bibinfo{year}{2023}b.
+\newblock \bibinfo{title}{{Identifying potential recharge areas of mountain
+  springs through hydrogeological mapping}}.
+\newblock \bibinfo{journal}{Banko Janakari} \bibinfo{volume}{33},
+  \bibinfo{pages}{3--15}.
+\newblock \DOIprefix\doi{10.3126/banko.v33i1.55463}.
+%Type = Article
+\bibitem[{Thapa et~al.(2025)Thapa, Pandit, Bhuchar and
+  Dhakal}]{thapa2025citizen}
+\bibinfo{author}{Thapa, S.}, \bibinfo{author}{Pandit, A.},
+  \bibinfo{author}{Bhuchar, S.}, \bibinfo{author}{Dhakal, M.},
+  \bibinfo{year}{2025}.
+\newblock \bibinfo{title}{Citizen science approach for springshed management: A
+  comprehensive community-driven mapping and dataset of spring sources in
+  {Kavre}, {Nepal}}.
+\newblock \bibinfo{journal}{Data in Brief} \bibinfo{volume}{60},
+  \bibinfo{pages}{111466}.
+\newblock \DOIprefix\doi{10.1016/j.dib.2025.111466}.
+%Type = Article
+\bibitem[{Theobald et~al.(2015)Theobald, Harrison-Atlas, Monahan and
+  Albano}]{theobald2015ecologically}
+\bibinfo{author}{Theobald, D.M.}, \bibinfo{author}{Harrison-Atlas, D.},
+  \bibinfo{author}{Monahan, W.B.}, \bibinfo{author}{Albano, C.M.},
+  \bibinfo{year}{2015}.
+\newblock \bibinfo{title}{Ecologically-relevant maps of landforms and
+  physiographic diversity for climate adaptation planning}.
+\newblock \bibinfo{journal}{PLOS ONE} \bibinfo{volume}{10},
+  \bibinfo{pages}{e0143619}.
+\newblock \DOIprefix\doi{10.1371/journal.pone.0143619}.
+%Type = Misc
+\bibitem[{{U.S. Geological Survey}(2015)}]{usgs2015shakemap}
+\bibinfo{author}{{U.S. Geological Survey}}, \bibinfo{year}{2015}.
+\newblock \bibinfo{title}{{ShakeMap} and {ComCat} products for the 25 {April}
+  2015 {M}7.8 {Gorkha} (us20002926) and 12 {May} 2015 {M}7.3 {Dolakha}
+  (us20002ejl) earthquakes}.
+\newblock
+  \bibinfo{howpublished}{\url{https://earthquake.usgs.gov/earthquakes/eventpage/us20002926}}.
+\newblock \bibinfo{note}{Accessed {October} 2026}.
+%Type = Article
+\bibitem[{Valavi et~al.(2019)Valavi, Elith, Lahoz-Monfort and
+  Guillera-Arroita}]{valavi2019blockcv}
+\bibinfo{author}{Valavi, R.}, \bibinfo{author}{Elith, J.},
+  \bibinfo{author}{Lahoz-Monfort, J.J.}, \bibinfo{author}{Guillera-Arroita,
+  G.}, \bibinfo{year}{2019}.
+\newblock \bibinfo{title}{{block CV : An r package for generating spatially or
+  environmentally separated folds for k -fold cross-validation of species
+  distribution models}}.
+\newblock \bibinfo{journal}{Methods in Ecology and Evolution}
+  \bibinfo{volume}{10}, \bibinfo{pages}{225--232}.
+\newblock \DOIprefix\doi{10.1111/2041-210x.13107}.
+%Type = Article
+\bibitem[{Wald et~al.(1999)Wald, Quitoriano, Heaton, Kanamori, Scrivner and
+  Worden}]{wald1999trinet}
+\bibinfo{author}{Wald, D.J.}, \bibinfo{author}{Quitoriano, V.},
+  \bibinfo{author}{Heaton, T.H.}, \bibinfo{author}{Kanamori, H.},
+  \bibinfo{author}{Scrivner, C.W.}, \bibinfo{author}{Worden, C.B.},
+  \bibinfo{year}{1999}.
+\newblock \bibinfo{title}{{TriNet} ``{ShakeMaps}'': Rapid generation of peak
+  ground motion and intensity maps for earthquakes in southern {California}}.
+\newblock \bibinfo{journal}{Earthquake Spectra} \bibinfo{volume}{15},
+  \bibinfo{pages}{537--555}.
+\newblock \DOIprefix\doi{10.1193/1.1586057}.
+%Type = Book
+\bibitem[{Wang and Manga(2010)}]{wang2010earthquakes}
+\bibinfo{author}{Wang, C.y.}, \bibinfo{author}{Manga, M.},
+  \bibinfo{year}{2010}.
+\newblock \bibinfo{title}{Earthquakes and Water}. volume \bibinfo{volume}{114}
+  of \textit{\bibinfo{series}{Lecture Notes in Earth Sciences}}.
+\newblock \bibinfo{publisher}{Springer}, \bibinfo{address}{Berlin, Heidelberg}.
+\newblock \DOIprefix\doi{10.1007/978-3-642-00810-8}.
+%Type = Article
+\bibitem[{Ward(1963)}]{ward1963hierarchical}
+\bibinfo{author}{Ward, J.H.}, \bibinfo{year}{1963}.
+\newblock \bibinfo{title}{Hierarchical grouping to optimize an objective
+  function}.
+\newblock \bibinfo{journal}{Journal of the American Statistical Association}
+  \bibinfo{volume}{58}, \bibinfo{pages}{236--244}.
+\newblock \DOIprefix\doi{10.1080/01621459.1963.10500845}.
+%Type = Article
+\bibitem[{West and Blom(2017)}]{west2017interviewer}
+\bibinfo{author}{West, B.T.}, \bibinfo{author}{Blom, A.G.},
+  \bibinfo{year}{2017}.
+\newblock \bibinfo{title}{Explaining interviewer effects: A research
+  synthesis}.
+\newblock \bibinfo{journal}{Journal of Survey Statistics and Methodology}
+  \bibinfo{volume}{5}, \bibinfo{pages}{175--211}.
+\newblock \DOIprefix\doi{10.1093/jssam/smw024}.
+%Type = Article
+\bibitem[{Worden et~al.(2012)Worden, Gerstenberger, Rhoades and
+  Wald}]{worden2012probabilistic}
+\bibinfo{author}{Worden, C.B.}, \bibinfo{author}{Gerstenberger, M.C.},
+  \bibinfo{author}{Rhoades, D.A.}, \bibinfo{author}{Wald, D.J.},
+  \bibinfo{year}{2012}.
+\newblock \bibinfo{title}{Probabilistic relationships between ground-motion
+  parameters and {Modified Mercalli Intensity} in {California}}.
+\newblock \bibinfo{journal}{Bulletin of the Seismological Society of America}
+  \bibinfo{volume}{102}, \bibinfo{pages}{204--221}.
+\newblock \DOIprefix\doi{10.1785/0120110156}.
+%Type = Misc
+\bibitem[{{WorldPop}(2018)}]{worldpop2018}
+\bibinfo{author}{{WorldPop}}, \bibinfo{year}{2018}.
+\newblock \bibinfo{title}{Global 100m population}.
+\newblock \bibinfo{howpublished}{University of Southampton}.
+\newblock \DOIprefix\doi{10.5258/SOTON/WP00645}.
+%Type = Article
+\bibitem[{Yamazaki et~al.(2019)Yamazaki, Ikeshima, Sosa, Bates, Allen and
+  Pavelsky}]{yamazaki2019merit}
+\bibinfo{author}{Yamazaki, D.}, \bibinfo{author}{Ikeshima, D.},
+  \bibinfo{author}{Sosa, J.}, \bibinfo{author}{Bates, P.D.},
+  \bibinfo{author}{Allen, G.H.}, \bibinfo{author}{Pavelsky, T.M.},
+  \bibinfo{year}{2019}.
+\newblock \bibinfo{title}{{MERIT Hydro}: A high-resolution global hydrography
+  map based on latest topography dataset}.
+\newblock \bibinfo{journal}{Water Resources Research} \bibinfo{volume}{55},
+  \bibinfo{pages}{5053--5073}.
+\newblock \DOIprefix\doi{10.1029/2019WR024873}.
+%Type = Misc
+\bibitem[{Zanaga et~al.(2022)Zanaga, Van De~Kerchove, Daems, De~Keersmaecker,
+  Brockmann, Kirches et~al.}]{zanaga2022worldcover}
+\bibinfo{author}{Zanaga, D.}, \bibinfo{author}{Van De~Kerchove, R.},
+  \bibinfo{author}{Daems, D.}, \bibinfo{author}{De~Keersmaecker, W.},
+  \bibinfo{author}{Brockmann, C.}, \bibinfo{author}{Kirches, G.}, et~al.,
+  \bibinfo{year}{2022}.
+\newblock \bibinfo{title}{{ESA WorldCover} 10 m 2021 v200}.
+\newblock \bibinfo{howpublished}{Zenodo}.
+\newblock \DOIprefix\doi{10.5281/zenodo.7254221}.
 
 \end{thebibliography}

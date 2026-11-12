@@ -1,0 +1,6 @@
+check,n,estimate,detail
+within-ward SN/status association,5689,0.027874733666903025,median within-ward Spearman rho; 43 positive of 75 wards; SN chronology is undocumented
+reported value coded 2071-2085 among valid-year dried records,1513,0.23065599106233406,"ward observed-scale ICC; period is operational, questionnaire wording and visit dates are unavailable"
+valid reported-year coverage among dried records,1521,0.9947403024326101,1513 of 1521 dried records had numeric values 2000-2085
+ward WorldCover/recorded-land-use disagreement vs drying rate,5557,0.224757461094199,"Spearman rho across wards; coarse 2021 250-m-buffer proxy, not a validation or style measure"
+spatially isolated source comparison,383,0.06732290384953418,385 sources are outside the largest within-ward component; majority matches are descriptive

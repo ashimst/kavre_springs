@@ -1,0 +1,2 @@
+contrast,estimate_a,estimate_b,difference,ci_low,ci_high,p_one_sided,n_boot,ratio_of_odds_ratios
+same ward - same 2 km2 catchment (log-odds),0.4437637663437107,0.1074086249638258,0.33635514137988487,-0.14730175863641287,0.5080550317785009,0.132890365448505,300,1.3998360762596729

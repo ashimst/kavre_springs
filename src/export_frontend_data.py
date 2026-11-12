@@ -1,219 +1,201 @@
-import json
+"""
+Export the data behind the interactive map (frontend/src/data.json).
+
+Every number shown by the frontend is computed here from the master table or read from results/metrics, so the
+site cannot drift from the paper. Nothing is typed in by hand except labels and short descriptions.
+
+Usage:  python -m src.export_frontend_data
+"""
+
+from __future__ import annotations
+
+import sys
 from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+import json
+
+import geopandas as gpd
+import numpy as np
 import pandas as pd
-from shapely.geometry import shape, mapping
+from shapely.geometry import mapping, shape
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-DATA_DIR = PROJECT_ROOT / "data"
-PARQUET_PATH = DATA_DIR / "processed" / "master_dataset.parquet"
-DISTRICT_GEOJSON = DATA_DIR / "processed" / "boundaries" / "kavre_district.geojson"
-PALIKAS_GEOJSON = DATA_DIR / "processed" / "boundaries" / "kavre_palikas.geojson"
-OUTPUT_JSON = PROJECT_ROOT / "frontend" / "src" / "data.json"
+from src.boundaries import DISTRICT_FILE, PALIKA_FILE, PALIKAS
+from src.ward_polygons import OSM_PALIKA, WARD_FILE, polygon_ward, recorded_key
 
-df = pd.read_parquet(PARQUET_PATH)
+M = PROJECT_ROOT / "results/metrics"
+PARQUET_PATH = PROJECT_ROOT / "data/processed/master_dataset.parquet"
+OUTPUT_JSON = PROJECT_ROOT / "frontend/src/data.json"
+SIMPLIFY = 0.0005
 
-# 1. District GeoJSON
-with open(DISTRICT_GEOJSON, encoding='utf-8') as f:
-    dist_gj = json.load(f)
-for feat in dist_gj['features']:
-    s = shape(feat['geometry']).simplify(0.0005, preserve_topology=True)
-    feat['geometry'] = mapping(s)
 
-# 2. Municipality Stats & Palikas GeoJSON
-muni_stats = df.groupby('municipality').agg(
-    total=('target_dried', 'count'),
-    dried=('target_dried', 'sum'),
-    rate=('target_dried', 'mean'),
-    elev=('elevation_m', 'mean'),
-    road=('dist_to_road_m', 'mean')
-).reset_index()
+def _r(v, d=3):
+    return None if v is None or (isinstance(v, float) and np.isnan(v)) else round(float(v), d)
 
-with open(PALIKAS_GEOJSON, encoding='utf-8') as f:
-    palikas_gj = json.load(f)
 
-for feat in palikas_gj['features']:
-    name = feat['properties']['name']
-    match = muni_stats[muni_stats['municipality'].str.lower().str.startswith(name[:4].lower())]
-    if len(match) > 0:
-        row = match.iloc[0]
-        feat['properties']['surveyed'] = True
-        feat['properties']['total_springs'] = int(row['total'])
-        feat['properties']['dried_springs'] = int(row['dried'])
-        feat['properties']['drying_rate'] = round(float(row['rate']) * 100, 1)
-        feat['properties']['mean_elev'] = round(float(row['elev']), 0)
-        feat['properties']['mean_road'] = round(float(row['road']), 0)
-    else:
-        feat['properties']['surveyed'] = False
-        feat['properties']['total_springs'] = 0
-        feat['properties']['dried_springs'] = 0
-        feat['properties']['drying_rate'] = 0.0
+def _simplified(gj):
+    for feat in gj["features"]:
+        feat["geometry"] = mapping(shape(feat["geometry"]).simplify(SIMPLIFY, preserve_topology=True))
+    return gj
 
-    s = shape(feat['geometry']).simplify(0.0005, preserve_topology=True)
-    feat['geometry'] = mapping(s)
 
-# 3. Compact representation of all 5,689 springs
-# [lat, lon, dried, elev, muni, type]
-springs_list = []
-for _, r in df.iterrows():
-    springs_list.append([
-        round(float(r['latitude']), 4),
-        round(float(r['longitude']), 4),
-        int(r['target_dried']),
-        int(round(float(r['elevation_m']))),
-        str(r['municipality']),
-        str(r.get('source_type', 'spring'))
-    ])
+def _rate_table(df, col, order=None):
+    g = df.groupby(col, observed=False).target_dried.agg(["count", "sum"]).reset_index()
+    if order is not None:
+        g[col] = pd.Categorical(g[col], order, ordered=True)
+        g = g.sort_values(col)
+    return [{"label": str(r[col]), "total": int(r["count"]), "dried": int(r["sum"]),
+             "rate": _r(100 * r["sum"] / r["count"], 1) if r["count"] else 0.0}
+            for _, r in g.iterrows() if r["count"] > 0]
 
-# 4. Detailed Chart Data Series
-# A. Elevation Distribution
-df['elev_bin'] = pd.cut(
-    df['elevation_m'], 
-    [0, 1000, 1300, 1600, 1900, 4000], 
-    labels=['< 1,000m', '1,000–1,300m', '1,300–1,600m', '1,600–1,900m', '> 1,900m']
-)
-elev_grp = df.groupby('elev_bin', observed=False)['target_dried'].agg(
-    total='count', dried='sum', rate=lambda x: round(float(x.mean()) * 100, 1)
-).reset_index()
-elev_dist = []
-for _, r in elev_grp.iterrows():
-    elev_dist.append({
-        'range': str(r['elev_bin']),
-        'total': int(r['total']),
-        'dried': int(r['dried']),
-        'active': int(r['total'] - r['dried']),
-        'rate': float(r['rate'])
-    })
 
-# B. Road Distance Gradient
-df['road_bin'] = pd.cut(
-    df['dist_to_road_m'], 
-    [-1, 50, 100, 250, 500, 20000], 
-    labels=['< 50m', '50–100m', '100–250m', '250–500m', '> 500m']
-)
-road_grp = df.groupby('road_bin', observed=False)['target_dried'].agg(
-    total='count', dried='sum', rate=lambda x: round(float(x.mean()) * 100, 1)
-).reset_index()
-road_dist = []
-for _, r in road_grp.iterrows():
-    road_dist.append({
-        'distance': str(r['road_bin']),
-        'total': int(r['total']),
-        'dried': int(r['dried']),
-        'active': int(r['total'] - r['dried']),
-        'rate': float(r['rate'])
-    })
+def build():
+    df = pd.read_parquet(PARQUET_PATH)
+    y = df.target_dried.astype(int)
 
-# C. Land Use Resilience
-lu_names = {
-    'dense_forest': 'Dense Forest',
-    'sparse_forest': 'Sparse Forest',
-    'agriculture': 'Agricultural Terraces',
-    'grassland': 'Grassland & Shrub',
-    'settlement': 'Settlement & Urban Fringe',
-    'fallow': 'Fallow Land',
-    'others': 'Other Barren'
-}
-lu_grp = df.groupby('landuse')['target_dried'].agg(
-    total='count', dried='sum', rate=lambda x: round(float(x.mean()) * 100, 1)
-).reset_index()
-lu_dist = []
-for _, r in lu_grp.iterrows():
-    lu_dist.append({
-        'landuse': lu_names.get(r['landuse'], str(r['landuse']).title()),
-        'total': int(r['total']),
-        'dried': int(r['dried']),
-        'rate': float(r['rate'])
-    })
-lu_dist.sort(key=lambda x: x['rate'])
+    # --- boundaries --------------------------------------------------------------------------------------------
+    district = _simplified(json.loads(Path(DISTRICT_FILE).read_text(encoding="utf-8")))
+    palikas = _simplified(json.loads(Path(PALIKA_FILE).read_text(encoding="utf-8")))
+    official = df.municipality.map(PALIKAS)
+    pstats = df.assign(official=official).groupby("official").agg(
+        total=("target_dried", "size"), dried=("target_dried", "sum"), elev=("elevation_m", "mean"),
+        road=("dist_to_road_m", "mean"), springs=("source_type", lambda s: int((s == "spring").sum())))
+    for feat in palikas["features"]:
+        p = feat["properties"]
+        if p["name"] in pstats.index:
+            s = pstats.loc[p["name"]]
+            p.update(surveyed=True, total_sources=int(s.total), dried_sources=int(s.dried),
+                     drying_rate=_r(100 * s.dried / s.total, 1), mean_elev=int(round(s.elev)),
+                     mean_road=int(round(s.road)))
+        else:
+            p.update(surveyed=False, total_sources=0, dried_sources=0, drying_rate=None)
 
-# D. Aspect Solar Insolation
-def aspect_to_quad(a):
-    if (a >= 315) or (a < 45): return 'North (Shaded / Moist)'
-    elif 45 <= a < 135: return 'East (Morning Sun)'
-    elif 135 <= a < 225: return 'South (High Insolation / Deficit)'
-    else: return 'West (Afternoon Thermal Deficit)'
+    # --- ward polygons (OpenStreetMap) with the agreement of recorded labels ----------------------------------
+    wards = gpd.read_file(WARD_FILE)
+    rec, poly = recorded_key(df), polygon_ward(df, wards)
+    inside = pd.Series(rec == poly).groupby(rec).mean()
+    n_rec = pd.Series(rec).value_counts()
+    rate_rec = pd.Series(y.to_numpy()).groupby(rec).mean()
+    back = {v: k for k, v in OSM_PALIKA.items()}
+    ward_features = []
+    for _, w in wards.iterrows():
+        key = f"{w.palika}-{w.ward}"
+        ward_features.append({"type": "Feature", "geometry": mapping(w.geometry.simplify(SIMPLIFY / 2, preserve_topology=True)),
+                              "properties": {"palika": PALIKAS.get(back.get(w.palika, ""), w.palika), "ward": int(w.ward),
+                                             "n_recorded": int(n_rec.get(key, 0)),
+                                             "share_inside": _r(inside.get(key, np.nan), 3),
+                                             "recorded_rate": _r(100 * rate_rec.get(key, np.nan), 1)}})
+    ward_gj = {"type": "FeatureCollection", "features": ward_features}
 
-df['aspect_quad'] = df['aspect_deg'].apply(aspect_to_quad)
-asp_grp = df.groupby('aspect_quad')['target_dried'].agg(
-    total='count', dried='sum', rate=lambda x: round(float(x.mean()) * 100, 1)
-).reset_index()
-aspect_dist = []
-for _, r in asp_grp.iterrows():
-    aspect_dist.append({
-        'quadrant': str(r['aspect_quad']),
-        'total': int(r['total']),
-        'dried': int(r['dried']),
-        'rate': float(r['rate'])
-    })
+    # --- sources: [lat, lon, dried, elevation, official palika, type, recorded ward] -------------------------
+    sources = [[_r(r.latitude, 4), _r(r.longitude, 4), int(r.target_dried), int(round(r.elevation_m)),
+                PALIKAS.get(r.municipality, r.municipality), str(r.source_type), int(r.ward)]
+               for r in df.itertuples()]
 
-# E. Recalled Community Desiccation Causes
-recalled_causes = [
-    {'cause': '2015 Gorkha Earthquake', 'count': 538, 'pct': 35.4, 'desc': 'Seismic fracture dilation & aquifer displacement'},
-    {'cause': 'Road & Track Construction', 'count': 374, 'pct': 24.6, 'desc': 'Heavy bulldozer cuts shearing shallow fracture lines'},
-    {'cause': 'Prolonged Drought & Rain Decline', 'count': 331, 'pct': 21.8, 'desc': 'Monsoon variability & winter precipitation deficits'},
-    {'cause': 'Land Cover & Forest Degradation', 'count': 167, 'pct': 11.0, 'desc': 'Loss of canopy interception & infiltration capacity'},
-    {'cause': 'Siltation & Unmanaged Upstream Diversion', 'count': 109, 'pct': 7.2, 'desc': 'Intake pipe tapping and sediment clogging'}
-]
+    # --- descriptive charts -----------------------------------------------------------------------------------
+    elev_labels = ["< 1,000 m", "1,000-1,300 m", "1,300-1,600 m", "1,600-1,900 m", "> 1,900 m"]
+    road_labels = ["< 50 m", "50-100 m", "100-250 m", "250-500 m", "> 500 m"]
+    df["elev_bin"] = pd.cut(df.elevation_m, [-1, 1000, 1300, 1600, 1900, 9000], labels=elev_labels)
+    df["road_bin"] = pd.cut(df.dist_to_road_m, [-1, 50, 100, 250, 500, 1e6], labels=road_labels)
+    quad = np.select([(df.aspect_deg >= 315) | (df.aspect_deg < 45), df.aspect_deg < 135, df.aspect_deg < 225],
+                     ["North", "East", "South"], "West")
+    df["aspect_quad"] = quad
+    lu_names = {"dense_forest": "Dense forest", "sparse_forest": "Sparse forest", "agriculture": "Agriculture",
+                "grassland": "Grassland", "settlement": "Settlement", "fallow": "Fallow", "others": "Other"}
+    df["landuse_label"] = df.landuse.map(lu_names).fillna("Other")
+    landuse = sorted(_rate_table(df, "landuse_label"), key=lambda r: r["rate"])
+    cause_names = {"earthquake": "2015 earthquake", "drought": "Drought", "infrastructure_development": "Infrastructure",
+                   "natural_disaster": "Other natural disaster", "source_neglected": "Source neglected",
+                   "source_disruption": "Source disruption", "deforestation": "Deforestation"}
+    dried = df[df.target_dried == 1]
+    cause = dried.reason_of_drying.map(cause_names).fillna("Other or not stated")
+    causes = [{"label": k, "count": int(v), "pct": _r(100 * v / len(dried), 1)} for k, v in cause.value_counts().items()]
+    yr = pd.to_numeric(dried.years_since_dried, errors="coerce")
+    yr = yr[(yr >= 2050) & (yr <= 2081)].astype(int)
+    years = [{"year": int(k), "count": int(v)} for k, v in yr.value_counts().sort_index().items()]
 
-payload = {
-    'totalSprings': int(len(df)),
-    'totalDried': int(df['target_dried'].sum()),
-    'dryingRate': round(float(df['target_dried'].mean()) * 100, 1),
-    'district': dist_gj,
-    'palikas': palikas_gj,
-    'springs': springs_list,
-    'charts': {
-        'elevation': elev_dist,
-        'road': road_dist,
-        'landuse': lu_dist,
-        'aspect': aspect_dist,
-        'causes': recalled_causes
-    },
-    'icc': {
-        'ward': 0.358,
-        'catchment': 0.141,
-        'ratio': '2.54×'
-    },
-    'typology': [
-        {'id': 'T1', 'name': 'Urban Fringe Terraces', 'rate': 40.0, 'elev': '1,430m', 'hazard': 'High borehole and road density disruption', 'risk': 'High'},
-        {'id': 'T2', 'name': 'Alluvial Valleys', 'rate': 29.5, 'elev': '1,030m', 'hazard': 'Agricultural irrigation drawdown', 'risk': 'Moderate'},
-        {'id': 'T3', 'name': 'Mid-elevation Farmland', 'rate': 29.5, 'elev': '1,380m', 'hazard': 'Terraced cultivation water balance', 'risk': 'Moderate'},
-        {'id': 'T4', 'name': 'Wetland Depressions', 'rate': 26.1, 'elev': '1,150m', 'hazard': 'Sediment accumulation in ponds', 'risk': 'Moderate'},
-        {'id': 'T5', 'name': 'Steep Degraded South Slopes', 'rate': 36.9, 'elev': '1,490m', 'hazard': 'Severe climate water deficit & thin soils', 'risk': 'High'},
-        {'id': 'T6', 'name': 'Shaded North Hillslopes', 'rate': 18.5, 'elev': '1,460m', 'hazard': 'Relatively moist and resilient', 'risk': 'Low'},
-        {'id': 'T7', 'name': 'Forested Mid-Ridges', 'rate': 19.8, 'elev': '1,650m', 'hazard': 'Protected recharge canopy buffer', 'risk': 'Low'},
-        {'id': 'T8', 'name': 'High-Altitude Sanctuaries', 'rate': 12.6, 'elev': '1,890m', 'hazard': 'Pristine mountain recharge zones', 'risk': 'Resilient'}
-    ],
-    'rules': [
-        {'rule': 'Ridge Crest + High Water Deficit', 'consequent': 'Dried', 'confidence': '52.2%', 'lift': '1.95×', 'desc': 'High topographic position combined with south-facing moisture deficit doubles spring desiccation hazard.'},
-        {'rule': 'Low Upstream Area + High TPI', 'consequent': 'Dried', 'confidence': '39.3%', 'lift': '1.47×', 'desc': 'Springs near ridgelines with limited upslope collection area desiccate rapidly during droughts.'},
-        {'rule': 'Distance to Road < 50m + Public Ownership', 'consequent': 'Dried', 'confidence': '67.8%', 'lift': '2.54×', 'desc': 'Unpaved rural road cuts directly rupture shallow aquifer fracture lines and induce siltation.'},
-        {'rule': 'Dense Forest + High TWI + Low Deficit', 'consequent': 'Active', 'confidence': '99.2%', 'lift': '1.35×', 'desc': 'Intact native canopy and natural concave depressions maintain near-perfect hydrological resilience.'}
-    ],
-    'timeline': [
-        {'year': '2005', 'count': 18, 'isQuake': False},
-        {'year': '2008', 'count': 116, 'isQuake': False},
-        {'year': '2011', 'count': 50, 'isQuake': False},
-        {'year': '2013', 'count': 139, 'isQuake': False},
-        {'year': '2015', 'count': 538, 'isQuake': True},
-        {'year': '2017', 'count': 48, 'isQuake': False},
-        {'year': '2019', 'count': 39, 'isQuake': False},
-        {'year': '2021', 'count': 43, 'isQuake': False},
-        {'year': '2023', 'count': 29, 'isQuake': False}
-    ],
-    'credits': {
-        'dataProvider': 'International Centre for Integrated Mountain Development (ICIMOD)',
-        'dataDetails': 'Comprehensive field inventory of 5,689 springs conducted in collaboration with local palika governments and the Ministry of Energy, Water Resources and Irrigation, Nepal under Open Data principles.',
-        'author': 'Ashim Shrestha',
-        'organization': 'Noesis Frameworks',
-        'orgUrl': 'https://noesisframeworks.com',
-        'githubUrl': 'https://github.com/ashimst/kavre_springs',
-        'userGithub': 'https://github.com/ashimst'
+    # --- findings, read from the result tables -----------------------------------------------------------------
+    audit = pd.read_csv(M / "x0_raw_field_audit_summary.csv").iloc[0]
+    single = pd.read_csv(M / "single_feature_auc.csv").set_index("feature").single_feature_auc
+    bench = pd.read_csv(M / "benchmark_summary.csv")
+    tab = bench[(bench.scheme == "spatial") & (bench.buffer_m == 0) & bench.profile.isin(["main", "enriched"])
+                & bench.model.isin(["Logistic Regression", "Random Forest", "CatBoost"])]
+    within = pd.read_csv(M / "x2_within_ward_auc.csv").query("feature_set == 'env_hydro' and buffer_m == 0")
+    within = within[within.model.isin(["Logistic Regression", "Random Forest", "CatBoost"])]
+    pal_agree = pd.read_csv(M / "boundary_agreement.csv").set_index("palika").loc["all"]
+    ward_agree = pd.read_csv(M / "ward_boundary_agreement.csv").set_index("palika").loc["all"]
+    lat = pd.read_csv(M / "x28_latent_icc.csv")
+    con = pd.read_csv(M / "x28_latent_icc_contrasts.csv")
+    reduced = pd.read_csv(M / "x22_reduced_covariates.csv")
+
+    units = lat[lat.block == "units vs rotated grids"].set_index("unit")
+    unit_rows = []
+    for key, label in [("ward", "Wards (75)"), ("catchment T=0.5 km2", "Catchments, 0.5 km²"),
+                       ("catchment T=2 km2", "Catchments, 2 km²"), ("catchment count-matched", "Catchments, matched to 75"),
+                       ("catchment T=10 km2", "Catchments, 10 km²")]:
+        u = units.loc[key]
+        unit_rows.append({"unit": label, "observed": _r(u.observed_obs), "observed_beats_grids": bool(u.observed_n_exceed == 0),
+                          "latent": _r(u.latent_obs), "latent_beats_grids": bool(u.latent_n_exceed == 0),
+                          "latent_grid_exceed": int(u.latent_n_exceed)})
+    fam = lat[(lat.block == "ward vs reference families") & (lat.subset == "all sources")]
+    fam_rows = []
+    names = {"rotated matched grids": "Rotated grids", "contiguous size-matched regions": "Contiguous random regions",
+             "contiguous size-matched regions within municipality": "Regions within municipality"}
+    for outcome, olabel in [("recorded drying", "Recorded drying"),
+                            ("adjusted for 65 environmental covariates", "After 65 covariates")]:
+        for null, nlabel in names.items():
+            r = fam[(fam.outcome == outcome) & (fam["null"] == null)].iloc[0]
+            fam_rows.append({"outcome": olabel, "reference": nlabel,
+                             "observed_exceed": int(r.observed_n_exceed), "latent_exceed": int(r.latent_n_exceed),
+                             "n": int(r.latent_n_null)})
+    contrasts = [{"contrast": c.contrast.replace("ward - catchment count-matched", "Wards minus catchments matched to 75")
+                  .replace("ward - catchment T=2 km2", "Wards minus 2 km² catchments"),
+                  "scale": c.scale, "difference": _r(c.difference), "low": _r(c.ci_low), "high": _r(c.ci_high)}
+                 for c in con.itertuples()]
+    within_ward = reduced[(reduced.model.str.startswith("within")) & reduced.ci_excludes_zero]
+    drivers = [{"term": {"tpi_500m": "Topographic position (TPI, 500 m)", "chili": "Heat load (CHILI)"}.get(t.term, t.term),
+                "beta": _r(t.coef_per_sd, 2), "low": _r(t.ci_low, 2), "high": _r(t.ci_high, 2)}
+               for t in within_ward.itertuples()]
+
+    findings = {
+        "skipLogic": {"fields": int(audit.n_fields), "outcomeDependent": int(audit.n_outcome_dependent),
+                      "completionIndicatorAuc": _r(single.get("earthquake_impact_known"))},
+        "prediction": {"aucLow": _r(tab.roc_auc_mean.min(), 2), "aucHigh": _r(tab.roc_auc_mean.max(), 2),
+                       "withinWardLow": _r(within.within_ward_auc.min(), 2),
+                       "withinWardHigh": _r(within.within_ward_auc.max(), 2)},
+        "location": {"insidePalika": _r(100 * pal_agree.inside_recorded_palika, 1),
+                     "insideWard": _r(100 * ward_agree.inside_recorded_ward, 1),
+                     "within100m": _r(100 * ward_agree.within_100m_of_recorded_ward, 1),
+                     "adjacentWard": _r(100 * ward_agree.outside_in_adjacent_ward, 1),
+                     "wardsUnderHalf": int(ward_agree.wards_under_50pct_inside)},
+        "icc": {"units": unit_rows, "references": fam_rows, "contrasts": contrasts},
+        "withinWardDrivers": drivers,
     }
-}
 
-OUTPUT_JSON.parent.mkdir(parents=True, exist_ok=True)
-with open(OUTPUT_JSON, 'w', encoding='utf-8') as f:
-    json.dump(payload, f)
+    return {
+        "totalSources": int(len(df)), "totalDried": int(y.sum()), "dryingRate": _r(100 * y.mean(), 1),
+        "springs": int((df.source_type == "spring").sum()), "ponds": int((df.source_type == "pond").sum()),
+        "district": district, "palikas": palikas, "wards": ward_gj, "sources": sources,
+        "charts": {"elevation": _rate_table(df, "elev_bin", elev_labels), "road": _rate_table(df, "road_bin", road_labels),
+                   "landuse": landuse, "aspect": _rate_table(df, "aspect_quad", ["North", "East", "South", "West"]),
+                   "causes": causes, "years": years},
+        "findings": findings,
+        "credits": {
+            "dataProvider": "International Centre for Integrated Mountain Development (ICIMOD)",
+            "dataTitle": "Status of Springs in Seven Municipalities of Kavre, Nepal",
+            "dataDoi": "https://doi.org/10.26066/RDS.1974131", "dataLicence": "CC BY 4.0",
+            "authors": ["Ashim Shrestha", "Kushal Kunwar"],
+            "organization": "Noesis Frameworks", "orgUrl": "https://noesisframeworks.com",
+            "githubUrl": "https://github.com/ashimst/kavre_springs", "userGithub": "https://github.com/ashimst",
+        },
+    }
 
-print(f"Exported data.json to {OUTPUT_JSON} (size: {OUTPUT_JSON.stat().st_size / 1024:.1f} KB)")
+
+if __name__ == "__main__":
+    payload = build()
+    OUTPUT_JSON.parent.mkdir(parents=True, exist_ok=True)
+    OUTPUT_JSON.write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
+    print(f"Exported {OUTPUT_JSON} ({OUTPUT_JSON.stat().st_size / 1024:.0f} KB)")

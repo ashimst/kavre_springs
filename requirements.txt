@@ -1,29 +1,20 @@
-# Exact versions used to produce the published results (Python 3.12, CUDA 12.6).
-# torch: install the build matching your platform from https://pytorch.org (CPU works, ~5x slower).
+# Exact versions used to produce the published results (Python 3.12.8). CPU only; no GPU or deep-learning stack needed.
 numpy==2.2.6
 pandas==2.2.3
 pyarrow==23.0.0
 scipy==1.13.1
 scikit-learn==1.5.2
-torch==2.13.0
-torch-geometric==2.8.1
 catboost==1.2.10
-xgboost==3.4.1
-shap==0.54.1
 matplotlib==3.9.2
-seaborn==0.13.2
 geopandas==1.2.0
-folium==0.20.0
+shapely==2.1.2
+mlxtend==0.23.4          # apriori (src/pattern_mining.py)
+pysheds==0.5             # DEM flow routing (src/hydro_gis.py)
+rasterio==1.5.2
 pytest==8.3.3
-# Apriori pattern mining (src/pattern_mining.py)
-mlxtend==0.23.4
-networkx
-# Notebooks
-nbformat
-nbclient
-ipykernel
-# DEM hydrology (src/hydro_gis.py): flow routing and catchments
-pysheds==0.5
-rasterio
-# Only needed to re-extract the Earth Engine covariates (requires an authenticated account):
-# earthengine-api>=1.7
+# notebooks (python reproduce_all.py --notebooks)
+nbformat==5.10.4
+nbclient==0.10.0
+ipykernel==6.29.5
+# Optional, only to re-extract the versioned covariates (needs an authenticated Earth Engine account / network):
+# earthengine-api==1.7.51 fsspec geemap

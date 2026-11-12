@@ -14,7 +14,7 @@ code with a fill value -- encodes the label itself.
 An earlier version of this project used `earthquake_impact_ordinal` and
 `earthquake_impact_known` as node features. A one-line rule on the latter
 reproduces the balanced accuracy of every model reported then (see
-`results/metrics/leakage_audit.csv` and Table S4 of the SI).
+`results/metrics/leakage_audit.csv` and Table S2 of the SI).
 
 Feature sets
 ------------
@@ -106,6 +106,16 @@ EXPLANATORY_SET = "env_rich"
 # Change / dynamics variables: may partly reflect drying itself (reverse causation), so they are excluded from the
 # static landscape typology and interpreted with care.
 DYNAMIC_FEATURES = ["ndvi_trend", "ndvi_change_2015", "et_trend", "gfc_loss_post2015", "built_change"]
+
+
+# Columns that make the 65-covariate set rank-deficient: wc_shrub is constant in the study area, and the WorldCover
+# fractions and the ownership classes each sum to one. Dropping them gives the 62-covariate full-rank set.
+FULL_RANK_DROP = ("wc_shrub", "wc_water", "ownership_public")
+
+
+def full_rank_columns(df=None):
+    """The explanatory set without the three exactly redundant columns (rank 62 + intercept)."""
+    return [c for c in explanatory_columns(df) if c not in FULL_RANK_DROP]
 
 
 def explanatory_columns(df=None, drop_coordinates=True):
@@ -215,7 +225,8 @@ LABEL_DERIVED_COLUMNS = {
 FORBIDDEN_FEATURES = set(EARTHQUAKE_LEAKY) | SKIP_LOGIC_SURVEY_COLUMNS | LABEL_DERIVED_COLUMNS
 
 # A model feature whose source column's missingness differs by more than this between
-# dried and active sources is treated as skip-logic leakage.
+# dried and active sources is blocked as a leakage backstop. Explicit questionnaire
+# routing and the forbidden-field list remain the primary safeguards.
 MAX_MISSINGNESS_GAP = 0.05
 
 

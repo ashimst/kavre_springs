@@ -7,7 +7,7 @@ export default function Map({
   onSelectPalika,
   statusFilter,
   activeBasemap,
-  onHoverPalika
+  showWards
 }) {
   const mapContainerRef = useRef(null);
   const mapInstanceRef = useRef(null);
@@ -15,6 +15,7 @@ export default function Map({
   const districtLayerRef = useRef(null);
   const palikasLayerRef = useRef(null);
   const springsLayerRef = useRef(null);
+  const wardsLayerRef = useRef(null);
   const canvasRendererRef = useRef(null);
 
   // Zero-API-Key Open GIS Basemaps
@@ -65,7 +66,7 @@ export default function Map({
       strokeColor = '#f59e0b';
     }
 
-    const isSelected = selectedPalika && p.name.toLowerCase().startsWith(selectedPalika.slice(0, 4).toLowerCase());
+    const isSelected = selectedPalika === p.name;
 
     return {
       fillColor,
@@ -163,12 +164,10 @@ export default function Map({
               const target = e.target;
               target.setStyle(getPalikaStyle(feat, true));
               target.bringToFront();
-              if (onHoverPalika) onHoverPalika(p);
             },
             mouseout: (e) => {
               const target = e.target;
               target.setStyle(getPalikaStyle(feat, false));
-              if (onHoverPalika) onHoverPalika(null);
             },
             click: () => {
               if (p.surveyed) {
@@ -184,13 +183,13 @@ export default function Map({
           const statusHtml = p.surveyed 
             ? `<div style="font-weight:600; color:#0f172a; font-size:14px; margin-bottom:4px;">${p.name}</div>
                <div style="font-size:12px; color:#475569; display:grid; grid-template-columns:1fr 1fr; gap:6px;">
-                 <div><strong>Total Springs:</strong> ${p.total_springs.toLocaleString()}</div>
-                 <div><strong>Drying Rate:</strong> <span style="color:${p.drying_rate > 30 ? '#dc2626' : '#2563eb'}">${p.drying_rate}%</span></div>
+                 <div><strong>Sources:</strong> ${p.total_sources.toLocaleString()}</div>
+                 <div><strong>Recorded dried:</strong> <span style="color:${p.drying_rate > 30 ? '#dc2626' : '#2563eb'}">${p.drying_rate}%</span></div>
                  <div><strong>Mean Elev:</strong> ${p.mean_elev} m</div>
                  <div><strong>Road Dist:</strong> ${p.mean_road} m</div>
                </div>`
             : `<div style="font-weight:600; color:#64748b; font-size:14px;">${p.name}</div>
-               <div style="font-size:12px; color:#94a3b8; margin-top:2px;">Unsurveyed in official baseline</div>`;
+               <div style="font-size:12px; color:#94a3b8; margin-top:2px;">Not covered by the inventory</div>`;
 
           layer.bindTooltip(statusHtml, {
             sticky: true,
@@ -201,10 +200,43 @@ export default function Map({
     }
   }, [data, selectedPalika]);
 
-  // 4. Render 5,689 Springs on Canvas Renderer
+  // 4. Ward boundaries (OpenStreetMap), shaded by how many of each recorded ward's sources fall inside the polygon
   useEffect(() => {
     const map = mapInstanceRef.current;
-    if (!map || !data || !data.springs) return;
+    if (!map || !data?.wards) return;
+    if (wardsLayerRef.current) {
+      map.removeLayer(wardsLayerRef.current);
+      wardsLayerRef.current = null;
+    }
+    if (!showWards) return;
+
+    const shade = (s) => (s === null ? '#e2e8f0' : s < 0.5 ? '#f59e0b' : s < 0.8 ? '#bfdbfe' : '#3b82f6');
+    wardsLayerRef.current = L.geoJSON(data.wards, {
+      style: (feat) => ({
+        color: '#1e3a8a',
+        weight: 0.8,
+        fillColor: shade(feat.properties.share_inside),
+        fillOpacity: 0.35
+      }),
+      onEachFeature: (feat, layer) => {
+        const p = feat.properties;
+        const share = p.share_inside === null ? '–' : `${Math.round(p.share_inside * 100)}%`;
+        layer.bindTooltip(
+          `<div style="font-weight:600; color:#0f172a; font-size:13px;">${p.palika} ward ${p.ward}</div>
+           <div style="font-size:12px; color:#475569;">Sources recorded in this ward: ${p.n_recorded}<br/>
+           Of those, inside this polygon: <strong>${share}</strong><br/>
+           Recorded dried (by recorded ward): ${p.recorded_rate ?? '–'}%</div>`,
+          { sticky: true, className: 'palika-map-tooltip' }
+        );
+      }
+    }).addTo(map);
+    if (springsLayerRef.current) springsLayerRef.current.bringToFront();
+  }, [data, showWards]);
+
+  // 5. Render the sources on the canvas renderer
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map || !data?.sources) return;
 
     if (springsLayerRef.current) {
       map.removeLayer(springsLayerRef.current);
@@ -215,21 +247,10 @@ export default function Map({
 
     const isAllPalikas = !selectedPalika || selectedPalika === 'All Palikas';
 
-    for (let i = 0; i < data.springs.length; i++) {
-      const sp = data.springs[i];
-      const lat = sp[0];
-      const lon = sp[1];
-      const dried = sp[2];
-      const elev = sp[3];
-      const muni = sp[4];
-      const type = sp[5];
+    for (const sp of data.sources) {
+      const [lat, lon, dried, elev, muni, type, ward] = sp;
 
-      // Municipality Filter
-      if (!isAllPalikas) {
-        if (!muni.toLowerCase().startsWith(selectedPalika.slice(0, 4).toLowerCase())) {
-          continue;
-        }
-      }
+      if (!isAllPalikas && muni !== selectedPalika) continue;
 
       // Status Filter
       if (statusFilter === 'dried' && dried === 0) continue;
@@ -249,12 +270,12 @@ export default function Map({
         <div style="padding:10px; font-family:'Plus Jakarta Sans',sans-serif; min-width:180px;">
           <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
             <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:${isDried ? '#b91c1c' : '#15803d'}; background:${isDried ? '#fef2f2' : '#f0fdf4'}; padding:2px 6px; border-radius:4px; border:1px solid ${isDried ? '#fecaca' : '#bbf7d0'};">
-              ${isDried ? 'Dried Source' : 'Active Spring'}
+              ${isDried ? 'Recorded dried' : 'Recorded active'}
             </span>
-            <span style="font-size:11px; color:#64748b; font-family:monospace;">${elev}m</span>
+            <span style="font-size:11px; color:#64748b; font-family:monospace;">${elev} m</span>
           </div>
-          <div style="font-weight:600; font-size:13px; color:#0f172a; margin-bottom:4px;">${muni}</div>
-          <div style="font-size:12px; color:#475569; margin-bottom:2px;">Type: <span style="color:#0f172a;">${type || 'Spring'}</span></div>
+          <div style="font-weight:600; font-size:13px; color:#0f172a; margin-bottom:4px;">${muni}, recorded ward ${ward}</div>
+          <div style="font-size:12px; color:#475569; margin-bottom:2px;">Type: <span style="color:#0f172a;">${type}</span></div>
           <div style="font-size:11px; color:#94a3b8; font-family:monospace; margin-top:4px;">${lat.toFixed(4)}°N, ${lon.toFixed(4)}°E</div>
         </div>
       `, {
@@ -277,22 +298,33 @@ export default function Map({
 
       {/* Cartographic Legend */}
       <div className="map-legend glass-panel">
-        <div className="legend-title">Cartographic Legend</div>
-        
+        <div className="legend-title">Legend</div>
+
         <div className="legend-section">
-          <div className="legend-subtitle">Spring Status ({data?.totalSprings?.toLocaleString() || 5689})</div>
+          <div className="legend-subtitle">Recorded condition ({data.totalSources.toLocaleString()} springs and ponds)</div>
           <div className="legend-row">
             <span className="legend-symbol active-symbol"></span>
-            <span className="legend-label">Active Spring ({((100 - (data?.dryingRate || 26.7))).toFixed(1)}%)</span>
+            <span className="legend-label">Active ({(100 - data.dryingRate).toFixed(1)}%)</span>
           </div>
           <div className="legend-row">
             <span className="legend-symbol dried-symbol"></span>
-            <span className="legend-label">Dried Spring ({data?.dryingRate || 26.7}%)</span>
+            <span className="legend-label">Dried ({data.dryingRate}%)</span>
           </div>
         </div>
 
+        {showWards && (
+          <div className="legend-section">
+            <div className="legend-subtitle">Recorded ward sources inside polygon</div>
+            <div className="choropleth-gradient">
+              <div className="choro-step" style={{ background: '#fcd9a1' }}>&lt;50%</div>
+              <div className="choro-step" style={{ background: '#dbeafe' }}>50–80%</div>
+              <div className="choro-step" style={{ background: '#93c5fd' }}>&ge;80%</div>
+            </div>
+          </div>
+        )}
+
         <div className="legend-section">
-          <div className="legend-subtitle">Palika Desiccation Rate</div>
+          <div className="legend-subtitle">Palika share recorded as dried</div>
           <div className="choropleth-gradient">
             <div className="choro-step" style={{ background: '#d1fae5' }}>&lt;15%</div>
             <div className="choro-step" style={{ background: '#fef3c7' }}>15–25%</div>
@@ -301,12 +333,12 @@ export default function Map({
           </div>
           <div className="legend-row unsurveyed-row">
             <span className="legend-symbol unsurveyed-symbol"></span>
-            <span className="legend-label">Unsurveyed (6 Palikas)</span>
+            <span className="legend-label">Not in the inventory (6 palikas)</span>
           </div>
         </div>
 
         <div className="legend-footer">
-          <div>Data: <strong>ICIMOD</strong> Field Inventory</div>
+          <div>Data: <strong>ICIMOD</strong> (CC BY 4.0)</div>
           <div>Analysis: <a href="https://noesisframeworks.com" target="_blank" rel="noopener noreferrer" style={{ color: '#2563eb', textDecoration: 'none', fontWeight: 600 }}>Noesis Frameworks</a></div>
         </div>
       </div>
